@@ -1,27 +1,28 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# frontend
-# dependencies
-frontend/node_modules
-frontend/.pnp
-frontend/.pnp.js
-
-# testing
-frontend/coverage
-
-# production
-frontend/build
-
-# misc
-frontend/.DS_Store
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
-
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-
-# backend
+# Backend
 backend/node_modules
+
+# Fronted
+# Logs
+fronted/logs
+fronted/*.log
+fronted/npm-debug.log*
+fronted/yarn-debug.log*
+fronted/yarn-error.log*
+fronted/pnpm-debug.log*
+fronted/lerna-debug.log*
+
+fronted/node_modules
+fronted/dist
+fronted/dist-ssr
+fronted/*.local
+
+# Editor directories and files
+fronted/.vscode/*
+fronted/!.vscode/extensions.json
+fronted/.idea
+fronted/.DS_Store
+fronted/*.suo
+fronted/*.ntvs*
+fronted/*.njsproj
+fronted/*.sln
+fronted/*.sw?
