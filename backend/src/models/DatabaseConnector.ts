@@ -1,15 +1,19 @@
-import mongoose, { ConnectOptions } from "mongoose";
+import mongoose from "mongoose";
+import logger from "../utils/logger.js";
+import environment from "../utils/environment.js";
 
-export async function loadDatabase(ip: string, port: string) {
-	await mongoose
-		.connect(`mongodb://${ip}:${port}/hotel`, {
-			useUnifiedTopology: true,
-			useNewUrlParser: true,
-		} as ConnectOptions)
+/**
+ * Connect to the database. The connection is done asynchronously.
+ */
+export function loadDatabase() {
+	const host = environment.db.host;
+	const port = environment.db.port;
+	mongoose
+		.connect(`mongodb://${host}:${port}/`)
 		.then((res) => {
-			console.log("[server]: Connected to the Hotel's Database");
+			logger.info("Connected to the Hotel's Database");
 		})
 		.catch((err) => {
-			console.log(`[server]: Database connection error occured - err`);
+			logger.error(`Database connection error occured - ${err}`);
 		});
 }
