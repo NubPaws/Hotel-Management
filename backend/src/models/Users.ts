@@ -3,9 +3,14 @@ import environment from '../utils/environment.js';
 import logger from '../utils/logger.js';
 import mongoose, { Schema } from 'mongoose';
 
+export class UserDoesNotExistError extends Error {}
+export class CreatorDoesNotExistError extends Error {}
+export class CreatorIsNotAdminError extends Error {}
+export class JwtTokenIsNotValidError extends Error {}
+
 export enum UserRole {
-	Admin = "admin",
-	User = "user",
+	Admin,
+	User,
 }
 
 interface UserPayload {
@@ -13,15 +18,26 @@ interface UserPayload {
 	pass: string,
 }
 
+interface User {
+	user: string,
+	pass: string,
+	role: UserRole,
+	token: string,
+}
+
 // MongoDB user schema.
-const userSchema = new Schema({
+const userSchema = new Schema<User>({
 	user: String,
 	pass: String,
-	role: String,
+	role: {
+		type: Number,
+		enum: Object.values(UserRole),
+		default: UserRole.User,
+	},
 	token: String,
 });
 // Creating the user model.
-const User = mongoose.model("User", userSchema);
+const UserModel = mongoose.model<User>("User", userSchema);
 
 function jwtValidate(token: string): JwtPayload | null {
 	try {
@@ -35,10 +51,10 @@ function jwtValidate(token: string): JwtPayload | null {
 	return null;
 }
 
-async function authenticate(username: string, password: string): Promise<string | null> {
-	const user = await User.findOne({ user: username, pass: password });
+async function authenticate(username: string, password: string): Promise<string> {
+	const user = await UserModel.findOne({ user: username, pass: password });
 	if (!user) {
-		return null;
+		throw new UserDoesNotExistError();
 	}
 	return user.token as string;
 }
@@ -47,14 +63,17 @@ async function authenticate(username: string, password: string): Promise<string 
  * @returns The JWT Token that was created if a user has been created.
  * Returns null if there was an error in the user creation.
  */
-async function create(username: string, password: string, creatorToken: string) {
+async function create(username: string, password: string, creatorToken: string): Promise<string> {
 	if (!jwtValidate(creatorToken)) {
-		return null;
+		throw new JwtTokenIsNotValidError();
 	}
 	
-	const creator = await User.findOne({ token: creatorToken });
-	if (!creator || creator.role !== UserRole.Admin) {
-		return null;
+	const creator = await UserModel.findOne({ token: creatorToken });
+	if (!creator) {
+		throw new CreatorDoesNotExistError();
+	}
+	if (creator.role !== UserRole.Admin) {
+		throw new CreatorIsNotAdminError();
 	}
 	
 	// The user is an admin so they can create a new user.
@@ -63,7 +82,7 @@ async function create(username: string, password: string, creatorToken: string) 
 		pass: password,
 	};
 	const token = jwt.sign(payload, environment.jwtSecret);
-	await User.create({
+	await UserModel.create({
 		user: username,
 		pass: password,
 		role: UserRole.User,
@@ -73,7 +92,7 @@ async function create(username: string, password: string, creatorToken: string) 
 	return token;
 }
 
-export const UserModel = {
+export const Users = {
 	create,
 	authenticate,
 };
