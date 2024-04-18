@@ -1,29 +1,38 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import environment from '../utils/environment.js';
 import logger from '../utils/logger.js';
 import mongoose, { Schema } from 'mongoose';
 
-enum Role {
+export enum UserRole {
 	Admin = "admin",
 	User = "user",
 }
 
+interface UserPayload {
+	user: string,
+	pass: string,
+}
+
+// MongoDB user schema.
 const userSchema = new Schema({
 	user: String,
 	pass: String,
 	role: String,
 	token: String,
 });
-
+// Creating the user model.
 const User = mongoose.model("User", userSchema);
 
-function jwtValidate(token: string): string | jwt.JwtPayload | null {
+function jwtValidate(token: string): JwtPayload | null {
 	try {
-		return jwt.verify(token, environment.jwtSecret);
+		const decoded = jwt.verify(token, environment.jwtSecret);
+		if (typeof decoded !== "string") {
+			return decoded as UserPayload;
+		}
 	} catch (err) {
 		logger.error(`Failed to validate jwt token ${token}`);
-		return null;
 	}
+	return null;
 }
 
 async function authenticate(username: string, password: string): Promise<string | null> {
@@ -44,16 +53,20 @@ async function create(username: string, password: string, creatorToken: string) 
 	}
 	
 	const creator = await User.findOne({ token: creatorToken });
-	if (!creator || creator.role !== Role.Admin) {
+	if (!creator || creator.role !== UserRole.Admin) {
 		return null;
 	}
 	
-	// The user is an admin.
-	const token = jwt.sign({user: username, pass: password}, environment.jwtSecret);
+	// The user is an admin so they can create a new user.
+	const payload: UserPayload = {
+		user: username,
+		pass: password,
+	};
+	const token = jwt.sign(payload, environment.jwtSecret);
 	await User.create({
 		user: username,
 		pass: password,
-		role: Role.User,
+		role: UserRole.User,
 		token: token,
 	});
 	
