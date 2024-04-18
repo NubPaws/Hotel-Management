@@ -16,34 +16,55 @@ interface RoomType {
 	description: string,
 }
 
-const roomTypeSchema = new Schema<RoomType>({
-	code: String,
-	description: String,
-});
-
-const RoomTypeModel = mongoose.model<RoomType>("RoomTypeModel", roomTypeSchema);
+const RoomTypeModel = mongoose.model<RoomType>("RoomTypeModel",
+	new Schema<RoomType>({
+		code: {
+			type: String,
+			required: true,
+		},
+		description: {
+			type: String,
+			required: true,
+		}
+	})
+);
 
 interface Room {
 	id: number,
-	type: string,
+	typeRef: RoomType,
 	state: RoomState,
 	occupied: boolean,
 	reservation: string | null
 }
 
-const roomSchema = new Schema<Room>({
-	id: {type: Number, required: true},
-	type: Schema.ObjectId,
-	state: {
-		type: Number,
-		enum: Object.values(RoomState),
-		default: RoomState.Clean,
-	},
-	occupied: {type: Boolean, default: false},
-	reservation: {type: Schema.ObjectId, default: null},
-}, {id: false});
-
-const RoomModel = mongoose.model<Room>("RoomModel", roomSchema);
+const RoomModel = mongoose.model<Room>(
+	"RoomModel",
+	new Schema<Room>({
+		id: {
+			type: Number,
+			required: true,
+		},
+		typeRef: {
+			type: Schema.ObjectId,
+			ref: "RoomTypeModel",
+			required: true,
+		},
+		state: {
+			type: Number,
+			enum: Object.values(RoomState),
+			default: RoomState.Clean,
+		},
+		occupied: {
+			type: Boolean,
+			default: false
+		},
+		reservation: {
+			type: Schema.ObjectId,
+			default: null,
+			ref: "ReservationModel",
+		},
+	}, {id: false})
+);
 
 async function createType(code: string, description: string) {
 	if (await RoomTypeModel.exists({code: code}))
@@ -62,11 +83,19 @@ async function createRoom(num: number, typeCode: string) {
 	
 	await RoomModel.create({
 		id: num,
-		type: typeObj._id
+		typeRef: typeObj._id
 	});
 }
 
-export const Rooms = {
+async function removeRoom(num: number) {
+	if (!(await RoomModel.findById(num))) {
+		return;
+	}
+	await RoomModel.deleteOne({id: num});
+}
+
+export default {
 	createType,
 	createRoom,
+	removeRoom,
 };

@@ -8,14 +8,14 @@ export class CreatorDoesNotExistError extends Error {}
 export class CreatorIsNotAdminError extends Error {}
 export class JwtTokenIsNotValidError extends Error {}
 
-export enum UserRole {
-	Admin,
-	User,
-}
-
 interface UserPayload {
 	user: string,
 	pass: string,
+}
+
+export enum UserRole {
+	Admin,
+	User,
 }
 
 interface User {
@@ -25,19 +25,29 @@ interface User {
 	token: string,
 }
 
-// MongoDB user schema.
-const userSchema = new Schema<User>({
-	user: String,
-	pass: String,
-	role: {
-		type: Number,
-		enum: Object.values(UserRole),
-		default: UserRole.User,
-	},
-	token: String,
-});
 // Creating the user model.
-const UserModel = mongoose.model<User>("User", userSchema);
+const UserModel = mongoose.model<User>(
+	"UserModel",
+	new Schema<User>({
+		user: {
+			type: String,
+			required: true,
+		},
+		pass: {
+			type: String,
+			required: true,
+		},
+		role: {
+			type: Number,
+			enum: Object.values(UserRole),
+			default: UserRole.User,
+		},
+		token: {
+			type: String,
+			required: true,
+		},
+	})
+);
 
 function jwtValidate(token: string): JwtPayload | null {
 	try {
@@ -92,7 +102,8 @@ async function create(username: string, password: string, creatorToken: string):
 	return token;
 }
 
-export const Users = {
+export default {
+	jwtValidate,
 	create,
 	authenticate,
 };
