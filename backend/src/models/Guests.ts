@@ -55,10 +55,6 @@ async function addReservation(id: number, reservationId: any) {
 	});
 }
 
-async function removeReservation(id: number, reserveId: any) {
-	
-}
-
 export default {
 	create,
 	addReservation,
