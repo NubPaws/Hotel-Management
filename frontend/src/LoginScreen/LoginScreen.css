@@ -1,0 +1,51 @@
+.fieldsContainer {
+	background: white;
+	display: flex;
+	flex-direction: column;
+	width: 70vw;
+	min-width: 500px;
+	padding: 1.5rem;
+	margin: 1.5rem auto 0 auto;
+}
+
+.field {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.fieldLabel {
+	width: 200px;
+}
+
+.fieldInputContainer {
+	flex-grow: 1;
+	flex-direction: column;
+}
+
+.fieldInput {
+	width: 100%;
+	max-height: 26pt;
+	padding: 0.25rem;
+}
+
+.label {
+    height: 16px;
+    width: 288px;
+}
+
+.label .text-wrapper {
+    color: #000000;
+    font-family: "League Spartan-Medium", Helvetica;
+    font-size: 36px;
+    font-weight: 500;
+    height: 16px;
+    left: 100px;
+    letter-spacing: 0;
+    line-height: 16px;
+    position: relative;
+    text-align: center;
+    top: 10px;
+    white-space: nowrap;
+    width: 288px;
+}
