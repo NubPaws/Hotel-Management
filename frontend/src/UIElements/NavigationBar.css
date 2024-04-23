@@ -1,3 +1,12 @@
+.navigationContainer {
+	display: block;
+	flex-direction: column;
+	width: 70vw;
+	min-width: 500px;
+	padding: 1.5rem;
+	margin: 1.5rem auto 0 auto;
+}
+
 .navigation-button {
     background-color: #ffffff;
     border: 4px solid;
@@ -10,15 +19,13 @@
 .home-button {
     width: 120px;
     height: 49px;
-    position: relative;
-    left: 200px;
 }
 
 .settings-button {
     width: 144px;
     height: 49px;
     position: relative;
-    left: 900px;
+    left: 700px;
 }
 
 .logout-button {
@@ -26,7 +33,7 @@
     height: 49px;
     background-color: #f54d4d;
     position: relative;
-    left: 900px;
+    left: 700px;
 }
 
 .navigation-button .text {
