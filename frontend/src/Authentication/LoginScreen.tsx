@@ -1,13 +1,11 @@
 import { Input } from "../UIElements/Input"
 import { Button } from "../UIElements/Button"
-import "./LoginScreen.css"
+import { CenteredLabel } from "../UIElements/CenteredLabel"
 
 export function LoginScreen() {
     return (
       <>
-        <div className="label">
-          <div className="text-wrapper">Login</div>
-        </div>
+        <CenteredLabel labelName="Login" />
         <form className="fieldsContainer">
           <Input id="username" className="field" type="text" name="username"
                       placeholder="Username" errorMessageId="usernameErrorMessage">
