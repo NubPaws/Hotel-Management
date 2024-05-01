@@ -22,7 +22,6 @@ interface User {
 	user: string,
 	pass: string,
 	role: UserRole,
-	token: string,
 }
 
 // Creating the user model.
@@ -42,14 +41,10 @@ const UserModel = mongoose.model<User>(
 			enum: Object.values(UserRole),
 			default: UserRole.User,
 		},
-		token: {
-			type: String,
-			required: true,
-		},
 	})
 );
 
-function jwtValidate(token: string): JwtPayload | null {
+function jwtValidate(token: string): UserPayload | null {
 	try {
 		const decoded = jwt.verify(token, environment.jwtSecret);
 		if (typeof decoded !== "string") {
@@ -61,12 +56,16 @@ function jwtValidate(token: string): JwtPayload | null {
 	return null;
 }
 
-async function authenticate(username: string, password: string): Promise<string> {
-	const user = await UserModel.findOne({ user: username, pass: password });
+async function authenticate(token: string): Promise<User> {
+	const payload = jwtValidate(token);
+	if (!payload) {
+		throw new JwtTokenIsNotValidError();
+	}
+	const user = await UserModel.findOne({ user: payload.user, pass: payload.pass });
 	if (!user) {
 		throw new UserDoesNotExistError();
 	}
-	return user.token as string;
+	return user as User;
 }
 
 /**
@@ -78,7 +77,7 @@ async function create(username: string, password: string, creatorToken: string):
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	const creator = await UserModel.findOne({ token: creatorToken });
+	const creator = await authenticate(creatorToken);
 	if (!creator) {
 		throw new CreatorDoesNotExistError();
 	}

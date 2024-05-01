@@ -8,7 +8,7 @@ export interface Reservation {
 	guest: Guest,
 	reservationMade: Date,
 	startDate: Date,
-	dayCount: number,
+	nightCount: number,
 	prices: number[],
 	room: number,
 	cancelled: boolean,
@@ -30,7 +30,7 @@ const ReservationModel = mongoose.model<Reservation>(
 			type: Date,
 			required: true,
 		},
-		dayCount: {
+		nightCount: {
 			type: Number,
 			required: true,
 		},
@@ -56,12 +56,12 @@ function addDaysToDate(date: Date, days: number): Date {
 	return added;
 }
 
-async function create(guest: number, startDate: Date, dayCount: number, prices: number[]) {
+async function create(guest: number, startDate: Date, nightCount: number, prices: number[]) {
 	await ReservationModel.create({
 		guest,
 		reservationMade: new Date(),
 		startDate,
-		dayCount,
+		nightCount,
 		prices,
 	});
 }
@@ -73,7 +73,7 @@ async function getRoomReservation(roomNumber: number): Promise<number | null> {
 	for (let i = 0; i < rooms.length; i++) {
 		const room = rooms[i];
 		const startDate = room.startDate;
-		const endDate = addDaysToDate(startDate, room.dayCount);
+		const endDate = addDaysToDate(startDate, room.nightCount);
 		
 		if (startDate <= date && date <= endDate) {
 			return room.room;
