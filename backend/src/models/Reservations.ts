@@ -4,6 +4,13 @@ import { Guest } from "./Guests.js";
 export class ReservationNotFoundError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
 
+export enum ReservationState {
+	Pending,
+	Active,
+	Cancelled,
+	Passed,
+}
+
 export interface Reservation {
 	guest: Guest,
 	reservationMade: Date,
@@ -11,7 +18,7 @@ export interface Reservation {
 	nightCount: number,
 	prices: number[],
 	room: number,
-	cancelled: boolean,
+	state: ReservationState,
 }
 
 const ReservationModel = mongoose.model<Reservation>(
@@ -43,9 +50,10 @@ const ReservationModel = mongoose.model<Reservation>(
 			ref: "RoomModel",
 			default: -1,
 		},
-		cancelled: {
-			type: Boolean,
-			default: false,
+		state: {
+			type: Number,
+			values: Object.values(ReservationState),
+			default: ReservationState.Pending,
 		}
 	})
 );
