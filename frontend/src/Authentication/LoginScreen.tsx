@@ -1,4 +1,5 @@
 import { Input } from "../UIElements/Input"
+import { Button } from "../UIElements/Button"
 import "./LoginScreen.css"
 
 export function LoginScreen() {
@@ -16,9 +17,14 @@ export function LoginScreen() {
                     placeholder="Password" errorMessageId="passwordErrorMessage">
                     Password
           </Input>
-          <div>
-            <button type="submit">Login</button>
-          </div>
+          <Button
+                    className="fieldLabel"
+                    bgColor="white"
+                    textColor="black"
+                    borderWidth="1px"
+                    onClick={() => {}}>
+                    Login
+          </Button>
         </form>
       </>
     )
