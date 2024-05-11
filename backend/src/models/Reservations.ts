@@ -19,6 +19,8 @@ export interface Reservation {
 	prices: number[],
 	room: number,
 	state: ReservationState,
+	email: string,
+	phoneNumber: string,
 }
 
 const ReservationModel = mongoose.model<Reservation>(
@@ -54,6 +56,14 @@ const ReservationModel = mongoose.model<Reservation>(
 			type: Number,
 			values: Object.values(ReservationState),
 			default: ReservationState.Pending,
+		},
+		email: {
+			type: String,
+			required: true,
+		},
+		phoneNumber: {
+			type: String,
+			required: true,
 		}
 	})
 );
@@ -64,13 +74,15 @@ function addDaysToDate(date: Date, days: number): Date {
 	return added;
 }
 
-async function create(guest: number, startDate: Date, nightCount: number, prices: number[]) {
+async function create(guest: number, startDate: Date, nightCount: number, prices: number[], email: string, phoneNumber: string) {
 	await ReservationModel.create({
 		guest,
 		reservationMade: new Date(),
 		startDate,
 		nightCount,
 		prices,
+		email,
+		phoneNumber,
 	});
 }
 
@@ -106,6 +118,32 @@ async function setRoom(guest: number, reservationMade: Date, room: number) {
 	}, {
 		$set: {room: room}
 	})
+}
+
+async function setEmail(guest: number, reservationMade: Date, email: string) {
+	const reservationExists = await ReservationModel.exists({guest, reservationMade});
+	if (!reservationExists)
+		throw new ReservationNotFoundError();
+	
+	await ReservationModel.updateOne({
+		guest,
+		reservationMade,
+	}, {
+		$set: {email}
+	});
+}
+
+async function setPhoneNumber(guest: number, reservationMade: Date, phoneNumber: string) {
+	const reservationExists = await ReservationModel.exists({guest, reservationMade});
+	if (!reservationExists)
+		throw new ReservationNotFoundError();
+	
+	await ReservationModel.updateOne({
+		guest,
+		reservationMade,
+	}, {
+		$set: {phoneNumber}
+	});
 }
 
 async function getAllReservations(guest: number) {

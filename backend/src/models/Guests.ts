@@ -8,6 +8,7 @@ export interface Guest {
 	id: number,
 	fullName: string,
 	email: string,
+	phoneNumber: string,
 	reservations: Reservation[],
 }
 
@@ -26,6 +27,10 @@ const GuestModel = mongoose.model<Guest>(
 			type: String,
 			required: true,
 		},
+		phoneNumber: {
+			type: String,
+			required: true,
+		},
 		reservations: [{
 			type: Schema.ObjectId,
 			ref: "ReservationModel",
@@ -34,7 +39,7 @@ const GuestModel = mongoose.model<Guest>(
 	}, {id: false})
 );
 
-async function create(id: number, fullName: string, email: string) {
+async function create(id: number, fullName: string, email: string, phoneNumber: string) {
 	if (await GuestModel.exists({id}))
 		throw new GuestAlreadyExistsError();
 	
@@ -42,6 +47,7 @@ async function create(id: number, fullName: string, email: string) {
 		id,
 		fullName,
 		email,
+		phoneNumber,
 		reservations: [],
 	});
 }
@@ -73,9 +79,19 @@ async function changeName(id: number, fullName: string) {
 	});
 }
 
+async function changePhoneNumber(id: number, phoneNumber: string) {
+	if (!(await GuestModel.exists({id})))
+		throw new GuestDoesNotExistError();
+	
+	await GuestModel.updateOne({id}, {
+		$set: {phoneNumber}
+	});
+}
+
 export default {
 	create,
 	addReservation,
 	changeEmail,
 	changeName,
+	changePhoneNumber,
 }
