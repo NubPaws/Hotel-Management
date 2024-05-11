@@ -96,8 +96,8 @@ async function setRoom(guest: number, reservationMade: Date, room: number) {
 		throw new RoomIsAlreadyOccupiedAtThatTimeError();
 	}
 	
-	const reservation = await ReservationModel.findOne({guest, reservationMade});
-	if (!reservation)
+	const reservationExists = await ReservationModel.exists({guest, reservationMade});
+	if (!reservationExists)
 		throw new ReservationNotFoundError();
 	
 	await ReservationModel.updateOne({
@@ -108,6 +108,28 @@ async function setRoom(guest: number, reservationMade: Date, room: number) {
 	})
 }
 
+async function getAllReservations(guest: number) {
+	return await ReservationModel.find({guest});
+}
+
+async function getReservation(guest: number, reservationMade: Date) {
+	const reservation = await ReservationModel.findOne({guest, reservationMade});
+	if (!reservation)
+		throw new ReservationNotFoundError();
+	
+	return reservation;
+}
+
+async function getLastReservations(guest: number, count: number = 1) {
+	await ReservationModel.find({guest}, {}, {
+		sort: {"startDate": -1}, limit: count
+	});
+}
+
 export default {
 	create,
+	setRoom,
+	getAllReservations,
+	getReservation,
+	getLastReservations,
 }

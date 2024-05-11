@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { Reservation } from "./Reservations.js";
 
 export class GuestAlreadyExistsError extends Error {}
-export class GuestDoesNotexistError extends Error {}
+export class GuestDoesNotExistError extends Error {}
 
 export interface Guest {
 	id: number,
@@ -48,14 +48,34 @@ async function create(id: number, fullName: string, email: string) {
 
 async function addReservation(id: number, reservationId: any) {
 	if (!(await GuestModel.exists({id})))
-		throw new GuestDoesNotexistError();
+		throw new GuestDoesNotExistError();
 	
 	await GuestModel.updateOne({id}, {
 		$push: { reservations: reservationId }
 	});
 }
 
+async function changeEmail(id: number, email: string) {
+	if (!(await GuestModel.exists({id})))
+		throw new GuestDoesNotExistError();
+	
+	await GuestModel.updateOne({id}, {
+		$set: {email}
+	});
+}
+
+async function changeName(id: number, fullName: string) {
+	if (!(await GuestModel.exists({id})))
+		throw new GuestDoesNotExistError();
+	
+	await GuestModel.updateOne({id}, {
+		$set: {fullName}
+	});
+}
+
 export default {
 	create,
 	addReservation,
+	changeEmail,
+	changeName,
 }
