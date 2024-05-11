@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
 import { loadDatabase } from "./models/DatabaseConnector.js";
 import environment from "./utils/environment.js";
 import logger from "./utils/logger.js";
-import cors from "cors";
 import { TokensRouter } from "./controllers/Tokens.js";
+import SwaggerUI from 'swagger-ui-express';
+import SwaggerSpecs from "./swagger.js";
 
 const app = express();
 const port = environment.port;
@@ -35,6 +37,9 @@ app.get('/', (req: Request, res: Response)=>{
     res.status(200);
     res.send("Main page<br>Another line to test");
 });
+
+// Serve SwaggerUI.
+app.use("/api-docs", SwaggerUI.serve, SwaggerUI.setup(SwaggerSpecs));
 
 app.listen(port, () => {
     logger.info(`Server is running at http://localhost:${port}`);
