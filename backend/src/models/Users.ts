@@ -1,8 +1,9 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import environment from '../utils/environment.js';
 import logger from '../utils/logger.js';
 import mongoose, { Schema } from 'mongoose';
 
+export class InvalidUserCredentialsError extends Error {}
 export class UserDoesNotExistError extends Error {}
 export class CreatorDoesNotExistError extends Error {}
 export class CreatorIsNotAdminError extends Error {}
@@ -10,7 +11,6 @@ export class JwtTokenIsNotValidError extends Error {}
 
 interface UserPayload {
 	user: string,
-	pass: string,
 }
 
 export enum UserRole {
@@ -44,7 +44,24 @@ const UserModel = mongoose.model<User>(
 	})
 );
 
-function jwtValidate(token: string): UserPayload | null {
+/**
+ * @param username The username to load as the payload.
+ * @returns The jwt token of the payload or undefined if an error occured.
+ */
+function getJwtToken(username: string): string | undefined {
+	try {
+		return jwt.sign({username}, environment.jwtSecret);
+	} catch (err) {
+		console.log(err);
+	}
+	return undefined;
+}
+
+/**
+ * @param token The jwt token to get the payload from.
+ * @returns The payload stored in the jwt token or null if an error occured.
+ */
+function getJwtPayload(token: string): UserPayload | null {
 	try {
 		const decoded = jwt.verify(token, environment.jwtSecret);
 		if (typeof decoded !== "string") {
@@ -56,41 +73,58 @@ function jwtValidate(token: string): UserPayload | null {
 	return null;
 }
 
-async function authenticate(token: string): Promise<User> {
-	const payload = jwtValidate(token);
-	if (!payload) {
-		throw new JwtTokenIsNotValidError();
+/**
+ * @param username
+ * @param password
+ * @returns The token of the user if he does exist in the database with that password.
+ * @throws InvalidUserCredentialsError if the username doesn't exist or the password
+ * doesn't match.
+ */
+async function authenticate(username: string, password: string) {
+	const users = await UserModel.find({username});
+	if (users.length === 0) {
+		throw new InvalidUserCredentialsError();
 	}
-	const user = await UserModel.findOne({ user: payload.user, pass: payload.pass });
+	
+	const user = users[0].toObject();
+	if (user.pass !== password) {
+		throw new InvalidUserCredentialsError();
+	}
+	
+	return getJwtToken(username);
+}
+
+async function isAdmin(username: string): Promise<boolean> {
+	const user = await UserModel.findOne({username});
 	if (!user) {
-		throw new UserDoesNotExistError();
+		return false;
 	}
-	return user as User;
+	
+	return user.role === UserRole.Admin;
 }
 
 /**
  * @returns The JWT Token that was created if a user has been created.
  * Returns null if there was an error in the user creation.
  */
-async function create(username: string, password: string, creatorToken: string): Promise<string> {
-	if (!jwtValidate(creatorToken)) {
+async function createUser(username: string, password: string, creatorToken: string): Promise<string> {
+	if (!getJwtPayload(creatorToken)) {
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	const creator = await authenticate(creatorToken);
+	const creator = await getJwtPayload(creatorToken);
 	if (!creator) {
 		throw new CreatorDoesNotExistError();
 	}
-	if (creator.role !== UserRole.Admin) {
+	if (!(await isAdmin(creator.user))) {
 		throw new CreatorIsNotAdminError();
 	}
 	
 	// The user is an admin so they can create a new user.
 	const payload: UserPayload = {
 		user: username,
-		pass: password,
 	};
-	const token = jwt.sign(payload, environment.jwtSecret);
+	const token = getJwtToken(username) as string;
 	await UserModel.create({
 		user: username,
 		pass: password,
@@ -102,7 +136,8 @@ async function create(username: string, password: string, creatorToken: string):
 }
 
 export default {
-	jwtValidate,
-	create,
+	getJwtPayload,
 	authenticate,
+	createUser,
+	isAdmin,
 };
