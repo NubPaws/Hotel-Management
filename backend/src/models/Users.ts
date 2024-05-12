@@ -135,9 +135,19 @@ async function createUser(username: string, password: string, creatorToken: stri
 	return token;
 }
 
+async function isUser(jwtToken: string) {
+	const payload = getJwtPayload(jwtToken);
+	if (!payload) {
+		throw new JwtTokenIsNotValidError();
+	}
+	
+	return await UserModel.exists({user: payload.user});
+}
+
 export default {
 	getJwtPayload,
 	authenticate,
 	createUser,
 	isAdmin,
+	isUser,
 };
