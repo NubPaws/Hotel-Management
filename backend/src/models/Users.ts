@@ -135,6 +135,11 @@ async function createUser(username: string, password: string, creatorToken: stri
 	return token;
 }
 
+/**
+ * Given a jwt token, checks whether or not the user is part of the system.
+ * @param jwtToken
+ * @returns true whether the username exists, false otherwise.
+ */
 async function isUser(jwtToken: string) {
 	const payload = getJwtPayload(jwtToken);
 	if (!payload) {
