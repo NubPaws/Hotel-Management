@@ -4,10 +4,10 @@ export function NavigationBar() {
     return (
         <>
             <div className="navigationContainer">
-                <button className="navigation-button home-button">Home</button>
+                <button className="navigationButton homeButton">Home</button>
 
-                <button className="navigation-button settings-button">Settings</button>
-                <button className="navigation-button logout-button">Logout</button>
+                <button className="navigationButton settingsButton">Settings</button>
+                <button className="navigationButton logoutButton">Logout</button>
             </div>
         </>
     )

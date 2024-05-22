@@ -6,11 +6,11 @@ import { NavigationBar } from './UIElements/NavigationBar'
 function App() {
 
   return (
-    <>
+    <div className="appContainer">
       <NavigationBar />
       {/* <LoginScreen /> */}
       <ChangePassword />
-    </>
+    </div>
   )
 }
 
