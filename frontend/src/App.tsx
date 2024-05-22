@@ -2,6 +2,7 @@ import './App.css'
 import {LoginScreen} from './Authentication/LoginScreen'
 import { ChangePassword } from './Authentication/PasswordChange'
 import { NavigationBar } from './UIElements/NavigationBar'
+import { UserCreationScreen } from './Authentication/UserCreationScreen'
 
 function App() {
 
@@ -9,7 +10,8 @@ function App() {
     <div className="appContainer">
       <NavigationBar />
       {/* <LoginScreen /> */}
-      <ChangePassword />
+      {/* <ChangePassword /> */}
+      <UserCreationScreen />
     </div>
   )
 }
