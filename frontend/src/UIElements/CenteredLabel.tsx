@@ -2,8 +2,8 @@ import './CenteredLabel.css'
 
 export function CenteredLabel(props : {labelName: string}) {
     return (
-        <div className="label">
-            <div className="text-wrapper">{props.labelName}</div>
+        <div className="centeredLabel">
+            <span className="centeredLabelText">{props.labelName}</span>
         </div>
     )
 }
