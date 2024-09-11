@@ -2,7 +2,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 
 const options: swaggerJSDoc.OAS3Options = {
 	definition: {
-		openapi: "3.1.0",
+		openapi: "3.0.3",
 		info: {
 			title: "Hotel Management API",
 			version: "1.0.0",
