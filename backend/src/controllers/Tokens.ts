@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import Users from "../models/Users.js";
 import { dataValidate } from "./Validator.js";
+import logger from "../utils/logger.js";
 
 const router = Router();
 
@@ -31,7 +32,11 @@ router.post("/", async (req: Request, res: Response) => {
 	// Take the information that should be passed from the app.
 	const { username, password } = req.body;
 	
-	dataValidate({username, password}).respond(res);
+	const validation = dataValidate({username, password});
+	if (validation.status) {
+		validation.respond(res);
+		return;
+	}
 	
 	try {
 		// Get the token.

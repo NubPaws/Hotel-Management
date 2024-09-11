@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
 import environment from "../utils/environment.js";
+import Users from "./Users.js";
 
 /**
  * Connect to the database. The connection is done asynchronously.
  */
 export function loadDatabase() {
 	const host = environment.db.host;
-	const port = environment.db.port;
+	const port = environment.db.port; 
 	mongoose
 		.connect(`mongodb://${host}:${port}/`)
 		.then((res) => {

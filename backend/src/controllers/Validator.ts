@@ -31,7 +31,7 @@ export function isEmpty(thing: any): boolean {
  * @param res The item to send the error over if an error did occur.
  * @returns True if an error was generates and false otherwise.
  */
-export function dataValidate(items: Object) {
+export function dataValidate(items: Object): ValidationResponse {
 	const error = new Map<string, string>();
 	for (const key in items) {
 		if (isEmpty(items[key as keyof Object])) {
@@ -39,7 +39,11 @@ export function dataValidate(items: Object) {
 		}
 	}
 	if (Object.keys(error).length === 0) {
-		return {status: false, error: null, respond: (res: Response) => {}};
+		return {
+			status: false,
+			error: null,
+			respond: (res: Response) => {}
+		};
 	}
 	return {
 		status: true,

@@ -10,7 +10,7 @@ export class CreatorIsNotAdminError extends Error {}
 export class JwtTokenIsNotValidError extends Error {}
 
 export interface UserPayload {
-	user: string,
+	user: string;
 }
 
 export enum UserRole {
@@ -24,25 +24,62 @@ interface User extends Document {
 	role: UserRole,
 }
 
+const UserSchema = new Schema<User>({
+	user: {
+		type: String,
+		required: true,
+	},
+	pass: {
+		type: String,
+		required: true,
+	},
+	role: {
+		type: Number,
+		enum: Object.values(UserRole).filter(value => typeof value === "number"),
+		default: UserRole.User,
+	}
+});
+
 // Creating the user model.
-const UserModel = mongoose.model<User>(
-	"UserModel",
-	new Schema<User>({
-		user: {
-			type: String,
-			required: true,
-		},
-		pass: {
-			type: String,
-			required: true,
-		},
-		role: {
-			type: Number,
-			enum: Object.values(UserRole),
-			default: UserRole.User,
-		},
-	})
-);
+const UserModel = mongoose.model<User>("UserModel", UserSchema);
+
+async function isAdminUserExists() {
+	return await UserModel.exists({role: UserRole.Admin }).exec() !== null;
+}
+
+/**
+ * Creates default user called admin with username and password being admin.
+ * This mustn't be kept in production and must be changed when deploying the
+ * user on other machines.
+ */
+async function initUsersModel(): Promise<boolean> {
+	try {
+		if (await isAdminUserExists()) {
+			logger.info("Admin user exists.");
+			logger.info("Skipping creation of default admin user.");
+			return true;
+		}
+		
+		logger.warn("Admin user doesn't exists.")
+		logger.info("Starting creation of default admin user.");
+		await UserModel.create({
+			user: "admin",
+			pass: "admin",
+			role: UserRole.Admin,
+		});
+		
+		if (await isAdminUserExists()) {
+			logger.info("Default admin user created");
+			return true;
+		}
+	} catch (err) {
+		logger.error("Failed to create default admin user.");
+		logger.error("Note there are no admin users in the system.");
+		logger.error("Something has gone terribly wrong!");
+		logger.error(`${err}`);
+	}
+	return false;
+}
 
 /**
  * @param username The username to load as the payload.
@@ -50,7 +87,7 @@ const UserModel = mongoose.model<User>(
  */
 function getJwtToken(username: string): string | undefined {
 	try {
-		return jwt.sign({username}, environment.jwtSecret);
+		return jwt.sign({user: username}, environment.jwtSecret);
 	} catch (err) {
 		console.log(err);
 	}
@@ -81,7 +118,7 @@ function getJwtPayload(token: string): UserPayload | null {
  * doesn't match.
  */
 async function authenticate(username: string, password: string) {
-	const users = await UserModel.find({username});
+	const users = await UserModel.find({user: username}).exec();
 	if (users.length === 0) {
 		throw new InvalidUserCredentialsError();
 	}
@@ -95,7 +132,7 @@ async function authenticate(username: string, password: string) {
 }
 
 async function isAdmin(username: string): Promise<boolean> {
-	const user = await UserModel.findOne({username});
+	const user = await UserModel.findOne({user: username});
 	if (!user) {
 		return false;
 	}
@@ -125,11 +162,11 @@ async function createUser(username: string, password: string, creatorToken: stri
 		user: username,
 	};
 	const token = getJwtToken(username) as string;
+	
 	await UserModel.create({
 		user: username,
 		pass: password,
 		role: UserRole.User,
-		token: token,
 	});
 	
 	return token;
@@ -154,6 +191,7 @@ async function getUser(username: string): Promise<User | null> {
 }
 
 export default {
+	initUsersModel,
 	getJwtPayload,
 	authenticate,
 	createUser,
