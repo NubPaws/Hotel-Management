@@ -6,6 +6,7 @@ import logger from "./utils/logger.js";
 import { TokensRouter } from "./controllers/Tokens.js";
 import SwaggerUI from 'swagger-ui-express';
 import SwaggerSpecs from "./swagger.js";
+import { UsersRouter } from "./controllers/Users.js";
 
 const app = express();
 const port = environment.port;
@@ -32,6 +33,7 @@ app.use((req, res, next) => {
 
 // Load the routes.
 app.use("/api/Tokens", TokensRouter);
+app.use("/api/Users", UsersRouter);
 
 app.get('/', (req: Request, res: Response)=>{
     res.status(200);

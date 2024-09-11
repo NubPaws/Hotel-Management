@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import Users from "../models/Users.js";
 import { dataValidate } from "./Validator.js";
 
@@ -27,7 +27,7 @@ const router = Router();
  *       '404':
  *         description: User was not found.
  */
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", async (req: Request, res: Response) => {
 	// Take the information that should be passed from the app.
 	const { username, password } = req.body;
 	
@@ -39,7 +39,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 		// Send the token to the user.
 		res.send(token);
 	} catch (err) {
-		next(err);
+		res.status(404).send("User was not found");
 	}
 });
 

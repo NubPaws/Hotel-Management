@@ -9,7 +9,7 @@ export class CreatorDoesNotExistError extends Error {}
 export class CreatorIsNotAdminError extends Error {}
 export class JwtTokenIsNotValidError extends Error {}
 
-interface UserPayload {
+export interface UserPayload {
 	user: string,
 }
 
@@ -18,7 +18,7 @@ export enum UserRole {
 	User,
 }
 
-interface User {
+interface User extends Document {
 	user: string,
 	pass: string,
 	role: UserRole,
@@ -146,7 +146,11 @@ async function isUser(jwtToken: string) {
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	return await UserModel.exists({user: payload.user});
+	return UserModel.exists({user: payload.user}).exec();
+}
+
+async function getUser(username: string): Promise<User | null> {
+	return UserModel.findOne({user: username}).exec();
 }
 
 export default {
@@ -155,4 +159,5 @@ export default {
 	createUser,
 	isAdmin,
 	isUser,
+	getUser,
 };

@@ -10,7 +10,8 @@ const SwaggerSpecs = swaggerJSDoc({
 		}
 	},
 	apis: [
-		"src/controllers/Tokens.ts"
+		"src/controllers/Tokens.ts",
+		"src/controllers/Users.ts",
 	],
 });
 
