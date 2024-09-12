@@ -7,6 +7,7 @@ import { TokensRouter } from "./controllers/Tokens.js";
 import SwaggerUI from 'swagger-ui-express';
 import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
 import { UsersRouter } from "./controllers/Users.js";
+import ErrorHandler from "./controllers/ErrorHandler.js";
 
 const app = express();
 const port = environment.port;
@@ -19,10 +20,8 @@ app.use(cors());
 
 // Middleware to handle content-type: application/json.
 app.use(express.json());
-
 // Middleware to handle content-type: text/plain.
 app.use(express.text({ type: "text/*" }));
-
 // Middleware to handle anything that wasn't catched by the previous middlewares.
 app.use((req, res, next) => {
     const contentType = req.headers["content-type"];
@@ -47,6 +46,9 @@ app.use((req, res, next) => {
 // Load the routes.
 app.use("/api/Tokens", TokensRouter);
 app.use("/api/Users", UsersRouter);
+
+// Erro handling middleware.
+app.use(ErrorHandler.users);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200);

@@ -1,7 +1,12 @@
-import { Request, Response, Router } from "express";
-import UserModel, { UserPayload, UserRole } from "../models/Users.js";
+import { NextFunction, Request, Response, Router } from "express";
+import UserModel, { InvalidUserCredentialsError, UserPayload, UserRole } from "../models/Users.js";
+import { dataValidate } from "./Validator.js";
 
 const router = Router();
+
+function tokenRequired(res: Response) {
+	return res.status(403).send("Token required");
+}
 
 /**
  * @swagger
@@ -18,7 +23,7 @@ const router = Router();
  *           This endpoint always returns a 200 error unless an internal server
  *           has occured.
  *     tags:
- *       - User
+ *       - Users
  */
 router.get("/initUsers", async (req: Request, res: Response) => {
 	const created = await UserModel.initUsersModel();
@@ -27,7 +32,7 @@ router.get("/initUsers", async (req: Request, res: Response) => {
 	} else {
 		res.send("Failed initializeding user model.");
 	}
-})
+});
 
 /**
  * @swagger
@@ -69,32 +74,85 @@ router.get("/initUsers", async (req: Request, res: Response) => {
  *       404:
  *         description: User not found.
  *     tags:
- *       - User
+ *       - Users
  */
-router.get("/:username", async (req: Request, res: Response) => {
+router.get("/:username", async (req: Request, res: Response, next: NextFunction) => {
 	if (!req.headers.authorization) {
-		res.status(403).send("Token required");
-		return;
+		return tokenRequired(res);
 	}
 	
 	const token = req.headers.authorization.split(" ")[1] as string;
-	const payload = UserModel.getJwtPayload(token);
-	if (!payload) {
-		return res.status(403).send("Invalid token.");
+	try {
+		const payload = UserModel.getJwtPayload(token) ;
+		const requestingUser = await UserModel.getUser(payload.user);
+		
+		if (req.params.username === requestingUser.user || requestingUser.role == UserRole.Admin) {
+			const user = await UserModel.getUser(req.params.username);
+			res.json(user);
+		}
+		throw new InvalidUserCredentialsError();
+	} catch (err) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Users/create:
+ *   post:
+ *     summary: Creates a user and returns a JWT token.
+ *     description: This endpoint allows you to create a new user by providing a username,
+ *       password, and an authorization token. It returns a JWT token upon success.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: username
+ *               password:
+ *                 type: string
+ *                 example: password
+ *     responses:
+ *       200:
+ *         description: User created successfully and returns JWT token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: jwtToken
+ */ 
+router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
+	if (!req.headers.authorization) {
+		return tokenRequired(res);
 	}
 	
-	const requestingUser = await UserModel.getUser(payload.user);
-	if (!requestingUser) {
-		return res.status(401).send("Requesting user token is invalid.");
+	const token = req.headers.authorization.split(" ")[1] as string;
+	
+	const { username, password } = req.body;
+	const validation = dataValidate({username, password});
+	
+	if (!validation.status) {
+		return validation.respond(res);
 	}
 	
-	if (req.params.username === requestingUser.user || requestingUser.role == UserRole.Admin) {
-		const user = await UserModel.getUser(req.params.username);
-		res.json(user);
-	} else {
-		res.status(401).send("Requesting user is unauthorized.");
+	try {
+		const jwtToken = await UserModel.createUser(username, password, token);
+		
+		res.send(jwtToken);
+	} catch (err) {
+		next(err);
 	}
-	
 });
 
 export const UsersRouter = router;

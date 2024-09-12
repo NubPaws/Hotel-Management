@@ -1,7 +1,6 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import Users from "../models/Users.js";
 import { dataValidate } from "./Validator.js";
-import logger from "../utils/logger.js";
 
 const router = Router();
 
@@ -27,15 +26,16 @@ const router = Router();
  *         description: JWT token for the user to authenticate with in front of the api.
  *       '404':
  *         description: User was not found.
+ *     tags:
+ *       - Tokens
  */
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	// Take the information that should be passed from the app.
 	const { username, password } = req.body;
 	
 	const validation = dataValidate({username, password});
 	if (validation.status) {
-		validation.respond(res);
-		return;
+		return validation.respond(res);
 	}
 	
 	try {
@@ -44,7 +44,7 @@ router.post("/", async (req: Request, res: Response) => {
 		// Send the token to the user.
 		res.send(token);
 	} catch (err) {
-		res.status(404).send("User was not found");
+		next(err);
 	}
 });
 

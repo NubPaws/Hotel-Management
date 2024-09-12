@@ -8,6 +8,7 @@ export class UserDoesNotExistError extends Error {}
 export class CreatorDoesNotExistError extends Error {}
 export class CreatorIsNotAdminError extends Error {}
 export class JwtTokenIsNotValidError extends Error {}
+export class FailedToSignJwtTokenError extends Error {}
 
 export interface UserPayload {
 	user: string;
@@ -83,31 +84,34 @@ async function initUsersModel(): Promise<boolean> {
 
 /**
  * @param username The username to load as the payload.
- * @returns The jwt token of the payload or undefined if an error occured.
+ * @returns The jwt token of the payload.
+ * @throws FailedToSignJwtTokenError if the signing of the jwt token failed.
  */
-function getJwtToken(username: string): string | undefined {
+function getJwtToken(username: string): string {
 	try {
 		return jwt.sign({user: username}, environment.jwtSecret);
 	} catch (err) {
-		console.log(err);
+		logger.error(`${err}`);
+		throw new FailedToSignJwtTokenError();
 	}
-	return undefined;
 }
 
 /**
  * @param token The jwt token to get the payload from.
- * @returns The payload stored in the jwt token or null if an error occured.
+ * @returns The payload stored in the jwt token.
+ * @throws JwtTokenIsNotValidError if the token is not valid.
  */
-function getJwtPayload(token: string): UserPayload | null {
+function getJwtPayload(token: string): UserPayload {
 	try {
 		const decoded = jwt.verify(token, environment.jwtSecret);
-		if (typeof decoded !== "string") {
-			return decoded as UserPayload;
+		if (typeof decoded === "string") {
+			return { user: decoded };
 		}
+		return decoded as UserPayload;
 	} catch (err) {
 		logger.error(`Failed to validate jwt token ${token}`);
+		throw new JwtTokenIsNotValidError();
 	}
-	return null;
 }
 
 /**
@@ -142,7 +146,9 @@ async function isAdmin(username: string): Promise<boolean> {
 
 /**
  * @returns The JWT Token that was created if a user has been created.
- * Returns null if there was an error in the user creation.
+ * @throws JwtTokenIsNotValidError
+ * @throws CreatorDoesNotExistError
+ * @throws CreatorIsNotAdminError
  */
 async function createUser(username: string, password: string, creatorToken: string): Promise<string> {
 	if (!getJwtPayload(creatorToken)) {
@@ -186,8 +192,19 @@ async function isUser(jwtToken: string) {
 	return UserModel.exists({user: payload.user}).exec();
 }
 
-async function getUser(username: string): Promise<User | null> {
-	return UserModel.findOne({user: username}).exec();
+/**
+ * Returns a user based on their username.
+ * @param username the username to fetch.
+ * @returns User object.
+ * @throws UserDoesNotExistsError if the username isn't in the database.
+ */
+async function getUser(username: string): Promise<User> {
+	const user = await UserModel.findOne({user: username}).exec();
+	if (!user) {
+		logger.warn(`User ${username} doesn't exists in the system.`);
+		throw new UserDoesNotExistError();
+	}
+	return user as User;
 }
 
 export default {

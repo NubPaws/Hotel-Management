@@ -1,9 +1,10 @@
 import { Response } from "express";
+import { ErrorCode } from "./ErrorHandler.js";
 
 interface ValidationResponse {
 	status: boolean,
 	error: Map<string, string> | null,
-	respond: (res: Response) => void;
+	respond: (res: Response) => Response;
 };
 
 /**
@@ -42,14 +43,14 @@ export function dataValidate(items: Object): ValidationResponse {
 		return {
 			status: false,
 			error: null,
-			respond: (res: Response) => {}
+			respond: (res: Response) => { return res; }
 		};
 	}
 	return {
 		status: true,
 		error,
 		respond: (res: Response) => {
-			res.status(400).json(Object.fromEntries(error))
+			return res.status(ErrorCode.BadRequest).json(Object.fromEntries(error))
 		}
 	};
 }
