@@ -21,10 +21,10 @@ const router = Router();
  *               password:
  *                 type: string
  *     responses:
- *       '200':
+ *       200:
  *         type: string
  *         description: JWT token for the user to authenticate with in front of the api.
- *       '404':
+ *       404:
  *         description: User was not found.
  *     tags:
  *       - Tokens

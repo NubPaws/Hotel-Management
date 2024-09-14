@@ -150,7 +150,7 @@ async function isAdmin(username: string): Promise<boolean> {
  * @throws CreatorDoesNotExistError
  * @throws CreatorIsNotAdminError
  */
-async function createUser(username: string, password: string, creatorToken: string): Promise<string> {
+async function createUser(username: string, password: string, role: UserRole, creatorToken: string): Promise<string> {
 	if (!getJwtPayload(creatorToken)) {
 		throw new JwtTokenIsNotValidError();
 	}
@@ -172,7 +172,7 @@ async function createUser(username: string, password: string, creatorToken: stri
 	await UserModel.create({
 		user: username,
 		pass: password,
-		role: UserRole.User,
+		role: role,
 	});
 	
 	return token;
@@ -207,6 +207,42 @@ async function getUser(username: string): Promise<User> {
 	return user as User;
 }
 
+/**
+ * Change a user's password.
+ * @param username
+ * @param newPassword
+ * @throws UserDoesNotExistError
+ */
+async function changePassword(username: string, newPassword: string) {
+	const user = await UserModel.findOne({ user: username });
+	
+	if (!user) {
+		throw new UserDoesNotExistError();
+	}
+	
+	user.pass = newPassword;
+	
+	await user.save();
+}
+
+/**
+ * Change the user's role.
+ * @param username
+ * @param newRole
+ * @throws UserDoesNotExistError
+ */
+async function changeRole(username: string, newRole: UserRole) {
+	const user = await UserModel.findOne({ user: username });
+	
+	if (!user) {
+		throw new UserDoesNotExistError();
+	}
+	
+	user.role = newRole;
+	
+	await user.save();
+}
+
 export default {
 	initUsersModel,
 	getJwtPayload,
@@ -215,4 +251,6 @@ export default {
 	isAdmin,
 	isUser,
 	getUser,
+	changePassword,
+	changeRole,
 };
