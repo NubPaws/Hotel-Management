@@ -1,7 +1,11 @@
-import mongoose, { ObjectId, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import Reservations, { ReservationNotFoundError } from "./Reservations.js";
 
-export class RoomDoesNotExistError extends Error {}
+export class RoomDoesNotExistError extends Error {
+	constructor(num: number) {
+		super(`Room #${num} does not exist.`)
+	}
+}
 export class RoomNumberAlreadyExistsError extends Error {}
 export class RoomTypeDoesNotExistError extends Error {
 	constructor(rt: string) {
@@ -9,6 +13,11 @@ export class RoomTypeDoesNotExistError extends Error {
 	}
 }
 export class RoomTypeAlreadyExistsError extends Error {}
+export class MissingReservationIdError extends Error {
+	constructor() {
+		super("Must provide reservation id when trying to make a room occupied.");
+	}
+}
 
 export enum RoomState {
 	Clean = "Clean",
@@ -17,9 +26,17 @@ export enum RoomState {
 	OutOfOrder = "OutOfOrder",
 }
 
-interface RoomType {
+interface RoomType extends Document {
 	code: string,
 	description: string,
+}
+
+interface Room extends Document {
+	id: number,
+	typeRef: mongoose.Types.ObjectId,
+	state: RoomState,
+	occupied: boolean,
+	reservation: mongoose.Types.ObjectId | null,
 }
 
 const RoomTypeModel = mongoose.model<RoomType>(
@@ -36,14 +53,6 @@ const RoomTypeModel = mongoose.model<RoomType>(
 		}
 	})
 );
-
-interface Room {
-	id: number,
-	typeRef: mongoose.Types.ObjectId,
-	state: RoomState,
-	occupied: boolean,
-	reservation: mongoose.Types.ObjectId | null,
-}
 
 const RoomModel = mongoose.model<Room>(
 	"RoomModel",
@@ -72,20 +81,35 @@ const RoomModel = mongoose.model<Room>(
 			default: null,
 			ref: "ReservationModel",
 		},
-	}, {_id: false})
+	}, { _id: false })
 );
 
+/**
+ * @param num The room number to get.
+ * @returns Room
+ * @throws RoomDoesNotExistError
+ */
+async function findRoomById(num: number) {
+	const room = await RoomModel.findOne({ id: num });
+	if (!room) {
+		throw new RoomDoesNotExistError(num);
+	}
+	
+	return room;
+}
+
 async function createType(code: string, description: string) {
-	if (await RoomTypeModel.exists({ code }))
+	if (await RoomTypeModel.exists({ code })) {
 		throw new RoomTypeAlreadyExistsError();
+	}
 	
 	await RoomTypeModel.create({ code, description });
 }
 
 async function createRoom(num: number, code: string) {
-	if (await RoomModel.exists({ id: num })) {
-		throw new RoomNumberAlreadyExistsError();
-	}
+	// This will throw an error if there isn't a room like that.
+	// We'll just ignore the return value.
+	await findRoomById(num);
 	
 	const roomType = await RoomTypeModel.findOne({ code });
 	if (!roomType) {
@@ -99,10 +123,7 @@ async function createRoom(num: number, code: string) {
 }
 
 async function removeRoom(num: number) {
-	const room = await RoomModel.findOne({ id: num });
-	if (!room) {
-		throw new RoomDoesNotExistError();
-	}
+	await findRoomById(num);
 	await RoomModel.deleteOne({ id: num });
 }
 
@@ -124,8 +145,6 @@ async function removeType(typeCode: string, newTypeCode: string) {
 		throw new RoomTypeDoesNotExistError(newTypeCode);
 	}
 	
-	const rooms = await RoomModel.find({ typeRef: roomType._id });
-	
 	// Update all rooms that have the old type to the new type.
 	await RoomModel.updateMany(
 		{ typeRef: roomType._id },
@@ -136,24 +155,31 @@ async function removeType(typeCode: string, newTypeCode: string) {
 }
 
 async function changeRoomState(num: number, state: RoomState) {
-	const room = await RoomModel.findOne({ id: num });
-	if (!room) {
-		throw new RoomDoesNotExistError();
-	}
+	const room = await findRoomById(num);
 	
 	room.state = state;
 	await room.save();
 }
 
-async function isOccupied(num: number) {
-	const room = await RoomModel.findOne({ id: num });
-	if (!room) {
-		throw new RoomDoesNotExistError();
-	}
+/**
+ * @param num room number
+ * @returns whether the room is occupied or not.
+ * @throws RoomDoesNotExistError
+ */
+async function isRoomOccupied(num: number): Promise<boolean> {
+	const room = await findRoomById(num);
 	return room.occupied;
 }
 
-async function setOccupied(num: number, occupied: boolean, reservationId?: string) {
+/**
+ * @param num room number to set occupation to.
+ * @param occupied true or false.
+ * @param reservationId if occupied is true, then this needs to hold the value of the
+ * reservation the the room currently has. Otherwise, this can stay undefined.
+ * @throws RoomDoesNotExistError
+ * @throws MissingReservationIdError
+ */
+async function setRoomOccupation(num: number, occupied: boolean, reservationId?: string) {
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(
@@ -163,7 +189,7 @@ async function setOccupied(num: number, occupied: boolean, reservationId?: strin
 		);
 		
 		if (!room) {
-			throw new RoomDoesNotExistError();
+			throw new RoomDoesNotExistError(num);
 		}
 		
 		return;
@@ -181,30 +207,36 @@ async function setOccupied(num: number, occupied: boolean, reservationId?: strin
 	
 	const room = await RoomModel.findOneAndUpdate(
 		{ id: num },
-		{ $set: { occupied: true, reservation: new mongoose.Types.ObjectId(reservationId) } },
+		{ $set: {
+			occupied: true,
+			reservation: new mongoose.Types.ObjectId(reservationId),
+		} },
 		{ new: true }
 	);
 	
 	if (!room) {
-		throw new RoomDoesNotExistError();
+		throw new RoomDoesNotExistError(num);
 	}
 }
 
-async function getReservation(num: number) {
-	const room = await RoomModel.findOne({ id: num });
-	if (!room) {
-		throw new RoomDoesNotExistError();
-	}
+/**
+ * @param num Room number to get the reservation from.
+ * @returns ObjectId of the reservation, or null if no active reservation.
+ * @throws RoomDoesNotExistError
+ */
+async function getRoomReservation(num: number): Promise<mongoose.Types.ObjectId | null> {
+	const room = await findRoomById(num);
 	return room.reservation;
 }
 
 export default {
+	findRoomById,
 	createType,
 	createRoom,
 	removeRoom,
 	removeType,
 	changeRoomState,
-	isOccupied,
-	setOccupied,
-	getReservation,
+	isRoomOccupied,
+	setRoomOccupation,
+	getRoomReservation,
 };
