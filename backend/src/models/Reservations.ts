@@ -1,14 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 import { Guest } from "./Guests.js";
+import logger from "../utils/logger.js";
 
 export class ReservationNotFoundError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
 
 export enum ReservationState {
-	Pending,
-	Active,
-	Cancelled,
-	Passed,
+	Pending = "Pending",
+	Active = "Active",
+	Cancelled = "Cancelled",
+	Passed = "Passed",
 }
 
 export interface Reservation {
@@ -17,7 +18,7 @@ export interface Reservation {
 	startDate: Date,
 	nightCount: number,
 	prices: number[],
-	room: number,
+	room: mongoose.Types.ObjectId | number,
 	state: ReservationState,
 	email: string,
 	phoneNumber: string,
@@ -50,10 +51,10 @@ const ReservationModel = mongoose.model<Reservation>(
 		room: {
 			type: Number,
 			ref: "RoomModel",
-			default: -1,
+			default: null,
 		},
 		state: {
-			type: Number,
+			type: String,
 			values: Object.values(ReservationState),
 			default: ReservationState.Pending,
 		},
@@ -86,7 +87,7 @@ async function create(guest: number, startDate: Date, nightCount: number, prices
 	});
 }
 
-async function getRoomReservation(roomNumber: number): Promise<number | null> {
+async function getRoomReservation(roomNumber: number) {
 	const rooms = await ReservationModel.find({room: roomNumber});
 	
 	const date = new Date();
@@ -164,10 +165,27 @@ async function getLastReservations(guest: number, count: number = 1) {
 	});
 }
 
+async function isValidReservation(reservationId: string): Promise<boolean> {
+	if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+		return false;
+	}
+	
+	try {
+		const reservation = await ReservationModel.findById(reservationId);
+		return reservation !== null;
+	} catch (err) {
+		logger.error(`Error fetching reservation: ${err}`);
+		return false;
+	}
+}
+
 export default {
 	create,
 	setRoom,
+	setEmail,
+	setPhoneNumber,
 	getAllReservations,
 	getReservation,
 	getLastReservations,
+	isValidReservation,
 }

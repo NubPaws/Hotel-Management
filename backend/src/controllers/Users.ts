@@ -311,6 +311,4 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
 	}
 });
 
-
-
 export const UsersRouter = router;
