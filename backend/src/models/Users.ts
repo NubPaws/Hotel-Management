@@ -254,3 +254,51 @@ export default {
 	changePassword,
 	changeRole,
 };
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         user:
+ *           type: string
+ *           description: The username of the user
+ *         pass:
+ *           type: string
+ *           description: The password of the user
+ *         role:
+ *           type: integer
+ *           enum:
+ *             - 0
+ *             - 1
+ *           description: The role of the user (0 for Admin, 1 for User)
+ *       required:
+ *         - user
+ *         - pass
+ *         - role
+ * 
+ *     UserPayload:
+ *       type: object
+ *       properties:
+ *         user:
+ *           type: string
+ *           description: The username stored in the JWT payload
+ *       required:
+ *         - user
+ * 
+ *     JwtToken:
+ *       type: string
+ *       description: JWT token for the user
+ * 
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ * 
+ * tags:
+ *   - name: User
+ *     description: User management and authentication
+ */

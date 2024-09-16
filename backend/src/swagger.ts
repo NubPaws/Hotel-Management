@@ -25,6 +25,7 @@ const options: swaggerJSDoc.OAS3Options = {
 	},
 	apis: [
 		"src/controllers/*.ts",
+		"src/models/*.ts",
 	],
 }
 

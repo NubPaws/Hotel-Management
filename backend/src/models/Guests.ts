@@ -4,7 +4,7 @@ import { Reservation } from "./Reservations.js";
 export class GuestAlreadyExistsError extends Error {}
 export class GuestDoesNotExistError extends Error {}
 
-export interface Guest {
+export interface Guest extends Document {
 	id: number,
 	fullName: string,
 	email: string,
@@ -18,6 +18,7 @@ const GuestModel = mongoose.model<Guest>(
 		id: {
 			type: Number,
 			required: true,
+			unique: true,
 		},
 		fullName: {
 			type: String,
@@ -32,7 +33,7 @@ const GuestModel = mongoose.model<Guest>(
 			required: true,
 		},
 		reservations: [{
-			type: Schema.ObjectId,
+			type: Schema.Types.ObjectId,
 			ref: "ReservationModel",
 			required: true,
 		}],
