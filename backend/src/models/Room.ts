@@ -1,18 +1,26 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import ReservationModel, { ReservationNotFoundError } from "./Reservation.js";
 
 export class RoomDoesNotExistError extends Error {
 	constructor(num: number) {
-		super(`Room #${num} does not exist.`)
+		super(`Room #${num} does not exist.`);
 	}
 }
-export class RoomNumberAlreadyExistsError extends Error {}
+export class RoomNumberAlreadyExistsError extends Error {
+	constructor(num: number) {
+		super(`Room #${num} already exists.`);
+	}
+}
 export class RoomTypeDoesNotExistError extends Error {
 	constructor(rt: string) {
 		super(`Room type ${rt} does not exist.`);
 	}
 }
-export class RoomTypeAlreadyExistsError extends Error {}
+export class RoomTypeAlreadyExistsError extends Error {
+	constructor(rt: string) {
+		super(`Room type ${rt} does not exist.`);
+	}
+}
 export class MissingReservationIdError extends Error {
 	constructor() {
 		super("Must provide reservation id when trying to make a room occupied.");
@@ -48,41 +56,40 @@ const RoomTypeModel = mongoose.model<RoomType>("RoomTypeModel", RoomTypeSchema);
 
 interface Room extends Document {
 	id: number,
-	typeRef: mongoose.Types.ObjectId,
+	type: string,
 	state: RoomState,
 	occupied: boolean,
 	reservation: number | null,
 }
 
-const RoomModel = mongoose.model<Room>(
-	"RoomModel",
-	new Schema<Room>({
-		id: {
-			type: Number,
-			required: true,
-			unique: true,
-		},
-		typeRef: {
-			type: Schema.Types.ObjectId,
-			ref: "RoomTypeModel",
-			required: true,
-		},
-		state: {
-			type: String,
-			enum: Object.values(RoomState),
-			default: RoomState.Clean,
-		},
-		occupied: {
-			type: Boolean,
-			default: false
-		},
-		reservation: {
-			type: Number,
-			default: null,
-			ref: "ReservationModel",
-		},
-	}, { _id: false })
-);
+const RoomSchema = new Schema<Room>({
+	id: {
+		type: Number,
+		required: true,
+		unique: true,
+	},
+	type: {
+		type: String,
+		ref: "RoomTypeModel",
+		required: true,
+	},
+	state: {
+		type: String,
+		enum: Object.values(RoomState),
+		default: RoomState.Clean,
+	},
+	occupied: {
+		type: Boolean,
+		default: false
+	},
+	reservation: {
+		type: Number,
+		default: null,
+		ref: "ReservationModel",
+	},
+}, { _id: false });
+
+const RoomModel = mongoose.model<Room>("RoomModel", RoomSchema);
 
 /**
  * @param num The room number to get.
@@ -100,7 +107,7 @@ async function findRoomById(num: number) {
 
 async function createType(code: string, description: string) {
 	if (await RoomTypeModel.exists({ code })) {
-		throw new RoomTypeAlreadyExistsError();
+		throw new RoomTypeAlreadyExistsError(code);
 	}
 	
 	await RoomTypeModel.create({ code, description });
@@ -145,7 +152,7 @@ async function createRoom(num: number, code: string) {
 	
 	await RoomModel.create({
 		id: num,
-		typeRef: roomType._id,
+		type: code,
 	});
 }
 
@@ -185,7 +192,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 		const room = await RoomModel.findOneAndUpdate(
 			{ id: num },
 			{ $set: { occupied: false, reservation: null } },
-			{ new: true }
+			{ new: true },
 		);
 		
 		if (!room) {
@@ -209,7 +216,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 		{ id: num },
 		{ $set: {
 			occupied: true,
-			reservation: new mongoose.Types.ObjectId(reservationId),
+			reservation: reservationId,
 		} },
 		{ new: true }
 	);
