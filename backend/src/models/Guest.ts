@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { Reservation } from "./Reservations.js";
+import { Reservation } from "./Reservation.js";
 
 export class GuestAlreadyExistsError extends Error {}
 export class GuestDoesNotExistError extends Error {}

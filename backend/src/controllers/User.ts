@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
-import UsersModel, { CreatorIsNotAdminError, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/Users.js";
+import UsersModel, { CreatorIsNotAdminError, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/User.js";
 import { dataValidate } from "./Validator.js";
-import logger from "../utils/logger.js";
 
 const router = Router();
 

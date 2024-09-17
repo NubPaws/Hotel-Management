@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import Reservations, { ReservationNotFoundError } from "./Reservations.js";
+import ReservationModel, { ReservationNotFoundError } from "./Reservation.js";
 
 export class RoomDoesNotExistError extends Error {
 	constructor(num: number) {
@@ -31,28 +31,28 @@ interface RoomType extends Document {
 	description: string,
 }
 
+const RoomTypeSchema = new Schema<RoomType>({
+	code: {
+		type: String,
+		required: true,
+		unique: true,
+		index: true,
+	},
+	description: {
+		type: String,
+		required: true,
+	}
+}, { _id: false });
+
+const RoomTypeModel = mongoose.model<RoomType>("RoomTypeModel", RoomTypeSchema);
+
 interface Room extends Document {
 	id: number,
 	typeRef: mongoose.Types.ObjectId,
 	state: RoomState,
 	occupied: boolean,
-	reservation: mongoose.Types.ObjectId | null,
+	reservation: number | null,
 }
-
-const RoomTypeModel = mongoose.model<RoomType>(
-	"RoomTypeModel",
-	new Schema<RoomType>({
-		code: {
-			type: String,
-			required: true,
-			unique: true,
-		},
-		description: {
-			type: String,
-			required: true,
-		}
-	})
-);
 
 const RoomModel = mongoose.model<Room>(
 	"RoomModel",
@@ -77,7 +77,7 @@ const RoomModel = mongoose.model<Room>(
 			default: false
 		},
 		reservation: {
-			type: Schema.Types.ObjectId,
+			type: Number,
 			default: null,
 			ref: "ReservationModel",
 		},
@@ -106,27 +106,6 @@ async function createType(code: string, description: string) {
 	await RoomTypeModel.create({ code, description });
 }
 
-async function createRoom(num: number, code: string) {
-	// This will throw an error if there isn't a room like that.
-	// We'll just ignore the return value.
-	await findRoomById(num);
-	
-	const roomType = await RoomTypeModel.findOne({ code });
-	if (!roomType) {
-		throw new RoomTypeDoesNotExistError(code);
-	}
-	
-	await RoomModel.create({
-		id: num,
-		typeRef: roomType._id,
-	});
-}
-
-async function removeRoom(num: number) {
-	await findRoomById(num);
-	await RoomModel.deleteOne({ id: num });
-}
-
 /**
  * Removes the type from the database and sets all rooms of that type
  * to the new type that was given.
@@ -152,6 +131,27 @@ async function removeType(typeCode: string, newTypeCode: string) {
 	);
 	
 	await RoomTypeModel.deleteOne({ code: typeCode });
+}
+
+async function createRoom(num: number, code: string) {
+	// This will throw an error if there isn't a room like that.
+	// We'll just ignore the return value.
+	await findRoomById(num);
+	
+	const roomType = await RoomTypeModel.findOne({ code });
+	if (!roomType) {
+		throw new RoomTypeDoesNotExistError(code);
+	}
+	
+	await RoomModel.create({
+		id: num,
+		typeRef: roomType._id,
+	});
+}
+
+async function removeRoom(num: number) {
+	await findRoomById(num);
+	await RoomModel.deleteOne({ id: num });
 }
 
 async function changeRoomState(num: number, state: RoomState) {
@@ -200,7 +200,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	}
 	
 	// Otherwise, we have to make sure that the reservation is valid.
-	const isValidReservation = await Reservations.isValidReservation(reservationId);
+	const isValidReservation = await ReservationModel.isValidReservation(reservationId);
 	if (!isValidReservation) {
 		throw new ReservationNotFoundError();
 	}
@@ -224,17 +224,20 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
  * @returns ObjectId of the reservation, or null if no active reservation.
  * @throws RoomDoesNotExistError
  */
-async function getRoomReservation(num: number): Promise<mongoose.Types.ObjectId | null> {
+async function getRoomReservation(num: number): Promise<number | null> {
 	const room = await findRoomById(num);
 	return room.reservation;
 }
 
 export default {
 	findRoomById,
+	
 	createType,
+	removeType,
+	
 	createRoom,
 	removeRoom,
-	removeType,
+	
 	changeRoomState,
 	isRoomOccupied,
 	setRoomOccupation,

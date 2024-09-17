@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import Users from "../models/Users.js";
+import Users from "../models/User.js";
 import { dataValidate } from "./Validator.js";
 
 const router = Router();

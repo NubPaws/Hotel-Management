@@ -1,16 +1,16 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { loadDatabase } from "./models/DatabaseConnector.js";
-import environment from "./utils/environment.js";
-import logger from "./utils/logger.js";
-import { TokensRouter } from "./controllers/Tokens.js";
 import SwaggerUI from 'swagger-ui-express';
 import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
-import { UsersRouter } from "./controllers/Users.js";
+import Environment from "./utils/Environment.js";
+import Logger from "./utils/Logger.js";
+import { loadDatabase } from "./models/DatabaseConnector.js";
+import { TokensRouter } from "./controllers/Token.js";
+import { UsersRouter } from "./controllers/User.js";
 import ErrorHandler from "./controllers/ErrorHandler.js";
 
 const app = express();
-const port = environment.port;
+const port = Environment.port;
 
 // Connect to the database.
 loadDatabase();
@@ -28,14 +28,14 @@ app.use((req, res, next) => {
     
     if (contentType && contentType.startsWith("application/json")) {
         if (typeof req.body !== "object") {
-            logger.error("Invaild json body has been sent.");
+            Logger.error("Invaild json body has been sent.");
             return res.status(400).json({ error: "Invalid JSON body" });
         }
     }
     
     if (contentType && contentType.startsWith("text/")) {
         if (typeof req.body !== "string") {
-            logger.error("Invaild text body has been sent.");
+            Logger.error("Invaild text body has been sent.");
             return res.status(400).json({ error: "Invalid text body"});
         }
     }
@@ -59,5 +59,5 @@ app.get('/', (req: Request, res: Response) => {
 app.use("/api-docs", SwaggerUI.serve, SwaggerUI.setup(SwaggerSpecs, SwaggerUiOptions));
 
 app.listen(port, () => {
-    logger.info(`Server is running at http://localhost:${port}`);
+    Logger.info(`Server is running at http://localhost:${port}`);
 });

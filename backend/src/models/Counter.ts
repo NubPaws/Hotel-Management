@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema, trusted } from "mongoose";
-import logger from "../utils/logger.js";
+import Logger from "../utils/Logger.js";
 
 const DUPLICATE_ERROR_KEY_CODE = 1100;
 
@@ -34,7 +34,7 @@ async function create(name: string): Promise<boolean> {
 		await CounterModel.create({ name });
 	} catch (err: any) {
 		if (err.code === DUPLICATE_ERROR_KEY_CODE) {
-			logger.error("Duplicate key detected");
+			Logger.error("Duplicate key detected");
 		}
 		return false;
 	}
@@ -103,3 +103,20 @@ export default {
 	get,
 	set,
 }
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Counter:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The name of the counter, used as a unique identifier.
+ *           example: "reservationId"
+ *         value:
+ *           type: integer
+ *           description: The current value of the counter.
+ *           example: 42
+ */

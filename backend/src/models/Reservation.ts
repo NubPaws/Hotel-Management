@@ -1,15 +1,16 @@
 import mongoose, { Schema } from "mongoose";
-import logger from "../utils/logger.js";
-import { addDaysToDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/clock.js";
+import Logger from "../utils/Logger.js";
+import { addDaysToDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/Clock.js";
+import CounterModel from "./Counter.js";
+import RoomModel from "./Room.js";
+import { isEmailString } from "../utils/Email.js";
 
 export class ReservationNotFoundError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
-export class ReservationCreationError extends Error {
-	constructor(fieldName: string) {
-		super(`Field ${fieldName} is invalid.`);
-	}
-}
+export class ReservationCreationError extends Error {}
 export class ReservationDoesNotExistError extends Error {}
+export class ReservationFetchingError extends Error {}
+export class ReservationUpdateError extends Error {}
 
 export enum ReservationState {
 	Pending = "Pending",
@@ -18,54 +19,28 @@ export enum ReservationState {
 	Passed = "Passed",
 }
 
-export interface Extra extends Document {
-	item: string,
-	description: string,
-	reservation: number,
-}
-
 export interface Reservation extends Document {
 	reservationId: number,
-	guest: mongoose.Types.ObjectId | number,
 	reservationMade: Date,
 	startDate: Date,
 	startTime: Time24,
 	nightCount: number,
 	endTime: Time24,
 	prices: number[],
-	room: mongoose.Types.ObjectId | number | null,
+	room: number | null,
 	state: ReservationState,
+	extras: number[],
+	
+	guest: number | null,
 	email: string,
-	phoneNumber: string,
-	extras: mongoose.Types.ObjectId[];
+	phone: string,
 }
-
-const ExtraSchema = new Schema<Extra>({
-	item: {
-		type: String,
-		required: true,
-	},
-	description: {
-		type: String,
-		required: true,
-		default: "",
-	},
-	reservation: {
-		type: Number,
-		required: true,
-	},
-});
 
 const ReservationSchema = new Schema<Reservation>({
 	reservationId: {
 		type: Number,
 		required: true,
 		unique: true,
-	},
-	guest: {
-		type: Schema.Types.ObjectId,
-		ref: "GuestModel",
-		required: true,
 		index: true,
 	},
 	reservationMade: {
@@ -77,8 +52,12 @@ const ReservationSchema = new Schema<Reservation>({
 		required: true,
 	},
 	startTime: {
-		Type: String,
+		type: String,
 		required: true,
+		validate: {
+			validator: (value: string) => isTime24String(value),
+			message: "Invalid time format. Make sure it HH:mm (24 time format).",
+		},
 	},
 	nightCount: {
 		type: Number,
@@ -87,13 +66,17 @@ const ReservationSchema = new Schema<Reservation>({
 	endTime: {
 		type: String,
 		required: true,
+		validate: {
+			validator: (value: string) => isTime24String(value),
+			message: "Invalid time format. Make sure it HH:mm (24 time format).",
+		},
 	},
 	prices: [{
 		type: Number,
 		required: true,
 	}],
 	room: {
-		type: Schema.Types.ObjectId,
+		type: Number,
 		ref: "RoomModel",
 		default: null,
 	},
@@ -102,24 +85,61 @@ const ReservationSchema = new Schema<Reservation>({
 		enum: Object.values(ReservationState),
 		default: ReservationState.Pending,
 	},
+	extras: [{
+		type: Number,
+		ref: "ExtraModel",
+	}],
+	
+	guest: {
+		type: Number,
+		ref: "GuestModel",
+		required: true,
+		index: true,
+	},
 	email: {
 		type: String,
 		required: true,
+		validate: {
+			validator: (value: string) => isEmailString(value),
+			message: "Email format is invalid.",
+		},
 	},
-	phoneNumber: {
+	phone: {
 		type: String,
 		required: true,
 	},
-	extras: [{
-		type: Schema.Types.ObjectId,
-		ref: "ExtraModel",
-	}],
 }, { _id: false });
-
-const ExtraModel = mongoose.model<Extra>("ExtraModel", ExtraSchema);
 
 const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
 
+ReservationSchema.pre("save", async function (next) {
+	const doc = this;
+	if (doc.isNew) {
+		const counter = await CounterModel.increment("reservationId");
+		doc.reservationId = counter;
+	}
+	next();
+});
+
+/**
+ * Create a new reservation in the reservation system. This function also
+ * does validation checks to make sure that the information passed is
+ * valid. Therefore, no validation checks are needed to be done outside
+ * of this function.
+ * 
+ * @param guest guest id.
+ * @param startDate dd/MM/YYYY date.
+ * @param startTime string of format HH:mm, to know more read Time24.
+ * @param nightCount number of nights from startDate.
+ * @param endTime On the last day, the time to checkout, like startTime.
+ * to know more read Time24.
+ * @param prices array of numbers, each number correspond with the price
+ * of each night.
+ * @param email string representing the email of the guest, read more at Email.
+ * @param phone string representing the phone number of the guest.
+ * @returns The newly created reservation.
+ * @throws ReservationCreationError
+ */
 async function create(
 	guest: number,
 	startDate: Date,
@@ -128,79 +148,173 @@ async function create(
 	endTime: Time24,
 	prices: number[],
 	email: string,
-	phoneNumber: string
+	phone: string
 ) {
 	const today = getTodaysDate();
 	
 	/* Validate all the fields, let's gooo!!! */
 	
 	if (startDate < today) {
-		throw new ReservationCreationError("startDate");
+		throw new ReservationCreationError("startDate field must be today or later.");
 	}
 	
 	if (nightCount < 0) {
-		throw new ReservationCreationError("nightCount");
-	}
-	
-	if (!isTime24String(startTime)) {
-		throw new ReservationCreationError("startTime");
-	}
-	
-	if (!isTime24String(endTime)) {
-		throw new ReservationCreationError("endTime");
+		throw new ReservationCreationError("nightCount must be greater than 0.");
 	}
 	
 	if (nightCount == 0 && numFromTime24(startTime) > numFromTime24(endTime)) {
-		throw new ReservationCreationError("startTime and/or endTime");
+		throw new ReservationCreationError(
+			"startTime and/or endTime for same day check in must be one after the other."
+		);
 	}
 	
-	await ReservationModel.create({
-		guest,
-		reservationMade: getTodaysDate(),
-		startDate,
-		startTime,
-		nightCount,
-		endTime,
-		prices,
-		email,
-		phoneNumber,
-		extras: [],
-	});
+	if (prices.length !== nightCount) {
+		throw new ReservationCreationError(" Prices array length must match nightCount");
+	}
+	
+	if (!prices.every((price) => price >= 0)) {
+		throw new ReservationCreationError("prices must all be non-negative.");
+	}
+	
+	/* Make sure that the start date is properly validated. */
+	startDate.setHours(0, 0, 0, 0);
+	
+	try {
+		const reservation = await ReservationModel.create({
+			guest,
+			reservationMade: getTodaysDate(),
+			startDate,
+			startTime,
+			nightCount,
+			endTime,
+			prices,
+			email,
+			phone,
+			extras: [],
+		});
+		
+		return reservation;
+	} catch (err: any) {
+		Logger.error(`${err.message}`);
+		throw new ReservationCreationError(`${err.message}`);
+	}
 }
 
-async function getRoomReservation(roomNumber: number) {
-	const rooms = await ReservationModel.find({ room: roomNumber });
+/* ---------------------- Getters ---------------------- */
+
+/**
+ * Return all reservations made by a guest since startDate onwards.
+ * 
+ * @param guestId Guest id who created the reservation.
+ * @param startDate Minimum start date of the reservation. If undefined then defaults
+ * to the last 3 months.
+ * @returns An array of reservations made by the guest since the start Date.
+ */
+async function getByGuestId(guestId: number, startDate?: Date) {
+	// Set default startDate to 3 month ago if not provided.
+	if (!startDate) {
+		const today = getTodaysDate();
+		startDate = addDaysToDate(today, -90);
+	}
 	
-	const date = getTodaysDate();
-	for (let i = 0; i < rooms.length; i++) {
-		const room = rooms[i];
-		const startDate = room.startDate;
-		const endDate = addDaysToDate(startDate, room.nightCount);
+	try {
+		const reservations = await ReservationModel.find({
+			guest: guestId,
+			startDate: { $gte: startDate },
+		});
 		
-		if (startDate <= date && date <= endDate) {
-			return room.room;
+		return reservations;
+	} catch (err: any) {
+		throw new ReservationFetchingError(err.message);
+	}
+}
+
+/**
+ * Return rooms by room, sorted from newest to latest. The number of rooms
+ * is at most `limit` in numbers.
+ * 
+ * @param room The room to get the reservation from.
+ * @param limit The number of results to return.
+ * @returns An array of reservations for the specified room.
+ */
+async function getByRoom(room: number, limit: number = 1) {
+	try {
+		const reservations = await ReservationModel.find({ room })
+			.sort({ reservationMade: -1 })
+			.limit(limit)
+			.exec();
+		
+		return reservations;
+	} catch (err: any) {
+		throw new ReservationFetchingError(err.message);
+	}
+}
+
+/**
+ * Return all reservations made within the range of the dates given.
+ * 
+ * @param fromDate The start date to get the reservations from.
+ * @param toDate The end date to get the reservations until.
+ * @returns List of reservations made within the dates stated.
+ */
+async function getByDateRange(fromDate: Date, toDate: Date) {
+	try {
+		const reservations = await ReservationModel.find({
+			startDate: {
+				$gte: fromDate,
+				$lte: toDate,
+			}
+		});
+		
+		return reservations;
+	} catch (err) {
+		throw new ReservationFetchingError(`Couldn't fetch reservations ${fromDate} - ${toDate}`);
+	}
+}
+
+/* ---------------------- Setters ---------------------- */
+
+/**
+ * Set the room of a reservation or null if no room is allocated for
+ * that reservation.
+ * 
+ * @param reservationId The reservation to update.
+ * @param roomNumber The room to update to the reservation.
+ */
+async function setRoom(reservationId: number, roomNumber: number | null) {
+	if (!roomNumber) {
+		const reservation = await RoomModel.getRoomReservation(roomNumber as number);
+		if (!reservation) {
+			throw new ReservationUpdateError("Occupied room");
 		}
 	}
 	
-	return null;
+	/* We can now update the reservation's room */
+	
+	try {
+		
+		const reservation = await ReservationModel.updateOne(
+			{ reservationId },
+			{ $set: { room: roomNumber } },
+			{ new: true }
+		);
+		
+	} catch (err) {
+		throw new ReservationUpdateError("Invalid room");
+	}
 }
 
-async function setRoom(guest: number, reservationMade: Date, room: number) {
-	if (getRoomReservation(room) !== null) {
-		throw new RoomIsAlreadyOccupiedAtThatTimeError();
-	}
-	
-	const reservationExists = await ReservationModel.exists({guest, reservationMade});
-	if (!reservationExists)
-		throw new ReservationNotFoundError();
-	
-	await ReservationModel.updateOne({
-		guest,
-		reservationMade,
-	}, {
-		$set: {room: room}
-	})
-}
+// 	const reservationExists = await ReservationModel.exists({guest, reservationMade});
+// 	if (!reservationExists)
+// 		throw new ReservationNotFoundError();
+// 
+// 	await ReservationModel.updateOne({
+// 		guest,
+// 		reservationMade,
+// 	}, {
+// 		$set: {room: room}
+// 	})
+// }
 
 async function setEmail(guest: number, reservationMade: Date, email: string) {
 	const reservationExists = await ReservationModel.exists({guest, reservationMade});
@@ -215,7 +329,7 @@ async function setEmail(guest: number, reservationMade: Date, email: string) {
 	});
 }
 
-async function setPhoneNumber(guest: number, reservationMade: Date, phoneNumber: string) {
+async function setPhoneNumber(guest: number, reservationMade: Date, phone: string) {
 	const reservationExists = await ReservationModel.exists({guest, reservationMade});
 	if (!reservationExists)
 		throw new ReservationNotFoundError();
@@ -224,7 +338,7 @@ async function setPhoneNumber(guest: number, reservationMade: Date, phoneNumber:
 		guest,
 		reservationMade,
 	}, {
-		$set: {phoneNumber}
+		$set: { phone }
 	});
 }
 
@@ -278,7 +392,7 @@ async function isValidReservation(reservationId: string): Promise<boolean> {
 		const reservation = await ReservationModel.findById(reservationId);
 		return reservation !== null;
 	} catch (err) {
-		logger.error(`Error fetching reservation: ${err}`);
+		Logger.error(`Error fetching reservation: ${err}`);
 		return false;
 	}
 }

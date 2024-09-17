@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import environment from '../utils/environment.js';
-import logger from '../utils/logger.js';
+import Environment from '../utils/Environment.js';
+import Logger from '../utils/Logger.js';
 import mongoose, { Schema } from 'mongoose';
 
 export class InvalidUserCredentialsError extends Error {}
@@ -56,13 +56,13 @@ async function isAdminUserExists() {
 async function initUsersModel(): Promise<boolean> {
 	try {
 		if (await isAdminUserExists()) {
-			logger.info("Admin user exists.");
-			logger.info("Skipping creation of default admin user.");
+			Logger.info("Admin user exists.");
+			Logger.info("Skipping creation of default admin user.");
 			return true;
 		}
 		
-		logger.warn("Admin user doesn't exists.")
-		logger.info("Starting creation of default admin user.");
+		Logger.warn("Admin user doesn't exists.")
+		Logger.info("Starting creation of default admin user.");
 		await UserModel.create({
 			user: "admin",
 			pass: "admin",
@@ -70,14 +70,14 @@ async function initUsersModel(): Promise<boolean> {
 		});
 		
 		if (await isAdminUserExists()) {
-			logger.info("Default admin user created");
+			Logger.info("Default admin user created");
 			return true;
 		}
 	} catch (err) {
-		logger.error("Failed to create default admin user.");
-		logger.error("Note there are no admin users in the system.");
-		logger.error("Something has gone terribly wrong!");
-		logger.error(`${err}`);
+		Logger.error("Failed to create default admin user.");
+		Logger.error("Note there are no admin users in the system.");
+		Logger.error("Something has gone terribly wrong!");
+		Logger.error(`${err}`);
 	}
 	return false;
 }
@@ -89,9 +89,9 @@ async function initUsersModel(): Promise<boolean> {
  */
 function getJwtToken(username: string): string {
 	try {
-		return jwt.sign({user: username}, environment.jwtSecret);
+		return jwt.sign({user: username}, Environment.jwtSecret);
 	} catch (err) {
-		logger.error(`${err}`);
+		Logger.error(`${err}`);
 		throw new FailedToSignJwtTokenError();
 	}
 }
@@ -103,13 +103,13 @@ function getJwtToken(username: string): string {
  */
 function getJwtPayload(token: string): UserPayload {
 	try {
-		const decoded = jwt.verify(token, environment.jwtSecret);
+		const decoded = jwt.verify(token, Environment.jwtSecret);
 		if (typeof decoded === "string") {
 			return { user: decoded };
 		}
 		return decoded as UserPayload;
 	} catch (err) {
-		logger.error(`Failed to validate jwt token ${token}`);
+		Logger.error(`Failed to validate jwt token ${token}`);
 		throw new JwtTokenIsNotValidError();
 	}
 }
@@ -201,7 +201,7 @@ async function isUser(jwtToken: string) {
 async function getUser(username: string): Promise<User> {
 	const user = await UserModel.findOne({user: username}).exec();
 	if (!user) {
-		logger.warn(`User ${username} doesn't exists in the system.`);
+		Logger.warn(`User ${username} doesn't exists in the system.`);
 		throw new UserDoesNotExistError();
 	}
 	return user as User;
@@ -259,46 +259,86 @@ export default {
  * @swagger
  * components:
  *   schemas:
- *     User:
+ *     Reservation:
  *       type: object
  *       properties:
- *         user:
- *           type: string
- *           description: The username of the user
- *         pass:
- *           type: string
- *           description: The password of the user
- *         role:
+ *         reservationId:
  *           type: integer
- *           enum:
- *             - 0
- *             - 1
- *           description: The role of the user (0 for Admin, 1 for User)
- *       required:
- *         - user
- *         - pass
- *         - role
- * 
- *     UserPayload:
+ *           description: The auto-incrementing ID of the reservation.
+ *           example: 1
+ *         reservationMade:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time the reservation was made.
+ *           example: "2024-09-17T12:34:56Z"
+ *         startDate:
+ *           type: string
+ *           format: date
+ *           description: The start date of the reservation.
+ *           example: "2024-09-20"
+ *         startTime:
+ *           type: string
+ *           description: The start time in HH:mm 24-hour format.
+ *           example: "14:00"
+ *         nightCount:
+ *           type: integer
+ *           description: The number of nights for the reservation.
+ *           example: 3
+ *         endTime:
+ *           type: string
+ *           description: The end time in HH:mm 24-hour format.
+ *           example: "11:00"
+ *         prices:
+ *           type: array
+ *           items:
+ *             type: number
+ *           description: An array of prices for each night of the reservation.
+ *           example: [100.00, 120.00, 110.00]
+ *         room:
+ *           type: integer
+ *           description: The ID of the room associated with the reservation, or null if none.
+ *           example: 101
+ *         state:
+ *           type: string
+ *           enum: [Pending, Active, Cancelled, Passed]
+ *           description: The current state of the reservation.
+ *           example: "Pending"
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: integer
+ *           description: An array of extra IDs associated with the reservation.
+ *           example: [1, 2]
+ *         guest:
+ *           type: integer
+ *           description: The ID of the guest associated with the reservation.
+ *           example: 1
+ *         email:
+ *           type: string
+ *           description: The email of the guest.
+ *           example: "guest@example.com"
+ *         phone:
+ *           type: string
+ *           description: The phone number of the guest.
+ *           example: "+123456789"
+ *
+ *     Extra:
  *       type: object
  *       properties:
- *         user:
+ *         extraId:
+ *           type: integer
+ *           description: The auto-incrementing ID of the extra.
+ *           example: 1
+ *         item:
  *           type: string
- *           description: The username stored in the JWT payload
- *       required:
- *         - user
- * 
- *     JwtToken:
- *       type: string
- *       description: JWT token for the user
- * 
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- * 
- * tags:
- *   - name: User
- *     description: User management and authentication
+ *           description: The name of the extra item.
+ *           example: "Breakfast"
+ *         description:
+ *           type: string
+ *           description: A description of the extra item.
+ *           example: "Continental breakfast included."
+ *         reservationId:
+ *           type: integer
+ *           description: The ID of the reservation this extra belongs to.
+ *           example: 1
  */

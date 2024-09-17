@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UserDoesNotExistError } from "../models/Users.js";
+import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UserDoesNotExistError } from "../models/User.js";
 
 export enum ErrorCode {
 	Ok = 200,
