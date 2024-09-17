@@ -4,7 +4,7 @@ import SwaggerUI from 'swagger-ui-express';
 import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
 import Environment from "./utils/Environment.js";
 import Logger from "./utils/Logger.js";
-import { loadDatabase } from "./models/DatabaseConnector.js";
+import { loadDatabase } from "./utils/DatabaseConnector.js";
 import { TokensRouter } from "./controllers/Token.js";
 import { UsersRouter } from "./controllers/User.js";
 import ErrorHandler from "./controllers/ErrorHandler.js";
