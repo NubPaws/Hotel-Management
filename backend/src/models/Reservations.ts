@@ -9,6 +9,7 @@ export class ReservationCreationError extends Error {
 		super(`Field ${fieldName} is invalid.`);
 	}
 }
+export class ReservationDoesNotExistError extends Error {}
 
 export enum ReservationState {
 	Pending = "Pending",
@@ -20,10 +21,11 @@ export enum ReservationState {
 export interface Extra extends Document {
 	item: string,
 	description: string,
-	reservation: mongoose.Types.ObjectId,
+	reservation: number,
 }
 
 export interface Reservation extends Document {
+	reservationId: number,
 	guest: mongoose.Types.ObjectId | number,
 	reservationMade: Date,
 	startDate: Date,
@@ -38,82 +40,85 @@ export interface Reservation extends Document {
 	extras: mongoose.Types.ObjectId[];
 }
 
-const ExtraModel = mongoose.model<Extra>(
-	"ExtraModel",
-	new Schema<Extra>({
-		item: {
-			type: String,
-			required: true,
-		},
-		description: {
-			type: String,
-			required: true,
-			default: "",
-		},
-		reservation: {
-			type: Schema.Types.ObjectId,
-			required: true,
-		},
-	})
-);
+const ExtraSchema = new Schema<Extra>({
+	item: {
+		type: String,
+		required: true,
+	},
+	description: {
+		type: String,
+		required: true,
+		default: "",
+	},
+	reservation: {
+		type: Number,
+		required: true,
+	},
+});
 
-const ReservationModel = mongoose.model<Reservation>(
-	"ReservationModel",
-	new Schema<Reservation>({
-		guest: {
-			type: Schema.Types.ObjectId,
-			ref: "GuestModel",
-			required: true,
-			index: true,
-		},
-		reservationMade: {
-			type: Date,
-			required: true,
-		},
-		startDate: {
-			type: Date,
-			required: true,
-		},
-		startTime: {
-			Type: String,
-			required: true,
-		},
-		nightCount: {
-			type: Number,
-			required: true,
-		},
-		endTime: {
-			type: String,
-			required: true,
-		},
-		prices: [{
-			type: Number,
-			required: true,
-		}],
-		room: {
-			type: Schema.Types.ObjectId,
-			ref: "RoomModel",
-			default: null,
-		},
-		state: {
-			type: String,
-			enum: Object.values(ReservationState),
-			default: ReservationState.Pending,
-		},
-		email: {
-			type: String,
-			required: true,
-		},
-		phoneNumber: {
-			type: String,
-			required: true,
-		},
-		extras: [{
-			type: Schema.Types.ObjectId,
-			ref: "ExtraModel",
-		}],
-	})
-);
+const ReservationSchema = new Schema<Reservation>({
+	reservationId: {
+		type: Number,
+		required: true,
+		unique: true,
+	},
+	guest: {
+		type: Schema.Types.ObjectId,
+		ref: "GuestModel",
+		required: true,
+		index: true,
+	},
+	reservationMade: {
+		type: Date,
+		required: true,
+	},
+	startDate: {
+		type: Date,
+		required: true,
+	},
+	startTime: {
+		Type: String,
+		required: true,
+	},
+	nightCount: {
+		type: Number,
+		required: true,
+	},
+	endTime: {
+		type: String,
+		required: true,
+	},
+	prices: [{
+		type: Number,
+		required: true,
+	}],
+	room: {
+		type: Schema.Types.ObjectId,
+		ref: "RoomModel",
+		default: null,
+	},
+	state: {
+		type: String,
+		enum: Object.values(ReservationState),
+		default: ReservationState.Pending,
+	},
+	email: {
+		type: String,
+		required: true,
+	},
+	phoneNumber: {
+		type: String,
+		required: true,
+	},
+	extras: [{
+		type: Schema.Types.ObjectId,
+		ref: "ExtraModel",
+	}],
+}, { _id: false });
+
+const ExtraModel = mongoose.model<Extra>("ExtraModel", ExtraSchema);
+
+const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
 
 async function create(
 	guest: number,
@@ -164,9 +169,9 @@ async function create(
 }
 
 async function getRoomReservation(roomNumber: number) {
-	const rooms = await ReservationModel.find({room: roomNumber});
+	const rooms = await ReservationModel.find({ room: roomNumber });
 	
-	const date = new Date();
+	const date = getTodaysDate();
 	for (let i = 0; i < rooms.length; i++) {
 		const room = rooms[i];
 		const startDate = room.startDate;
@@ -223,8 +228,19 @@ async function setPhoneNumber(guest: number, reservationMade: Date, phoneNumber:
 	});
 }
 
+
+
 async function getAllReservations(guest: number) {
 	return await ReservationModel.find({guest});
+}
+
+async function getById(reservationId: mongoose.Types.ObjectId) {
+	const reservation = await ReservationModel.findById(reservationId);
+	if (!reservation) {
+		throw new ReservationDoesNotExistError();
+	}
+	
+	return reservation;
 }
 
 async function getOneByCreationTime(guest: number, reservationMade: Date) {
