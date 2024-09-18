@@ -1,13 +1,13 @@
-import express, { Request, Response } from "express";
 import cors from "cors";
+import express, { Request, Response } from "express";
 import SwaggerUI from 'swagger-ui-express';
-import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
-import Environment from "./utils/Environment.js";
-import Logger from "./utils/Logger.js";
-import { loadDatabase } from "./utils/DatabaseConnector.js";
+import ErrorHandler from "./controllers/ErrorHandler.js";
 import { TokensRouter } from "./controllers/Token.js";
 import { UsersRouter } from "./controllers/User.js";
-import ErrorHandler from "./controllers/ErrorHandler.js";
+import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
+import { loadDatabase } from "./utils/DatabaseConnector.js";
+import Environment from "./utils/Environment.js";
+import Logger from "./utils/Logger.js";
 
 const app = express();
 const port = Environment.port;

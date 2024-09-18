@@ -1,10 +1,10 @@
 import mongoose, { Document, Schema } from "mongoose";
-import Logger from "../utils/Logger.js";
 import { addDaysToDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/Clock.js";
-import CounterModel from "./Counter.js";
-import Room from "./Room.js";
 import { Email, isEmailString } from "../utils/Email.js";
+import Logger from "../utils/Logger.js";
+import CounterModel from "./Counter.js";
 import Extra from "./Extra.js";
+import Room from "./Room.js";
 
 export class ReservationNotFoundError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}

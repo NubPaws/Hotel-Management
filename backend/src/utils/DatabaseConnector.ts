@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Logger from "./Logger.js";
 import Environment from "./Environment.js";
+import Logger from "./Logger.js";
 
 /**
  * Connect to the database. The connection is done asynchronously.
