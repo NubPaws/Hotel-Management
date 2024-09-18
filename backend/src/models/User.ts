@@ -15,8 +15,8 @@ export interface UserPayload {
 }
 
 export enum UserRole {
-	Admin,
-	User,
+	Admin = "Admin",
+	User = "User",
 }
 
 interface User extends Document {
@@ -29,23 +29,25 @@ const UserSchema = new Schema<User>({
 	user: {
 		type: String,
 		required: true,
+		unique: true,
+		index: true,
 	},
 	pass: {
 		type: String,
 		required: true,
 	},
 	role: {
-		type: Number,
-		enum: Object.values(UserRole).filter(value => typeof value === "number"),
+		type: String,
+		enum: Object.values(UserRole),
 		default: UserRole.User,
-	}
-});
+	},
+}, { _id: false });
 
 // Creating the user model.
 const UserModel = mongoose.model<User>("UserModel", UserSchema);
 
 async function isAdminUserExists() {
-	return await UserModel.exists({role: UserRole.Admin }).exec() !== null;
+	return await UserModel.exists({ role: UserRole.Admin }) !== null;
 }
 
 /**
@@ -150,12 +152,17 @@ async function isAdmin(username: string): Promise<boolean> {
  * @throws CreatorDoesNotExistError
  * @throws CreatorIsNotAdminError
  */
-async function createUser(username: string, password: string, role: UserRole, creatorToken: string): Promise<string> {
+async function createUser(
+	username: string,
+	password: string,
+	role: UserRole,
+	creatorToken: string
+): Promise<string> {
 	if (!getJwtPayload(creatorToken)) {
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	const creator = await getJwtPayload(creatorToken);
+	const creator = getJwtPayload(creatorToken);
 	if (!creator) {
 		throw new CreatorDoesNotExistError();
 	}
@@ -164,9 +171,6 @@ async function createUser(username: string, password: string, role: UserRole, cr
 	}
 	
 	// The user is an admin so they can create a new user.
-	const payload: UserPayload = {
-		user: username,
-	};
 	const token = getJwtToken(username) as string;
 	
 	await UserModel.create({
@@ -259,86 +263,22 @@ export default {
  * @swagger
  * components:
  *   schemas:
- *     Reservation:
+ *     User:
  *       type: object
  *       properties:
- *         reservationId:
- *           type: integer
- *           description: The auto-incrementing ID of the reservation.
- *           example: 1
- *         reservationMade:
+ *         user:
  *           type: string
- *           format: date-time
- *           description: The date and time the reservation was made.
- *           example: "2024-09-17T12:34:56Z"
- *         startDate:
+ *           description: The unique username for the user.
+ *           example: "john_doe"
+ *         pass:
  *           type: string
- *           format: date
- *           description: The start date of the reservation.
- *           example: "2024-09-20"
- *         startTime:
+ *           description: The user's password.
+ *           example: "password123"
+ *         role:
  *           type: string
- *           description: The start time in HH:mm 24-hour format.
- *           example: "14:00"
- *         nightCount:
- *           type: integer
- *           description: The number of nights for the reservation.
- *           example: 3
- *         endTime:
- *           type: string
- *           description: The end time in HH:mm 24-hour format.
- *           example: "11:00"
- *         prices:
- *           type: array
- *           items:
- *             type: number
- *           description: An array of prices for each night of the reservation.
- *           example: [100.00, 120.00, 110.00]
- *         room:
- *           type: integer
- *           description: The ID of the room associated with the reservation, or null if none.
- *           example: 101
- *         state:
- *           type: string
- *           enum: [Pending, Active, Cancelled, Passed]
- *           description: The current state of the reservation.
- *           example: "Pending"
- *         extras:
- *           type: array
- *           items:
- *             type: integer
- *           description: An array of extra IDs associated with the reservation.
- *           example: [1, 2]
- *         guest:
- *           type: integer
- *           description: The ID of the guest associated with the reservation.
- *           example: 1
- *         email:
- *           type: string
- *           description: The email of the guest.
- *           example: "guest@example.com"
- *         phone:
- *           type: string
- *           description: The phone number of the guest.
- *           example: "+123456789"
- *
- *     Extra:
- *       type: object
- *       properties:
- *         extraId:
- *           type: integer
- *           description: The auto-incrementing ID of the extra.
- *           example: 1
- *         item:
- *           type: string
- *           description: The name of the extra item.
- *           example: "Breakfast"
- *         description:
- *           type: string
- *           description: A description of the extra item.
- *           example: "Continental breakfast included."
- *         reservationId:
- *           type: integer
- *           description: The ID of the reservation this extra belongs to.
- *           example: 1
+ *           enum:
+ *             - Admin
+ *             - User
+ *           description: The role assigned to the user.
+ *           example: "User"
  */

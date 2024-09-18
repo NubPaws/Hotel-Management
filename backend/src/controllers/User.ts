@@ -103,8 +103,6 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *     summary: Creates a user and returns a JWT token.
  *     description: This endpoint allows you to create a new user by providing a username,
  *       password, and an authorization token. It returns a JWT token upon success.
- *       <br/>
- *       For the role, 0 means admin and 1 means user.
  *     tags:
  *       - Users
  *     security:
@@ -127,10 +125,8 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *                 type: string
  *                 example: password
  *               role:
- *                 type: number
- *                 enum:
- *                   - 0
- *                   - 1
+ *                 type: string
+ *                 enum: [Admin, User]
  *     responses:
  *       200:
  *         description: User created successfully and returns JWT token.
@@ -195,7 +191,7 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
  *                 example: old_password
  *               role:
  *                 type: string
- *                 example: new_password
+ *                 enum: [Admin, User]
  *     responses:
  *       200:
  *         description: User's password changed successfully and returns JWT token.
