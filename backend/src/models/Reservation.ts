@@ -2,8 +2,9 @@ import mongoose, { Schema } from "mongoose";
 import Logger from "../utils/Logger.js";
 import { addDaysToDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/Clock.js";
 import CounterModel from "./Counter.js";
-import RoomModel from "./Room.js";
-import { isEmailString } from "../utils/Email.js";
+import Room from "./Room.js";
+import { Email, isEmailString } from "../utils/Email.js";
+import Extra from "./Extra.js";
 
 export class ReservationNotFoundError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
@@ -46,6 +47,8 @@ const ReservationSchema = new Schema<Reservation>({
 	reservationMade: {
 		type: Date,
 		required: true,
+		index: true,
+		immutable: true,
 	},
 	startDate: {
 		type: Date,
@@ -62,6 +65,10 @@ const ReservationSchema = new Schema<Reservation>({
 	nightCount: {
 		type: Number,
 		required: true,
+		validate: {
+			validator: (value: number) => value >= 0,
+			message: "nightCount must be 0 or greater.",
+		},
 	},
 	endTime: {
 		type: String,
@@ -74,6 +81,10 @@ const ReservationSchema = new Schema<Reservation>({
 	prices: [{
 		type: Number,
 		required: true,
+		validate: {
+			validator: (value: number[]) => value.every((price) => price >= 0),
+			message: "Each price must be a non-negative number",
+		},
 	}],
 	room: {
 		type: Number,
@@ -158,10 +169,6 @@ async function create(
 		throw new ReservationCreationError("startDate field must be today or later.");
 	}
 	
-	if (nightCount < 0) {
-		throw new ReservationCreationError("nightCount must be greater than 0.");
-	}
-	
 	if (nightCount == 0 && numFromTime24(startTime) > numFromTime24(endTime)) {
 		throw new ReservationCreationError(
 			"startTime and/or endTime for same day check in must be one after the other."
@@ -170,10 +177,6 @@ async function create(
 	
 	if (prices.length !== nightCount) {
 		throw new ReservationCreationError(" Prices array length must match nightCount");
-	}
-	
-	if (!prices.every((price) => price >= 0)) {
-		throw new ReservationCreationError("prices must all be non-negative.");
 	}
 	
 	/* Make sure that the start date is properly validated. */
@@ -193,7 +196,7 @@ async function create(
 			extras: [],
 		});
 		
-		return reservation;
+		return reservation as Reservation;
 	} catch (err: any) {
 		Logger.error(`${err.message}`);
 		throw new ReservationCreationError(`${err.message}`);
@@ -210,7 +213,7 @@ async function create(
  * to the last 3 months.
  * @returns An array of reservations made by the guest since the start Date.
  */
-async function getByGuestId(guestId: number, startDate?: Date) {
+async function getByGuestId(guestId: number, startDate?: Date, limit: number = 10) {
 	// Set default startDate to 3 month ago if not provided.
 	if (!startDate) {
 		const today = getTodaysDate();
@@ -218,10 +221,17 @@ async function getByGuestId(guestId: number, startDate?: Date) {
 	}
 	
 	try {
-		const reservations = await ReservationModel.find({
-			guest: guestId,
-			startDate: { $gte: startDate },
-		});
+		const reservations = await ReservationModel.find(
+			{
+				guest: guestId,
+				startDate: { $gte: startDate },
+			},
+			{},
+			{
+				sort: { "startDate": -1 },
+				limit
+			}
+		);
 		
 		return reservations;
 	} catch (err: any) {
@@ -272,84 +282,15 @@ async function getByDateRange(fromDate: Date, toDate: Date) {
 	}
 }
 
-/* ---------------------- Setters ---------------------- */
-
 /**
- * Set the room of a reservation or null if no room is allocated for
- * that reservation.
+ * Returns the reservation as a mongoose document. That way it can
+ * be casted to Reservation or it can be used to run .save() on.
  * 
- * @param reservationId The reservation to update.
- * @param roomNumber The room to update to the reservation.
+ * @param reservationId The reservation id to find.
+ * @returns The reservation document.
  */
-async function setRoom(reservationId: number, roomNumber: number | null) {
-	if (!roomNumber) {
-		const reservation = await RoomModel.getRoomReservation(roomNumber as number);
-		if (!reservation) {
-			throw new ReservationUpdateError("Occupied room");
-		}
-	}
-	
-	/* We can now update the reservation's room */
-	
-	try {
-		
-		const reservation = await ReservationModel.updateOne(
-			{ reservationId },
-			{ $set: { room: roomNumber } },
-			{ new: true }
-		);
-		
-	} catch (err) {
-		throw new ReservationUpdateError("Invalid room");
-	}
-}
-
-// 	const reservationExists = await ReservationModel.exists({guest, reservationMade});
-// 	if (!reservationExists)
-// 		throw new ReservationNotFoundError();
-// 
-// 	await ReservationModel.updateOne({
-// 		guest,
-// 		reservationMade,
-// 	}, {
-// 		$set: {room: room}
-// 	})
-// }
-
-async function setEmail(guest: number, reservationMade: Date, email: string) {
-	const reservationExists = await ReservationModel.exists({guest, reservationMade});
-	if (!reservationExists)
-		throw new ReservationNotFoundError();
-	
-	await ReservationModel.updateOne({
-		guest,
-		reservationMade,
-	}, {
-		$set: {email}
-	});
-}
-
-async function setPhoneNumber(guest: number, reservationMade: Date, phone: string) {
-	const reservationExists = await ReservationModel.exists({guest, reservationMade});
-	if (!reservationExists)
-		throw new ReservationNotFoundError();
-	
-	await ReservationModel.updateOne({
-		guest,
-		reservationMade,
-	}, {
-		$set: { phone }
-	});
-}
-
-
-
-async function getAllReservations(guest: number) {
-	return await ReservationModel.find({guest});
-}
-
-async function getById(reservationId: mongoose.Types.ObjectId) {
-	const reservation = await ReservationModel.findById(reservationId);
+async function getDocumentById(reservationId: number) {
+	const reservation = await ReservationModel.findOne({ reservationId });
 	if (!reservation) {
 		throw new ReservationDoesNotExistError();
 	}
@@ -357,40 +298,248 @@ async function getById(reservationId: mongoose.Types.ObjectId) {
 	return reservation;
 }
 
-async function getOneByCreationTime(guest: number, reservationMade: Date) {
-	const reservation = await ReservationModel.findOne({guest, reservationMade});
-	if (!reservation)
-		throw new ReservationNotFoundError();
-	
-	return reservation;
+/**
+ * Returns a reservation by the ID.
+ * 
+ * @param reservationId The reservation's ID to fetch.
+ * @returns The Reservation interface.
+ * @throws ReservationDoesNotExistError
+ */
+async function getById(reservationId: number) {
+	return await getDocumentById(reservationId) as Reservation;
 }
 
-async function getManyByGuest(guest: number, state?: ReservationState) {
-	if (!state) {
-		return await ReservationModel.find({ guest });
-	}
-	
-	return await ReservationModel.find({ guest, state });
-}
+/* ---------------------- Setters ---------------------- */
 
-async function getReservation(guest: number, reservationMade: Date) {
-	
-}
-
-async function getLastReservations(guest: number, count: number = 1) {
-	await ReservationModel.find({guest}, {}, {
-		sort: {"startDate": -1}, limit: count
-	});
-}
-
-async function isValidReservation(reservationId: string): Promise<boolean> {
-	if (!mongoose.Types.ObjectId.isValid(reservationId)) {
-		return false;
-	}
-	
+/**
+ * Update a single field of a reservation.
+ * 
+ * @param reservationId The reservation ID to update.
+ * @param field The field name to update.
+ * @param value The new value for the field.
+ * @returns The udpated reservation.
+ * @throws ReservationUpdateError if the update fails.
+ */
+async function updateReservationField(
+	reservationId: number,
+	field: keyof Reservation,
+	value: any
+): Promise<Reservation> {
 	try {
-		const reservation = await ReservationModel.findById(reservationId);
-		return reservation !== null;
+		const updateData = { [field]: value };
+		const reservation = await ReservationModel.findOneAndUpdate(
+			{ reservationId },
+			{ $set: updateData },
+			{ new: true }
+		);
+		
+		if (!reservation) {
+			throw new ReservationUpdateError(`Failed to update ${field}.`);
+		}
+		
+		return reservation as Reservation;
+	} catch (err: any) {
+		throw new ReservationUpdateError(`Failed to update ${field}: ${err.message}`);
+	}
+}
+
+async function setEmail(reservationId: number, email: Email) {
+	return updateReservationField(reservationId, "email", email);
+}
+
+async function setPhone(reservationId: number, phone: string) {
+	return updateReservationField(reservationId, "phone", phone);
+}
+
+async function setStartDate(reservationId: number, startDate: Date) {
+	startDate.setHours(0, 0, 0, 0);
+	const today = getTodaysDate();
+	
+	if (startDate < today) {
+		throw new ReservationUpdateError("Invalid start date (must be today or later).");
+	}
+	
+	return await updateReservationField(reservationId, "startDate", startDate);
+}
+
+/**
+ * Change the start time of the reservation. Also checks that the time is
+ * indeed valid.
+ * 
+ * @param reservationId The reservation ID to change.
+ * @param startTime The new start time for the reservation.
+ * @throws ReservationDoesNotExistError
+ * @throws ReservationUpdateError
+ */
+async function setStartTime(reservationId: number, startTime: Time24) {
+	const reservation = await getDocumentById(reservationId);
+	
+	const endTime = reservation.endTime;
+	if (numFromTime24(startTime) >= numFromTime24(reservation.endTime)) {
+		throw new ReservationUpdateError(
+			`Start time ${startTime} must be earlier than end time ${endTime}.`
+		);
+	}
+	
+	reservation.startTime = startTime;
+	await reservation.save();
+}
+
+/**
+ * Add nights to the reservation with the relevant prices.
+ * 
+ * @param reservationId The reservation to add the nights to.
+ * @param nightsToAdd The number of nights to add.
+ * @param prices The prices for each of the nights.
+ * @returns The reservation with the nights updated.
+ * @throws ReservationUpdateError
+ * @throws ReservationNotFoundError
+ */
+async function addNights(reservationId: number, nightsToAdd: number, prices: number[]) {
+	if (nightsToAdd != prices.length) {
+		throw new ReservationUpdateError("For each night there must be a price.");
+	}
+	
+	const reservation = await getDocumentById(reservationId);
+	
+	reservation.nightCount += nightsToAdd;
+	reservation.prices.push(...prices);
+	
+	await reservation.save();
+	
+	return reservation as Reservation;
+}
+
+/**
+ * Removes nights from the end of the reservation and also removes
+ * the prices.
+ * 
+ * @param reservationId The reservation to remove the nights from.
+ * @param nightsToRemove The number of nights to remove.
+ * @returns The reservation with the updated information.
+ */
+async function removeNights(reservationId: number, nightsToRemove: number) {
+	const reservation = await getDocumentById(reservationId);
+	
+	if (reservation.nightCount < nightsToRemove) {
+		throw new ReservationUpdateError("Trying to remove too many nights!!!");
+	}
+	
+	if (
+		reservation.nightCount == nightsToRemove &&
+		numFromTime24(reservation.startTime) >= numFromTime24(reservation.endTime)
+	) {
+		throw new ReservationUpdateError("Start time and end time conflict.");
+	}
+	
+	reservation.nightCount -= nightsToRemove;
+	reservation.prices = reservation.prices.slice(0, -nightsToRemove);
+	
+	await reservation.save();
+	
+	return reservation as Reservation;
+}
+
+async function setEndTime(reservationId: number, endTime: Time24) {
+	const reservation = await getDocumentById(reservationId);
+	
+	if (numFromTime24(reservation.startTime) <= numFromTime24(endTime)) {
+		throw new ReservationUpdateError("End time must be after start time.");
+	}
+	
+	reservation.endTime = endTime;
+	
+	await reservation.save();
+	
+	return reservation as Reservation;
+}
+
+/**
+ * Set the price of the reservation at a specific night.
+ * 
+ * @param reservationId The reservation to update.
+ * @param night The night night to update the reservation to.
+ * @param price The price to update the night with.
+ * @returns The updated reservation.
+ * @throws ReservationNotFoundError if the reservation does not exist.
+ * @throws ReservationUpdateError if the night index is out of bounds.
+ */
+async function setPrice(reservationId: number, night: number, price: number) {
+	const reservation = await getDocumentById(reservationId);
+	
+	if (night < 0 || night >= reservation.nightCount) {
+		throw new ReservationUpdateError("Night is outside of the valid range.");
+	}
+	
+	reservation.prices[night] = price;
+	await reservation.save();
+	
+	return reservation as Reservation;
+}
+
+/**
+ * Set the room of a reservation or null if no room is allocated for
+ * that reservation.
+ * 
+ * @param reservationId The reservation to update.
+ * @param roomNumber The room to update to the reservation.
+ * @returns The new reservations.
+ * @throws ReservationUpdateError
+ */
+async function setRoom(reservationId: number, roomNumber: number | null) {
+	if (!roomNumber) {
+		roomNumber = roomNumber as number;
+		if (!(await Room.isValidRoom(roomNumber))) {
+			throw new ReservationUpdateError(`Room #${roomNumber} does not exist.`);
+		}
+		if (!(await Room.isRoomOccupied(roomNumber))) {
+			throw new ReservationUpdateError(`Occupied room #${roomNumber}.`);
+		}
+	}
+	
+	/* We can now update the reservation's room */
+	return updateReservationField(reservationId, "room", roomNumber);
+}
+
+async function setState(reservationId: number, state: ReservationState) {
+	return updateReservationField(reservationId, "state", state);
+}
+
+/**
+ * Create a new extra and adds it to the reservation.
+ * 
+ * @param reservationId The reservation to add the extra item to.
+ * @param item The name of the extra item.
+ * @param description A description of the extra item, can be as long as possible
+ * or can be an empty string.
+ */
+async function addExtra(reservationId: number, item: string, description: string = "") {
+	const reservation = await getDocumentById(reservationId);
+	
+	const extra = await Extra.create(item, description, reservationId);
+	
+	reservation.extras.push(extra.extraId);
+	await reservation.save();
+	return reservation as Reservation;
+}
+
+async function removeExtraById(reservationId: number, extraId: number) {
+	const reservation = await getDocumentById(reservationId);
+	
+	if (reservation.extras.every((val: number) => val !== extraId)) {
+		throw new ReservationUpdateError(`Extra ${extraId} does not exists in reservaiton`);
+	}
+	
+	reservation.extras = reservation.extras.filter((val: number) => val === extraId);
+	await reservation.save();
+	return reservation as Reservation;
+}
+
+async function isValidReservation(reservationId: number): Promise<boolean> {
+	try {
+		
+		return await ReservationModel.findOne({ reservationId }) !== null;
+		
 	} catch (err) {
 		Logger.error(`Error fetching reservation: ${err}`);
 		return false;
@@ -399,12 +548,31 @@ async function isValidReservation(reservationId: string): Promise<boolean> {
 
 export default {
 	create,
-	setRoom,
+	
+	getByGuestId,
+	getByRoom,
+	getByDateRange,
+	getDocumentById,
+	getById,
+	
+	updateReservationField,
+	
 	setEmail,
-	setPhoneNumber,
-	getAllReservations,
-	getReservation,
-	getLastReservations,
+	setPhone,
+	setStartDate,
+	setStartTime,
+	
+	addNights,
+	removeNights,
+	
+	setEndTime,
+	setPrice,
+	setRoom,
+	setState,
+	addExtra,
+	
+	removeExtraById,
+	
 	isValidReservation,
 }
 
@@ -422,6 +590,7 @@ export default {
  *         reservationMade:
  *           type: string
  *           format: date-time
+ *           readOnly: true
  *           description: The date and time when the reservation was made.
  *           example: "2023-09-16T15:00:00.000Z"
  *         startDate:
@@ -481,23 +650,4 @@ export default {
  *         - prices
  *         - email
  *         - phoneNumber
- * 
- *     Extra:
- *       type: object
- *       properties:
- *         item:
- *           type: string
- *           description: The name or type of the extra item.
- *           example: "Breakfast"
- *         description:
- *           type: string
- *           description: A detailed description of the extra item.
- *           example: "Includes a full English breakfast served in the dining room."
- *         reservation:
- *           type: string
- *           description: The ID of the reservation associated with this extra.
- *           example: "605c73c4f0a5e71b34567891"
- *       required:
- *         - item
- *         - reservation
  */

@@ -105,6 +105,17 @@ async function findRoomById(num: number) {
 	return room;
 }
 
+async function isValidRoom(num: number): Promise<boolean> {
+	try {
+		await findRoomById(num);
+	} catch (err: any) {
+		if (err instanceof RoomDoesNotExistError) {
+			return false;
+		}
+	}
+	return true;
+}
+
 async function createType(code: string, description: string) {
 	if (await RoomTypeModel.exists({ code })) {
 		throw new RoomTypeAlreadyExistsError(code);
@@ -186,7 +197,7 @@ async function isRoomOccupied(num: number): Promise<boolean> {
  * @throws RoomDoesNotExistError
  * @throws MissingReservationIdError
  */
-async function setRoomOccupation(num: number, occupied: boolean, reservationId?: string) {
+async function setRoomOccupation(num: number, occupied: boolean, reservationId?: number) {
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(
@@ -238,6 +249,7 @@ async function getRoomReservation(num: number): Promise<number | null> {
 
 export default {
 	findRoomById,
+	isValidRoom,
 	
 	createType,
 	removeType,
