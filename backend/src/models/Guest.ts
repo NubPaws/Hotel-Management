@@ -1,12 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 import { Email, isEmailString } from "../utils/Email.js";
 import Counter from "./Counter.js";
+import Logger from "../utils/Logger.js";
 
 export class GuestAlreadyExistsError extends Error {}
 export class GuestDoesNotExistError extends Error {}
+export class GuestCreationError extends Error {}
+export class GuestUpdateError extends Error {}
 
 export interface Guest extends Document {
-	guestId: number,
+	guestId: number,                     // System's ID for each guest.
+	identification: string,              // Actual guest's ID used for identification.
 	fullName: string,
 	title: string,
 	email: Email,
@@ -17,6 +21,12 @@ export interface Guest extends Document {
 const GuestSchema = new Schema<Guest>({
 	guestId: {
 		type: Number,
+		required: true,
+		unique: true,
+		index: true,
+	},
+	identification: {
+		type: String,
 		required: true,
 		unique: true,
 		index: true,
@@ -46,7 +56,6 @@ const GuestSchema = new Schema<Guest>({
 	phone: {
 		type: String,
 		required: false,
-		index: true,
 	},
 	reservations: [{
 		type: Number,
@@ -65,59 +74,167 @@ GuestSchema.pre("save", async function (next) {
 
 const GuestModel = mongoose.model<Guest>("GuestModel", GuestSchema);
 
-async function create(id: number, fullName: string, email: string, phoneNumber: string) {
-	if (await GuestModel.exists({guestId: id}))
+/**
+ * Create a new guest and adds them to the system.
+ * 
+ * @param identification Real life ID number (or string) used to identify the
+ * guest as the person they claim they are.
+ * @param fullName The full name of the guest.
+ * @param email The email address of the guest, for more information on
+ * how it should look you can look up the Email type.
+ * @param phone The phone number of the guest.
+ * @param title The title of guest if they have any.
+ * @returns The newly created guest.
+ * @throws GuestAlreadyExistsError
+ */
+async function create(
+	identification: string,
+	fullName: string,
+	email: Email,
+	phone: string,
+	title: string = ""
+) {
+	if (await GuestModel.exists({ identification }))
 		throw new GuestAlreadyExistsError();
 	
-	await GuestModel.create({
-		guestId: id,
-		fullName,
-		email,
-		phone: phoneNumber,
-		reservations: [],
-	});
+	try {
+		return await GuestModel.create({
+			identification,
+			fullName,
+			title,
+			email,
+			phone,
+			reservations: [],
+		});
+	} catch (err: any) {
+		Logger.error(`Failed to create guest ${err.message}`);
+		throw new GuestCreationError(err.message);
+	}
 }
 
-async function addReservation(id: number, reservationId: any) {
-	if (!(await GuestModel.exists({guestId: id})))
+/**
+ * Returns the Guest mongoose document based on the ID.
+ * 
+ * @param guestId The ID of the guest to get.
+ * @returns The guest with that ID as a document.
+ * @throws GuestDoesNotExistError
+ */
+async function getById(guestId: number) {
+	const guest = await GuestModel.findOne({ guestId });
+	if (!guest) {
 		throw new GuestDoesNotExistError();
+	}
 	
-	await GuestModel.updateOne({guestId: id}, {
-		$push: { reservations: reservationId }
-	});
+	return guest;
 }
 
-async function changeEmail(id: number, email: string) {
-	if (!(await GuestModel.exists({guestId: id})))
+/**
+ * Returns the Guest mongoose document based on the identification.
+ * 
+ * @param identification The identification of the guest to get.
+ * @returns The guest with that ID as a document.
+ * @throws GuestDoesNotExistError
+ */
+async function getByIdentification(identification: string) {
+	const guest = await GuestModel.findOne({ identification });
+	if (!guest) {
 		throw new GuestDoesNotExistError();
+	}
 	
-	await GuestModel.updateOne({guestId: id}, {
-		$set: {email}
-	});
+	return guest;
 }
 
-async function changeName(id: number, fullName: string) {
-	if (!(await GuestModel.exists({guestId: id})))
-		throw new GuestDoesNotExistError();
+/**
+ * Finds the guest who made the reservation and returns it.
+ * 
+ * @param reservationId The ID of the reservation that the guest made.
+ * @returns The guest mongoose document that made the reservation.
+ */
+async function getByReservation(reservationId: number) {
+	const guest = await GuestModel.findOne({ reservations: reservationId });
 	
-	await GuestModel.updateOne({guestId: id}, {
-		$set: {fullName}
-	});
+	if (!guest) {
+		throw new GuestDoesNotExistError();
+	}
+	
+	return guest;
 }
 
-async function changePhoneNumber(id: number, phoneNumber: string) {
-	if (!(await GuestModel.exists({guestId: id})))
-		throw new GuestDoesNotExistError();
+/**
+ * Add a reservation ID to the guest as to make it his own.
+ * 
+ * @param guestId The guest ID to add the reservation to.
+ * @param reservationId The reservation ID to add to the guest.
+ * @returns The guest document with the reservation added to them.
+ * @throws GuestUpdateError if the update failed.
+ */
+async function addReservation(guestId: number, reservationId: number) {
+	const existingGuest = await GuestModel.findOne({ reservations: reservationId });
 	
-	await GuestModel.updateOne({guestId: id}, {
-		$set: {phone: phoneNumber}
-	});
+	if (existingGuest) {
+		throw new GuestUpdateError("Reservation is already taken");
+	}
+	
+	const guest = await GuestModel.findOneAndUpdate(
+		{ guestId },
+		{ $push: { reservations: reservationId } },
+		{ new: true }
+	);
+	
+	if (!guest) {
+		throw new GuestUpdateError(`Failed to find guest ${guestId}`);
+	}
+	return guest;
+}
+
+/**
+ * Updated a guest with the field that is specified and value.
+ * 
+ * @param guestId The guest ID to update the field of.
+ * @param field The name of the field to update.
+ * @param value The value of the field to update.
+ * @returns The guest document after updating the field.
+ * @throws GuestUpdateError
+ */
+async function updateGuestField(guestId: number, field: keyof Guest, value: any) {
+	try {
+		const updateData = { [field]: value };
+		const guest = await GuestModel.findOneAndUpdate(
+			{ guestId },
+			{ $set: updateData },
+			{ new: true }
+		);
+		
+		if (!guest) {
+			throw new GuestUpdateError(`Failed to update ${field}.`);
+		}
+		
+		return guest;
+	} catch (err: any) {
+		throw new GuestUpdateError(`Failed to update ${field}: ${err.message}`);
+	}
+}
+
+async function setEmail(guestId: number, email: Email) {
+	return await updateGuestField(guestId, "email", email);
+}
+
+async function setName(guestId: number, fullName: string) {
+	return await updateGuestField(guestId, "fullName", fullName);
+}
+
+async function setPhone(guestId: number, phone: string) {
+	return await updateGuestField(guestId, "phone", phone);
 }
 
 export default {
 	create,
+	getById,
+	getByIdentification,
+	getByReservation,
 	addReservation,
-	changeEmail,
-	changeName,
-	changePhoneNumber,
+	updateGuestField,
+	setEmail,
+	setName,
+	setPhone,
 }

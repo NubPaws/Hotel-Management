@@ -289,24 +289,13 @@ async function getByDateRange(fromDate: Date, toDate: Date) {
  * @param reservationId The reservation id to find.
  * @returns The reservation document.
  */
-async function getDocumentById(reservationId: number) {
+async function getById(reservationId: number) {
 	const reservation = await ReservationModel.findOne({ reservationId });
 	if (!reservation) {
 		throw new ReservationDoesNotExistError();
 	}
 	
 	return reservation;
-}
-
-/**
- * Returns a reservation by the ID.
- * 
- * @param reservationId The reservation's ID to fetch.
- * @returns The Reservation interface.
- * @throws ReservationDoesNotExistError
- */
-async function getById(reservationId: number) {
-	return await getDocumentById(reservationId) as Reservation;
 }
 
 /* ---------------------- Setters ---------------------- */
@@ -372,7 +361,7 @@ async function setStartDate(reservationId: number, startDate: Date) {
  * @throws ReservationUpdateError
  */
 async function setStartTime(reservationId: number, startTime: Time24) {
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	const endTime = reservation.endTime;
 	if (numFromTime24(startTime) >= numFromTime24(reservation.endTime)) {
@@ -400,7 +389,7 @@ async function addNights(reservationId: number, nightsToAdd: number, prices: num
 		throw new ReservationUpdateError("For each night there must be a price.");
 	}
 	
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	reservation.nightCount += nightsToAdd;
 	reservation.prices.push(...prices);
@@ -419,7 +408,7 @@ async function addNights(reservationId: number, nightsToAdd: number, prices: num
  * @returns The reservation with the updated information.
  */
 async function removeNights(reservationId: number, nightsToRemove: number) {
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	if (reservation.nightCount < nightsToRemove) {
 		throw new ReservationUpdateError("Trying to remove too many nights!!!");
@@ -441,7 +430,7 @@ async function removeNights(reservationId: number, nightsToRemove: number) {
 }
 
 async function setEndTime(reservationId: number, endTime: Time24) {
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	if (numFromTime24(reservation.startTime) <= numFromTime24(endTime)) {
 		throw new ReservationUpdateError("End time must be after start time.");
@@ -465,7 +454,7 @@ async function setEndTime(reservationId: number, endTime: Time24) {
  * @throws ReservationUpdateError if the night index is out of bounds.
  */
 async function setPrice(reservationId: number, night: number, price: number) {
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	if (night < 0 || night >= reservation.nightCount) {
 		throw new ReservationUpdateError("Night is outside of the valid range.");
@@ -514,7 +503,7 @@ async function setState(reservationId: number, state: ReservationState) {
  * or can be an empty string.
  */
 async function addExtra(reservationId: number, item: string, description: string = "") {
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	const extra = await Extra.create(item, description, reservationId);
 	
@@ -524,7 +513,7 @@ async function addExtra(reservationId: number, item: string, description: string
 }
 
 async function removeExtraById(reservationId: number, extraId: number) {
-	const reservation = await getDocumentById(reservationId);
+	const reservation = await getById(reservationId);
 	
 	if (reservation.extras.every((val: number) => val !== extraId)) {
 		throw new ReservationUpdateError(`Extra ${extraId} does not exists in reservaiton`);
@@ -552,7 +541,6 @@ export default {
 	getByGuestId,
 	getByRoom,
 	getByDateRange,
-	getDocumentById,
 	getById,
 	
 	updateReservationField,
