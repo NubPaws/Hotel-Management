@@ -238,3 +238,42 @@ export default {
 	setName,
 	setPhone,
 }
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Guest:
+ *       type: object
+ *       properties:
+ *         guestId:
+ *           type: integer
+ *           description: The system's unique ID for each guest.
+ *           example: 123
+ *         identification:
+ *           type: string
+ *           description: The real-life ID number or string used to identify the guest.
+ *           example: "ID123456789"
+ *         fullName:
+ *           type: string
+ *           description: The full name of the guest.
+ *           example: "John Doe"
+ *         title:
+ *           type: string
+ *           description: The title of the guest if they have any.
+ *           example: "Mr."
+ *         email:
+ *           type: string
+ *           description: The email address of the guest.
+ *           example: "johndoe@example.com"
+ *         phone:
+ *           type: string
+ *           description: The phone number of the guest.
+ *           example: "+1-800-555-1234"
+ *         reservations:
+ *           type: array
+ *           items:
+ *             type: integer
+ *           description: An array of reservation IDs associated with the guest.
+ *           example: [101, 102, 103]
+ */
