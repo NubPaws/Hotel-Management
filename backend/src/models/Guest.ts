@@ -1,91 +1,116 @@
 import mongoose, { Schema } from "mongoose";
-import { Reservation } from "./Reservation.js";
+import { Email, isEmailString } from "../utils/Email.js";
+import Counter from "./Counter.js";
 
 export class GuestAlreadyExistsError extends Error {}
 export class GuestDoesNotExistError extends Error {}
 
 export interface Guest extends Document {
-	id: number,
+	guestId: number,
 	fullName: string,
-	email: string,
-	phoneNumber: string,
-	reservations: Reservation[],
+	title: string,
+	email: Email,
+	phone: string,
+	reservations: number[],
 }
 
-const GuestModel = mongoose.model<Guest>(
-	"GuestModel",
-	new Schema<Guest>({
-		id: {
-			type: Number,
-			required: true,
-			unique: true,
+const GuestSchema = new Schema<Guest>({
+	guestId: {
+		type: Number,
+		required: true,
+		unique: true,
+		index: true,
+	},
+	fullName: {
+		type: String,
+		required: true,
+		index: true,
+		validate: {
+			validator: (fname: string) => fname.length > 0,
+			message: "Name must not be an empty string.",
 		},
-		fullName: {
-			type: String,
-			required: true,
+	},
+	title: {
+		type: String,
+		required: true,
+		default: "",
+	},
+	email: {
+		type: String,
+		required: false,
+		validate: {
+			validator: (value: string) => isEmailString(value),
+			message: "Email is not in a valid format.",
 		},
-		email: {
-			type: String,
-			required: true,
-		},
-		phoneNumber: {
-			type: String,
-			required: true,
-		},
-		reservations: [{
-			type: Schema.Types.ObjectId,
-			ref: "ReservationModel",
-			required: true,
-		}],
-	}, {id: false})
-);
+	},
+	phone: {
+		type: String,
+		required: false,
+		index: true,
+	},
+	reservations: [{
+		type: Number,
+		ref: "ReservationModel",
+	}],
+}, { _id: false });
+
+GuestSchema.pre("save", async function (next) {
+	const doc = this;
+	if (doc.isNew) {
+		const counter = await Counter.increment("guestId");
+		doc.guestId = counter;
+	}
+	next();
+});
+
+const GuestModel = mongoose.model<Guest>("GuestModel", GuestSchema);
 
 async function create(id: number, fullName: string, email: string, phoneNumber: string) {
-	if (await GuestModel.exists({id}))
+	if (await GuestModel.exists({guestId: id}))
 		throw new GuestAlreadyExistsError();
 	
 	await GuestModel.create({
-		id,
+		guestId: id,
 		fullName,
 		email,
-		phoneNumber,
+		phone: phoneNumber,
 		reservations: [],
 	});
 }
 
 async function addReservation(id: number, reservationId: any) {
-	if (!(await GuestModel.exists({id})))
+	if (!(await GuestModel.exists({guestId: id})))
 		throw new GuestDoesNotExistError();
 	
-	await GuestModel.updateOne({id}, {
+	await GuestModel.updateOne({guestId: id}, {
 		$push: { reservations: reservationId }
 	});
 }
 
 async function changeEmail(id: number, email: string) {
-	if (!(await GuestModel.exists({id})))
+	if (!(await GuestModel.exists({guestId: id})))
 		throw new GuestDoesNotExistError();
 	
-	await GuestModel.updateOne({id}, {
+	await GuestModel.updateOne({guestId: id}, {
 		$set: {email}
 	});
 }
 
 async function changeName(id: number, fullName: string) {
-	if (!(await GuestModel.exists({id})))
+	if (!(await GuestModel.exists({guestId: id})))
 		throw new GuestDoesNotExistError();
 	
-	await GuestModel.updateOne({id}, {
+	await GuestModel.updateOne({guestId: id}, {
 		$set: {fullName}
 	});
 }
 
 async function changePhoneNumber(id: number, phoneNumber: string) {
-	if (!(await GuestModel.exists({id})))
+	if (!(await GuestModel.exists({guestId: id})))
 		throw new GuestDoesNotExistError();
 	
-	await GuestModel.updateOne({id}, {
-		$set: {phoneNumber}
+	await GuestModel.updateOne({guestId: id}, {
+		$set: {phone: phoneNumber}
 	});
 }
 

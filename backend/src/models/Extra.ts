@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import CounterModel from "./Counter.js";
+import Counter from "./Counter.js";
 import Reservation, { ReservationDoesNotExistError } from "./Reservation.js";
 
 export class ExtraDoesNotExistError extends Error {
@@ -49,7 +49,7 @@ const ExtraModel = mongoose.model<Extra>("ExtraModel", ExtraSchema);
 ExtraSchema.pre("save", async function (next) {
 	const doc = this;
 	if (doc.isNew) {
-		const counter = await CounterModel.increment("extraId");
+		const counter = await Counter.increment("extraId");
 		doc.extraId = counter;
 	}
 	next();

@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { addDaysToDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/Clock.js";
 import { Email, isEmailString } from "../utils/Email.js";
 import Logger from "../utils/Logger.js";
-import CounterModel from "./Counter.js";
+import Counter from "./Counter.js";
 import Extra from "./Extra.js";
 import Room from "./Room.js";
 
@@ -126,7 +126,7 @@ const ReservationModel = mongoose.model<Reservation>("ReservationModel", Reserva
 ReservationSchema.pre("save", async function (next) {
 	const doc = this;
 	if (doc.isNew) {
-		const counter = await CounterModel.increment("reservationId");
+		const counter = await Counter.increment("reservationId");
 		doc.reservationId = counter;
 	}
 	next();
