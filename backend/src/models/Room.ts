@@ -55,7 +55,7 @@ const RoomTypeSchema = new Schema<RoomType>({
 const RoomTypeModel = mongoose.model<RoomType>("RoomTypeModel", RoomTypeSchema);
 
 interface Room extends Document {
-	id: number,
+	roomId: number,
 	type: string,
 	state: RoomState,
 	occupied: boolean,
@@ -63,10 +63,11 @@ interface Room extends Document {
 }
 
 const RoomSchema = new Schema<Room>({
-	id: {
+	roomId: {
 		type: Number,
 		required: true,
 		unique: true,
+		index: true,
 	},
 	type: {
 		type: String,
@@ -96,10 +97,10 @@ const RoomModel = mongoose.model<Room>("RoomModel", RoomSchema);
  * @returns Room
  * @throws RoomDoesNotExistError
  */
-async function findRoomById(num: number) {
-	const room = await RoomModel.findOne({ id: num });
+async function getDocumentById(roomId: number) {
+	const room = await RoomModel.findOne({ roomNum: roomId });
 	if (!room) {
-		throw new RoomDoesNotExistError(num);
+		throw new RoomDoesNotExistError(roomId);
 	}
 	
 	return room;
@@ -107,7 +108,7 @@ async function findRoomById(num: number) {
 
 async function isValidRoom(num: number): Promise<boolean> {
 	try {
-		await findRoomById(num);
+		await getDocumentById(num);
 	} catch (err: any) {
 		if (err instanceof RoomDoesNotExistError) {
 			return false;
@@ -122,6 +123,22 @@ async function createType(code: string, description: string) {
 	}
 	
 	await RoomTypeModel.create({ code, description });
+}
+
+async function createRoom(num: number, code: string) {
+	// This will throw an error if there isn't a room like that.
+	// We'll just ignore the return value.
+	await getDocumentById(num);
+	
+	const roomType = await RoomTypeModel.findOne({ code });
+	if (!roomType) {
+		throw new RoomTypeDoesNotExistError(code);
+	}
+	
+	await RoomModel.create({
+		roomNum: num,
+		type: code,
+	});
 }
 
 /**
@@ -151,29 +168,13 @@ async function removeType(typeCode: string, newTypeCode: string) {
 	await RoomTypeModel.deleteOne({ code: typeCode });
 }
 
-async function createRoom(num: number, code: string) {
-	// This will throw an error if there isn't a room like that.
-	// We'll just ignore the return value.
-	await findRoomById(num);
-	
-	const roomType = await RoomTypeModel.findOne({ code });
-	if (!roomType) {
-		throw new RoomTypeDoesNotExistError(code);
-	}
-	
-	await RoomModel.create({
-		id: num,
-		type: code,
-	});
-}
-
 async function removeRoom(num: number) {
-	await findRoomById(num);
-	await RoomModel.deleteOne({ id: num });
+	await getDocumentById(num);
+	await RoomModel.deleteOne({ roomNum: num });
 }
 
 async function changeRoomState(num: number, state: RoomState) {
-	const room = await findRoomById(num);
+	const room = await getDocumentById(num);
 	
 	room.state = state;
 	await room.save();
@@ -185,7 +186,7 @@ async function changeRoomState(num: number, state: RoomState) {
  * @throws RoomDoesNotExistError
  */
 async function isRoomOccupied(num: number): Promise<boolean> {
-	const room = await findRoomById(num);
+	const room = await getDocumentById(num);
 	return room.occupied;
 }
 
@@ -201,7 +202,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(
-			{ id: num },
+			{ roomNum: num },
 			{ $set: { occupied: false, reservation: null } },
 			{ new: true },
 		);
@@ -224,7 +225,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	}
 	
 	const room = await RoomModel.findOneAndUpdate(
-		{ id: num },
+		{ roomNum: num },
 		{ $set: {
 			occupied: true,
 			reservation: reservationId,
@@ -243,18 +244,18 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
  * @throws RoomDoesNotExistError
  */
 async function getRoomReservation(num: number): Promise<number | null> {
-	const room = await findRoomById(num);
+	const room = await getDocumentById(num);
 	return room.reservation;
 }
 
 export default {
-	findRoomById,
+	getDocumentById,
 	isValidRoom,
 	
 	createType,
-	removeType,
-	
 	createRoom,
+	
+	removeType,
 	removeRoom,
 	
 	changeRoomState,
