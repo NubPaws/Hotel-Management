@@ -2,10 +2,10 @@ import { Input } from "../UIElements/Input"
 import { Button } from "../UIElements/Button"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { useState } from "react";
+import { loginUser } from "./Login";
+import { Modal } from "../UIElements/Modal";
 
 export function LoginScreen() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
     const [showErrorMessage, setShowErrorMessage] = useState(false);
 
     return (
@@ -13,13 +13,11 @@ export function LoginScreen() {
             <CenteredLabel labelName="Login" />
             <form className="fieldsContainer">
                 <Input id="username" className="field" type="text" name="username"
-                    placeholder="Username"
-                    onChange={(e) => setUsername(e.target.value)}>
+                    placeholder="Username" errorMessageId="usernameErrorMessage">
                     Username
                 </Input>
                 <Input id="password" className="field" type="password" name="password"
-                    placeholder="Password"
-                    onChange={(e) => setPassword(e.target.value)}>
+                    placeholder="Password" errorMessageId="passwordErrorMessage">
                     Password
                 </Input>
                 <Button
@@ -27,10 +25,13 @@ export function LoginScreen() {
                     bgColor="white"
                     textColor="black"
                     borderWidth="1px"
-                    onClick={() => {}}>
+                    onClick={(event) => {loginUser(event)}}>
                     Login
                 </Button>
             </form>
+            <Modal title="Login Failed" show={showErrorMessage} onClose={() => { setShowErrorMessage(false) }}>
+                <h5>Incorrect username/password</h5>
+            </Modal>
         </>
     )
 }

@@ -8,6 +8,7 @@ export function Input(props : {className: string,
                                name: string,
                                placeholder: string,
                                onChange?: ChangeEventHandler<HTMLInputElement>,
+                               errorMessageId: string
                             }) {
     return (
         <div className={props.className}>
@@ -15,6 +16,7 @@ export function Input(props : {className: string,
             <div className="fieldInputContainer">
                 <input className="fieldInput" type={props.type}  name={props.name} id={props.id}
                     placeholder={props.placeholder} onChange={props.onChange} required/>
+                    <div id={props.errorMessageId}></div>
             </div>
         </div>
     );

@@ -1,53 +1,69 @@
-import { Dispatch, SetStateAction } from "react";
-
 const USERNAME_MIN_LENGTH = 4;
 const PASSWORD_MIN_LENGTH = 4;
 
-// Validated all the fields required to create user
-function validateUserCreation(username: string,
-    password: string,
-    confirmPasswordText: string,
-    setUsernameErrorMessage: Dispatch<SetStateAction<string>>,
-    setConfirmPasswordFailedMessage: Dispatch<SetStateAction<string>>,
-) {
-    if (!validateUsername(username, setUsernameErrorMessage)) {
+function validateUsername() {
+    // let username = document.getElementById("username")!
+    let username = document.getElementById("username") as HTMLInputElement;
+    let errorMessageSpan = document.getElementById("usernameErrorMessage")!
+    if (username.value.length < USERNAME_MIN_LENGTH) {
+        errorMessageSpan.innerText = "Username needs to have at least 4 characters";
         return false;
     }
-    if (!validatePassword(password,
-                           confirmPasswordText,
-                           setConfirmPasswordFailedMessage)) {
-        return false;
-    }
+    errorMessageSpan.innerText = "";
     return true;
 }
 
-function validateUsername(username: string,
-                          setUsernameErrorMessage: Dispatch<SetStateAction<string>>) {
-    if (username.length === 0) {
-        setUsernameErrorMessage("Username is empty");
+function validatePassword(passwordId: string, passwordErrorMessageId: string) {
+    let password = document.getElementById(passwordId) as HTMLInputElement;
+    // let errorMessageSpan = document.getElementById("passwordErrorMessage")!
+    let errorMessageSpan = document.getElementById(passwordErrorMessageId)!
+    if (password.value.length < PASSWORD_MIN_LENGTH) {
+        errorMessageSpan.innerText = "Password needs have at least " + PASSWORD_MIN_LENGTH + " characters";
         return false;
     }
-    if (username.length < USERNAME_MIN_LENGTH) {
-        setUsernameErrorMessage(`Username length need to be ${USERNAME_MIN_LENGTH} characters length`);
-        return false;
-    }
+    errorMessageSpan.innerText = "";
     return true;
 }
 
-function validatePassword(passwordFirstAttempt: string,
-                         passwordSecondAttempt: string,
-                         setConfirmPasswordFailedMessage: Dispatch<SetStateAction<string>>) {
-    if (passwordFirstAttempt !== passwordSecondAttempt) {
-        setConfirmPasswordFailedMessage("Passwords don't match");
+function confirmPassword(passwordId: string, confirmPasswordId: string, confirmPasswordErrorMessageId: string) {
+    let password = document.getElementById(passwordId) as HTMLInputElement;
+    let confirmPassword = document.getElementById(confirmPasswordId) as HTMLInputElement;
+    let errorMessageSpan = document.getElementById(confirmPasswordErrorMessageId) as HTMLInputElement;
+    if (confirmPassword.value.length < PASSWORD_MIN_LENGTH) {
+        errorMessageSpan.innerText = "Password needs have at least " + PASSWORD_MIN_LENGTH + " characters";
         return false;
     }
-    if (passwordFirstAttempt.length < PASSWORD_MIN_LENGTH) {
-        setConfirmPasswordFailedMessage(`Username length need to be ${PASSWORD_MIN_LENGTH} characters length`);
+    if (confirmPassword.value !== password.value) {
+        errorMessageSpan.innerText = "Passwords do not match";
         return false;
     }
+    errorMessageSpan.innerText = "";
     return true;
+}
+
+function validateUserRole() {
+    const userRole: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[name="role"]');
+    let validChoice = false;
+    let userRoleErrorMessage = document.getElementById("userRoleErrorMessage") as HTMLInputElement;
+
+    for (let i = 0; i < userRole.length; i++) {
+        if (userRole[i].checked) {
+            validChoice = true;
+        }
+    }
+    if (!validChoice) {
+        userRoleErrorMessage.innerText = "Role must be chosen";
+        return false;
+    }
+    else {
+        userRoleErrorMessage.innerText = "";
+    }
+    return validChoice;
 }
 
 export {
-    validateUserCreation
+    validateUsername,
+    validatePassword,
+    confirmPassword,
+    validateUserRole
 }

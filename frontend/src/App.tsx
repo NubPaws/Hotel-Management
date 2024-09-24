@@ -1,6 +1,6 @@
 import './App.css'
 import { LoginScreen } from './Authentication/LoginScreen'
-import { ChangePassword } from './Authentication/PasswordChange'
+import { ChangePassword } from './Authentication/PasswordChangeScreen'
 import { NavigationBar } from './UIElements/NavigationBar'
 import { UserCreationScreen } from './Authentication/UserCreationScreen'
 
@@ -9,9 +9,9 @@ function App() {
     return (
         <div className="appContainer">
             <NavigationBar />
-            {/* <LoginScreen /> */}
+            <LoginScreen />
             {/* <ChangePassword /> */}
-            <UserCreationScreen />
+            {/* <UserCreationScreen /> */}
         </div>
     )
 }
