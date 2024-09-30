@@ -41,7 +41,7 @@ const UserSchema = new Schema<User>({
 		enum: Object.values(UserRole),
 		default: UserRole.User,
 	},
-}, { _id: false });
+});
 
 // Creating the user model.
 const UserModel = mongoose.model<User>("UserModel", UserSchema);

@@ -119,7 +119,7 @@ const ReservationSchema = new Schema<Reservation>({
 		type: String,
 		required: true,
 	},
-}, { _id: false });
+});
 
 const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
 

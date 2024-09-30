@@ -50,7 +50,7 @@ const RoomTypeSchema = new Schema<RoomType>({
 		type: String,
 		required: true,
 	}
-}, { _id: false });
+});
 
 const RoomTypeModel = mongoose.model<RoomType>("RoomTypeModel", RoomTypeSchema);
 
@@ -88,7 +88,7 @@ const RoomSchema = new Schema<Room>({
 		default: null,
 		ref: "ReservationModel",
 	},
-}, { _id: false });
+});
 
 const RoomModel = mongoose.model<Room>("RoomModel", RoomSchema);
 

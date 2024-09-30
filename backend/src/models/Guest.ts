@@ -61,7 +61,7 @@ const GuestSchema = new Schema<Guest>({
 		type: Number,
 		ref: "ReservationModel",
 	}],
-}, { _id: false });
+});
 
 GuestSchema.pre("save", async function (next) {
 	const doc = this;
