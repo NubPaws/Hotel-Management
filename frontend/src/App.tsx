@@ -1,7 +1,7 @@
 import './App.css'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { LoginScreen } from './Authentication/LoginScreen'
-import { ChangePassword } from './Authentication/PasswordChangeScreen'
+import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen'
 import { NavigationBar } from './UIElements/NavigationBar'
 import { UserCreationScreen } from './Authentication/UserCreationScreen'
 import { useState } from "react";
@@ -18,7 +18,7 @@ function App() {
                     <Route path='/' element={<LoginScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
                     <Route path='/login' element={<LoginScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
                     <Route path='/user-creation' element={<UserCreationScreen />}></Route>
-                    <Route path='/change-password' element={<ChangePassword />}></Route>
+                    <Route path='/change-password' element={<ChangePasswordScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials}/>}></Route>
                     <Route path='/home' element={<HomeScreen />}></Route>
                 </Routes>
             </BrowserRouter>

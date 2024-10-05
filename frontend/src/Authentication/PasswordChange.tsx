@@ -5,7 +5,11 @@ async function changePassword(event : any) {
     if (validatePassword("oldPassword", "oldPasswordErrorMessage")
         && validatePassword("newPassword", "passwordErrorMessage")
         && confirmPassword("newPassword", "confirmPassword", "confirmPasswordErrorMessage")) {
-        // change password logic
+        // let oldPassword = document.getElementById("oldPassword") as HTMLInputElement;
+        // let newPassword = document.getElementById("newPassword") as HTMLInputElement;
+        // let passwordChangeData = {
+
+        // }
     }
 }
 
