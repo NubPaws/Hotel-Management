@@ -39,7 +39,7 @@ async function loginUser(event : any,
             const userDetails = await getUserDetails(enteredUsername.value, "Bearer " + token,);
             if (token !== null && userDetails !== null) {
                 setUserCredentials({
-                    token: token,
+                    token: "Bearer " + token,
                     username: userDetails.user,
                     role: userDetails.role
                 })
