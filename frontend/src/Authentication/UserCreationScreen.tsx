@@ -17,7 +17,7 @@ export function UserCreationScreen(props: {
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (props.userCredentials.username === "") {
+        if (props.userCredentials.role !== "Admin") {
             navigate("/login");
         }
     }, [props.userCredentials, props.setUserCredentials, navigate]);
