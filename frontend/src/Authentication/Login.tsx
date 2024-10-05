@@ -4,7 +4,7 @@ import { validatePassword, validateUsername } from "./Validation";
 async function loginUser(event : any,
                         setShowErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
                         setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-                        setUserCredentials: React.Dispatch<React.SetStateAction<{}>>) {
+                        setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>) {
     event.preventDefault();
     if (validateUsername() && validatePassword("password", "passwordErrorMessage")) {
         let enteredUsername = document.getElementById("username") as HTMLInputElement;
@@ -39,8 +39,9 @@ async function loginUser(event : any,
             const userDetails = await getUserDetails(enteredUsername.value, "Bearer " + token,);
             if (token !== null && userDetails !== null) {
                 setUserCredentials({
-                    "token": "Bearer " + token,
-                    ...userDetails
+                    token: token,
+                    username: userDetails.user,
+                    role: userDetails.role
                 })
             }
         }

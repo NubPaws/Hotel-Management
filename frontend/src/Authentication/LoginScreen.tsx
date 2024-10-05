@@ -9,8 +9,8 @@ import { loginUser } from "./Login";
 import { Modal } from "../UIElements/Modal";
 
 export function LoginScreen(props: {
-    userCredentials: {},
-    setUserCredentials: React.Dispatch<React.SetStateAction<{}>>
+    userCredentials: UserCredentials,
+    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>
 }) {
     const navigate = useNavigate();
     const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -18,7 +18,7 @@ export function LoginScreen(props: {
 
     // Will change after successful login attempt
     useEffect(() => {
-        if (Object.keys(props.userCredentials).length !== 0) {
+        if (props.userCredentials.username !== "") {
             navigate("/home");
         }
     }, [props.userCredentials, props.setUserCredentials, navigate]);
