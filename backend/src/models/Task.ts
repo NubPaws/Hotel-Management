@@ -3,6 +3,7 @@ import User, { Department, UserDoesNotExistError } from "./User.js";
 import Room, { RoomDoesNotExistError } from "./Room.js";
 import Counter from "./Counter.js";
 import { dateToString, Time24 } from "../utils/Clock.js";
+import Logger from "../utils/Logger.js";
 
 export class TaskDoesNotExistError extends Error {
 	constructor(taskId: number) {
@@ -217,6 +218,33 @@ async function setStatus(taskId: number, setter: string, status: TaskStatus) {
 	setTaskValue(taskId, "status", status, setter);
 }
 
+/**
+ * Retrieves all tasks for a specific department and returns them
+ * sorted by urgency (high to low) and timeCreated (oldest to newest).
+ * 
+ * @param department The department to filter tasks by.
+ * @returns A promise that resolves to an array of Task objects.
+ */
+async function getTasksByDepartment(department: Department): Promise<Task[]> {
+	// Find tasks that match the department and sort them:
+	// 1. First by urgency (descending, higher urgency comes first)
+	// 2. Then by timeCreated (ascending, older tasks come first)
+	const tasks = await TaskModel.find({ department })
+	.sort({ urgency: -1, timeCreated: 1 })
+	.exec();
+	
+	return tasks;
+
+}
+
+async function remove(taskId: number) {
+	try {
+		await TaskModel.deleteOne({ taskId });
+	} catch (error) {
+		Logger.error(`Failed deleting task ${taskId}. Task might not even exist.`);
+	}
+}
+
 export default {
 	getTask,
 	create,
@@ -224,6 +252,8 @@ export default {
 	setUrgency,
 	setDepartment,
 	setStatus,
+	getTasksByDepartment,
+	remove,
 }
 
 /**
