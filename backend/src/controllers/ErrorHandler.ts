@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import Logger from "../utils/Logger.js";
+import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError } from "../models/Room.js";
 
 export enum ErrorCode {
 	Ok = 200,
@@ -20,7 +21,7 @@ function users(err: any, _req: Request, res: Response, next: NextFunction) {
 		message = "Incorrect username and/or password";
 	} else if (err instanceof UserDoesNotExistError) {
 		statusCode = ErrorCode.BadRequest;
-		message = ""
+		message = "User does not exists"
 	} else if (err instanceof CreatorDoesNotExistError) {
 		statusCode = ErrorCode.BadRequest;
 		message = "Creator does not exists";
@@ -40,10 +41,40 @@ function users(err: any, _req: Request, res: Response, next: NextFunction) {
 		next(err);
 		return;
 	}
-	Logger.warn(`Responding to user with: (${statusCode}) ${message}`);
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
+}
+
+function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = ErrorCode.Ok;
+	let message = "";
+	
+	if (err instanceof RoomDoesNotExistError) {
+		statusCode = ErrorCode.BadRequest;
+		message = err.message;
+	} else if (err instanceof RoomNumberAlreadyExistsError) {
+		statusCode = ErrorCode.BadRequest;
+		message = err.message;
+	} else if (err instanceof RoomTypeDoesNotExistError) {
+		statusCode = ErrorCode.BadRequest;
+		message = err.message;
+	} else if (err instanceof RoomTypeAlreadyExistsError) {
+		statusCode = ErrorCode.BadRequest;
+		message = err.message;
+	} else if (err instanceof MissingReservationIdError) {
+		statusCode = ErrorCode.BadRequest;
+		message = err.message;
+	} else {
+		next(err);
+		return;
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
 	res.status(statusCode).send(message);
 }
 
 export default {
 	users,
+	rooms,
 }

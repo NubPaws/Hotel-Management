@@ -8,6 +8,7 @@ import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
 import { loadDatabase } from "./utils/DatabaseConnector.js";
 import Environment from "./utils/Environment.js";
 import Logger from "./utils/Logger.js";
+import { RoomsRouter } from "./controllers/Room.js";
 
 const app = express();
 const port = Environment.port;
@@ -46,9 +47,11 @@ app.use((req, res, next) => {
 // Load the routes.
 app.use("/api/Tokens", TokensRouter);
 app.use("/api/Users", UsersRouter);
+app.use("/api/Rooms", RoomsRouter);
 
-// Erro handling middleware.
+// Error handling middleware.
 app.use(ErrorHandler.users);
+app.use(ErrorHandler.rooms);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200);
