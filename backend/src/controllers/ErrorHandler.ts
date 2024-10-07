@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UserDoesNotExistError } from "../models/User.js";
+import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
+import Logger from "../utils/Logger.js";
 
 export enum ErrorCode {
 	Ok = 200,
@@ -32,10 +33,14 @@ function users(err: any, _req: Request, res: Response, next: NextFunction) {
 	} else if (err instanceof FailedToSignJwtTokenError) {
 		statusCode = ErrorCode.BadRequest;
 		message = "Couldn't sign jwt token for user";
+	} else if (err instanceof UserAlreadyExistsError) {
+		statusCode = ErrorCode.Conflict;
+		message = "User already exists, username must be unique"
 	} else {
 		next(err);
 		return;
 	}
+	Logger.warn(`Responding to user with: (${statusCode}) ${message}`);
 	res.status(statusCode).send(message);
 }
 

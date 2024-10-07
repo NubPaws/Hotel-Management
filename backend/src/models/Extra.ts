@@ -42,7 +42,7 @@ const ExtraSchema = new Schema<Extra>({
 		required: true,
 		index: true,
 	},
-}, { _id: false } );
+} );
 
 const ExtraModel = mongoose.model<Extra>("ExtraModel", ExtraSchema);
 

@@ -9,6 +9,11 @@ export class CreatorDoesNotExistError extends Error {}
 export class CreatorIsNotAdminError extends Error {}
 export class JwtTokenIsNotValidError extends Error {}
 export class FailedToSignJwtTokenError extends Error {}
+export class UserAlreadyExistsError extends Error {
+	constructor(username: string) {
+		super(`User ${username} already exists in the database.`)
+	}
+}
 
 export interface UserPayload {
 	user: string;
@@ -41,7 +46,7 @@ const UserSchema = new Schema<User>({
 		enum: Object.values(UserRole),
 		default: UserRole.User,
 	},
-}, { _id: false });
+});
 
 // Creating the user model.
 const UserModel = mongoose.model<User>("UserModel", UserSchema);
@@ -124,7 +129,7 @@ function getJwtPayload(token: string): UserPayload {
  * doesn't match.
  */
 async function authenticate(username: string, password: string) {
-	const users = await UserModel.find({user: username}).exec();
+	const users = await UserModel.find({user: username});
 	if (users.length === 0) {
 		throw new InvalidUserCredentialsError();
 	}
@@ -168,6 +173,10 @@ async function createUser(
 	}
 	if (!(await isAdmin(creator.user))) {
 		throw new CreatorIsNotAdminError();
+	}
+	
+	if (await UserModel.exists({ user: username })) {
+		throw new UserAlreadyExistsError(username);
 	}
 	
 	// The user is an admin so they can create a new user.
