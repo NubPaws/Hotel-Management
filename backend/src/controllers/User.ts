@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import UsersModel, { CreatorIsNotAdminError, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/User.js";
 import { dataValidate } from "./Validator.js";
+import Logger from "../utils/Logger.js";
 
 const router = Router();
 
@@ -89,8 +90,9 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
 		if (req.params.username === requestingUser.user || requestingUser.role == UserRole.Admin) {
 			const user = await UsersModel.getUser(req.params.username);
 			res.json(user);
+		} else {
+			throw new InvalidUserCredentialsError();
 		}
-		throw new InvalidUserCredentialsError();
 	} catch (err) {
 		next(err);
 	}
@@ -139,6 +141,8 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *         description: Invalid body inserted or invalid requester.
  *       401:
  *         description: Unauthorized requester.
+ *       409:
+ *         description: A user with that username already exists.
  */ 
 router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
 	if (!req.headers.authorization) {
@@ -186,12 +190,12 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
  *               username:
  *                 type: string
  *                 example: username
- *               password:
+ *               old_password:
  *                 type: string
  *                 example: old_password
- *               role:
+ *               new_password:
  *                 type: string
- *                 enum: [Admin, User]
+ *                 example: new_password
  *     responses:
  *       200:
  *         description: User's password changed successfully and returns JWT token.
@@ -221,11 +225,8 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
 	
 	try {
 		// Validate old password.
-		const auth = await UsersModel.authenticate(username, oldPassword);
-		
-		if (auth !== token) {
-			throw new UserDoesNotExistError();
-		}
+		// This'll throw an error if the authentication fails
+		await UsersModel.authenticate(username, oldPassword);
 		
 		// Change password.
 		await UsersModel.changePassword(username, newPassword);
@@ -262,8 +263,8 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
  *                 type: string
  *                 example: username
  *               newRole:
- *                 type: number
- *                 example: 0
+ *                 type: string
+ *                 enum: [Admin, User]
  *     responses:
  *       200:
  *         description: User's role changed successfully.
