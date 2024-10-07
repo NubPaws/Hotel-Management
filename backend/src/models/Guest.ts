@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { Email, isEmailString } from "../utils/Email.js";
 import Counter from "./Counter.js";
 import Logger from "../utils/Logger.js";

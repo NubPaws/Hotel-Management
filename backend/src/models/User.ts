@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 import Environment from '../utils/Environment.js';
 import Logger from '../utils/Logger.js';
 
