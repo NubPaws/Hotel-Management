@@ -24,10 +24,20 @@ export enum UserRole {
 	User = "User",
 }
 
+export enum Department {
+	General = "General",
+	FrontDesk = "FrontDesk",
+	HouseKeeping = "HouseKeeping",
+	Maintenance = "Maintenance",
+	Security = "Security",
+	Conceirge = "Conceirge",
+}
+
 interface User extends Document {
 	user: string,
 	pass: string,
 	role: UserRole,
+	department: Department,
 }
 
 const UserSchema = new Schema<User>({
@@ -45,6 +55,11 @@ const UserSchema = new Schema<User>({
 		type: String,
 		enum: Object.values(UserRole),
 		default: UserRole.User,
+	},
+	department: {
+		type: String,
+		enum: Object.values(Department),
+		default: Department.General,
 	},
 });
 
@@ -161,6 +176,7 @@ async function createUser(
 	username: string,
 	password: string,
 	role: UserRole,
+	department: Department,
 	creatorToken: string
 ): Promise<string> {
 	if (!getJwtPayload(creatorToken)) {
@@ -186,6 +202,7 @@ async function createUser(
 		user: username,
 		pass: password,
 		role: role,
+		department: department,
 	});
 	
 	return token;
@@ -256,6 +273,24 @@ async function changeRole(username: string, newRole: UserRole) {
 	await user.save();
 }
 
+/**
+ * Change the user's department.
+ * @param username
+ * @param newDepartment
+ * @throws UserDoesNotExistError
+ */
+async function changeDepartment(username: string, newDepartment: Department) {
+	const user = await UserModel.findOne({ user: username });
+	
+	if (!user) {
+		throw new UserDoesNotExistError();
+	}
+	
+	user.department = newDepartment;
+	
+	await user.save();
+}
+
 export default {
 	initUsersModel,
 	getJwtPayload,
@@ -266,6 +301,7 @@ export default {
 	getUser,
 	changePassword,
 	changeRole,
+	changeDepartment,
 };
 
 /**
@@ -290,4 +326,15 @@ export default {
  *             - User
  *           description: The role assigned to the user.
  *           example: "User"
+ *         department:
+ *           type: string
+ *           enum:
+ *             - General
+ *             - FrontDesk
+ *             - HouseKeeping
+ *             - Maintenance
+ *             - Security
+ *             - Conceirge
+ *           description: The department the user works in.
+ *           example: "FrontDesk"
  */

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
-import UsersModel, { CreatorIsNotAdminError, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/User.js";
+import UsersModel, { CreatorIsNotAdminError, Department, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/User.js";
 import { dataValidate } from "./Validator.js";
-import Logger from "../utils/Logger.js";
 
 const router = Router();
 
@@ -68,6 +67,9 @@ router.get("/initUsers", async (req: Request, res: Response) => {
  *                 role:
  *                   type: string
  *                   enum: [Admin, User]
+ *                 department:
+ *                   type: string
+ *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
  *       401:
  *         description: Unauthorized request. Occurs when the requesting user is not authorized to view the data.
  *       403:
@@ -129,6 +131,9 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *               role:
  *                 type: string
  *                 enum: [Admin, User]
+ *               department:
+ *                   type: string
+ *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
  *     responses:
  *       200:
  *         description: User created successfully and returns JWT token.
@@ -150,7 +155,7 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
 	}
 	const token = req.headers.authorization.split(" ")[1] as string;
 	
-	const { username, password, role } = req.body;
+	const { username, password, role, department } = req.body;
 	const validation = dataValidate({ username, password, role });
 	
 	if (validation.status) {
@@ -158,7 +163,13 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
 	}
 	
 	try {
-		const jwtToken = await UsersModel.createUser(username, password, role as UserRole, token);
+		const jwtToken = await UsersModel.createUser(
+			username,
+			password,
+			role as UserRole,
+			department as Department,
+			token
+		);
 		
 		res.send(jwtToken);
 	} catch (err) {
@@ -301,6 +312,148 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
 		
 		// Change role.
 		await UsersModel.changeRole(username, newRole);
+		res.send("Success");
+	} catch (err) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Users/change-role:
+ *   post:
+ *     summary: Changes a user's role.
+ *     description: This endpoint changes a user's role. For the role, Admin or User can be assigned.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - newRole
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: username
+ *               newRole:
+ *                 type: string
+ *                 enum: [Admin, User]
+ *     responses:
+ *       200:
+ *         description: User's role changed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Success
+ *       400:
+ *         description: Invalid body inserted or invalid requester.
+ *       401:
+ *         description: Unauthorized requester.
+ *       403:
+ *         description: Forbidden. Occurs when the authorization token is missing or invalid.
+ *       404:
+ *         description: User not found.
+ */
+router.post("/change-role", async (req: Request, res: Response, next: NextFunction) => {
+	if (!req.headers.authorization) {
+		return tokenRequired(res);
+	}
+	
+	const token = req.headers.authorization.split(" ")[1] as string;
+	const { username, newRole } = req.body;
+	const validation = dataValidate({ username, newRole });
+	
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		const payload = UsersModel.getJwtPayload(token);
+		const isAdmin = await UsersModel.isAdmin(payload.user);
+		
+		if (!isAdmin) {
+			throw new CreatorIsNotAdminError();
+		}
+		
+		await UsersModel.changeRole(username, newRole as UserRole);
+		res.send("Success");
+	} catch (err) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Users/change-department:
+ *   post:
+ *     summary: Changes a user's department.
+ *     description: This endpoint changes a user's department.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - newDepartment
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: username
+ *               newDepartment:
+ *                 type: string
+ *                 enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
+ *     responses:
+ *       200:
+ *         description: User's department changed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Success
+ *       400:
+ *         description: Invalid body inserted or invalid requester.
+ *       401:
+ *         description: Unauthorized requester.
+ *       403:
+ *         description: Forbidden. Occurs when the authorization token is missing or invalid.
+ *       404:
+ *         description: User not found.
+ */
+router.post("/change-department", async (req: Request, res: Response, next: NextFunction) => {
+	if (!req.headers.authorization) {
+		return tokenRequired(res);
+	}
+	
+	const token = req.headers.authorization.split(" ")[1] as string;
+	const { username, newDepartment } = req.body;
+	const validation = dataValidate({ username, newDepartment });
+	
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		const payload = UsersModel.getJwtPayload(token);
+		const isAdmin = await UsersModel.isAdmin(payload.user);
+		
+		if (!isAdmin) {
+			throw new CreatorIsNotAdminError();
+		}
+		
+		await UsersModel.changeDepartment(username, newDepartment as Department);
 		res.send("Success");
 	} catch (err) {
 		next(err);
