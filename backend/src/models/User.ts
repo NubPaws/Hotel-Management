@@ -191,7 +191,7 @@ async function createUser(
 		throw new CreatorIsNotAdminError();
 	}
 	
-	if (await UserModel.exists({ user: username })) {
+	if (await UserModel.exists({ user: username }) !== null) {
 		throw new UserAlreadyExistsError(username);
 	}
 	
@@ -219,7 +219,7 @@ async function isUser(jwtToken: string) {
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	return UserModel.exists({user: payload.user}).exec();
+	return UserModel.exists({user: payload.user}) !== null;
 }
 
 /**

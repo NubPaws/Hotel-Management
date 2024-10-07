@@ -118,7 +118,7 @@ async function isValidRoom(num: number): Promise<boolean> {
 }
 
 async function createType(code: string, description: string) {
-	if (await RoomTypeModel.exists({ code })) {
+	if (await RoomTypeModel.exists({ code }) !== null) {
 		throw new RoomTypeAlreadyExistsError(code);
 	}
 	
