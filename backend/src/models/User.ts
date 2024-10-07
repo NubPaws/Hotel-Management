@@ -238,6 +238,16 @@ async function getUser(username: string): Promise<User> {
 }
 
 /**
+ * Checks whether a user exists or not based on the username.
+ * 
+ * @param username The username to check if it exists.
+ * @returns true if the user exists, false otherwise.
+ */
+async function doesUserExist(username: string): Promise<boolean> {
+	return await UserModel.exists({ user: username }) !== null;
+}
+
+/**
  * Change a user's password.
  * @param username
  * @param newPassword
@@ -299,6 +309,7 @@ export default {
 	isAdmin,
 	isUser,
 	getUser,
+	doesUserExist,
 	changePassword,
 	changeRole,
 	changeDepartment,

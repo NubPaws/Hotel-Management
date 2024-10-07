@@ -24,3 +24,17 @@ export function getTodaysDate(): Date {
 	date.setHours(15, 0, 0, 0);
 	return date;
 }
+
+const padL = (num: number, len: number = 2, chr: string = "0") => `${num}`.padStart(len, chr);
+
+export function dateToString(d: Date): string {
+	const day = padL(d.getDate());
+	const month = padL(d.getMonth() + 1);
+	const year = `${d.getFullYear()}`
+	
+	const seconds = padL(d.getSeconds());
+	const minutes = padL(d.getMinutes());
+	const hours = padL(d.getHours());
+	
+	return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
