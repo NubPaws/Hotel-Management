@@ -233,15 +233,27 @@ export default {
  *     Task:
  *       type: object
  *       required:
+ *         - taskId
+ *         - timeCreated
  *         - room
  *         - description
  *         - urgency
  *         - department
  *         - creator
  *         - status
+ *         - history
  *       properties:
+ *         taskId:
+ *           type: integer
+ *           description: The unique identifier for the task.
+ *           example: 12345
+ *         timeCreated:
+ *           type: string
+ *           format: date-time
+ *           description: The time when the task was created.
+ *           example: "2024-10-07T08:30:00.000Z"
  *         room:
- *           type: number
+ *           type: integer
  *           description: The room number associated with the task.
  *           example: 101
  *         description:
@@ -249,15 +261,14 @@ export default {
  *           description: A brief description of the task.
  *           example: "Fix the air conditioner in the room."
  *         urgency:
- *           type: number
- *           description: A number representing the urgency level of the task (0-9).
+ *           type: integer
+ *           description: The urgency level of the task (0-9).
  *           minimum: 0
  *           maximum: 9
- *           example: 5
- *           validationMessage: "Urgency can only be between 0 and 9 inclusive."
+ *           example: 7
  *         department:
  *           type: string
- *           enum: 
+ *           enum:
  *             - General
  *             - FrontDesk
  *             - HouseKeeping
@@ -274,9 +285,16 @@ export default {
  *           type: string
  *           enum:
  *             - Pending
- *             - InProgress
- *             - Completed
- *             - Cancelled
+ *             - Progress
+ *             - Finished
  *           description: The current status of the task.
  *           example: "Pending"
+ *         history:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: A list of updates or actions made to the task.
+ *           example:
+ *             - "[20/12/2024 08:35:00] (john_doe) Task created"
+ *             - "[20/12/2024 10:15:00] (admin) Urgency changed: 5 => 7"
  */
