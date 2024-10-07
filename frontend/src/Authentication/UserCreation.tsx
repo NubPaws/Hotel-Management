@@ -49,8 +49,7 @@ async function createUser(event : any,
 
         if (res!.status !== 200) {
             setShowErrorMessage(true);
-        }
-        else {
+        } else {
             setShowSuccessMessage(true);
             // Clearing the form
             let confirmPassword = document.getElementById("confirmPassword") as HTMLInputElement;
@@ -58,7 +57,6 @@ async function createUser(event : any,
             enteredPassword.value = "";
             confirmPassword.value = "";
             userRole[userRoleIndex].checked = false;
-
         }
     }
 }
