@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
+import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import Logger from "../utils/Logger.js";
-import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError } from "../models/Room.js";
+import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError } from "../models/Room.js";
 
 export enum ErrorCode {
 	Ok = 200,
@@ -37,6 +37,9 @@ function users(err: any, _req: Request, res: Response, next: NextFunction) {
 	} else if (err instanceof UserAlreadyExistsError) {
 		statusCode = ErrorCode.Conflict;
 		message = "User already exists, username must be unique"
+	} else if (err instanceof UnauthorizedUserError) {
+		statusCode = ErrorCode.Unauthorized;
+		message = "User is not authrozied."
 	} else {
 		next(err);
 		return;
@@ -65,6 +68,9 @@ function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
 	} else if (err instanceof MissingReservationIdError) {
 		statusCode = ErrorCode.BadRequest;
 		message = err.message;
+	} else if (err instanceof RoomTypeIsNotEmptyError) {
+		statusCode = ErrorCode.Unacceptable;
+		message = err.message
 	} else {
 		next(err);
 		return;

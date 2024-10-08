@@ -14,6 +14,7 @@ export class UserAlreadyExistsError extends Error {
 		super(`User ${username} already exists in the database.`)
 	}
 }
+export class UnauthorizedUserError extends Error {}
 
 export interface UserPayload {
 	user: string;
@@ -33,7 +34,7 @@ export enum Department {
 	Conceirge = "Conceirge",
 }
 
-interface User extends Document {
+export interface User extends Document {
 	user: string,
 	pass: string,
 	role: UserRole,
