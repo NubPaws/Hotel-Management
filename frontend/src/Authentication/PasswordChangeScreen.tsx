@@ -5,6 +5,7 @@ import { Button } from "../UIElements/Button"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { changePassword } from "./PasswordChange"
 import { Modal } from "../UIElements/Modal";
+import { NavigationBar } from "../UIElements/NavigationBar";
 
 export function ChangePasswordScreen(props: {
     userCredentials: UserCredentials,
@@ -23,6 +24,7 @@ export function ChangePasswordScreen(props: {
 
     return (
         <>
+            <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Password Change" />
             <form id="changePasswordForm" className="fieldsContainer" action="http://localhost:8000/api/Users/change-password">
                 <Input id="oldPassword" className="field" type="password" name="oldPassword"

@@ -6,6 +6,7 @@ import { Button } from "../UIElements/Button"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { createUser } from "./UserCreation";
 import { Modal } from "../UIElements/Modal";
+import { NavigationBar } from "../UIElements/NavigationBar";
 
 export function UserCreationScreen(props: {
     userCredentials: UserCredentials,
@@ -26,6 +27,7 @@ export function UserCreationScreen(props: {
 
     return (
         <>
+            <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Create User" />
             <form id="createUserForm" className="fieldsContainer" action="http://localhost:8000/api/Users/create">
                 <Input id="username" className="field" type="text" name="username"
