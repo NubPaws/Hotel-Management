@@ -2,7 +2,6 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import SwaggerUI from 'swagger-ui-express';
 import ErrorHandler from "./controllers/ErrorHandler.js";
-import { TokensRouter } from "./controllers/Token.js";
 import { UsersRouter } from "./controllers/User.js";
 import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
 import { loadDatabase } from "./utils/DatabaseConnector.js";
@@ -45,7 +44,6 @@ app.use((req, res, next) => {
 });
 
 // Load the routes.
-app.use("/api/Tokens", TokensRouter);
 app.use("/api/Users", UsersRouter);
 app.use("/api/Rooms", RoomsRouter);
 

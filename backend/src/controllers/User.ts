@@ -10,6 +10,50 @@ function tokenRequired(res: Response) {
 
 /**
  * @swagger
+ * /api/Users/login:
+ *   post:
+ *     summary: Post username and password for a jwt token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         type: string
+ *         description: JWT token for the user to authenticate with in front of the api.
+ *       404:
+ *         description: User was not found.
+ *     tags:
+ *       - Users
+ */
+router.post("/login", async (req: Request, res: Response, next: NextFunction) => {
+	// Take the information that should be passed from the app.
+	const { username, password } = req.body;
+	
+	const validation = dataValidate({username, password});
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		// Get the token.
+		const token = await UsersModel.authenticate(username, password);
+		// Send the token to the user.
+		res.send(token);
+	} catch (err) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
  * /api/Users/initUsers:
  *   get:
  *     summary: Initializes the users database with the first admin.
