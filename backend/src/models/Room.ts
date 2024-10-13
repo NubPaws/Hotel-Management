@@ -18,12 +18,22 @@ export class RoomTypeDoesNotExistError extends Error {
 }
 export class RoomTypeAlreadyExistsError extends Error {
 	constructor(rt: string) {
-		super(`Room type ${rt} does not exist.`);
+		super(`Room type ${rt} already exists.`);
 	}
 }
 export class MissingReservationIdError extends Error {
 	constructor() {
 		super("Must provide reservation id when trying to make a room occupied.");
+	}
+}
+export class RoomTypeIsNotEmptyError extends Error {
+	constructor(type: string) {
+		super(`Type ${type} is invalid`);
+	}
+}
+export class InvalidRoomNumberError extends Error {
+	constructor(num?: number) {
+		super(`Room #${num} is invalid`);
 	}
 }
 
@@ -97,8 +107,8 @@ const RoomModel = mongoose.model<Room>("RoomModel", RoomSchema);
  * @returns Room
  * @throws RoomDoesNotExistError
  */
-async function getDocumentById(roomId: number) {
-	const room = await RoomModel.findOne({ roomNum: roomId });
+async function getRoomById(roomId: number) {
+	const room = await RoomModel.findOne({ roomId });
 	if (!room) {
 		throw new RoomDoesNotExistError(roomId);
 	}
@@ -108,7 +118,7 @@ async function getDocumentById(roomId: number) {
 
 async function isValidRoom(num: number): Promise<boolean> {
 	try {
-		await getDocumentById(num);
+		await getRoomById(num);
 	} catch (err: any) {
 		if (err instanceof RoomDoesNotExistError) {
 			return false;
@@ -118,7 +128,7 @@ async function isValidRoom(num: number): Promise<boolean> {
 }
 
 async function createType(code: string, description: string) {
-	if (await RoomTypeModel.exists({ code })) {
+	if (await RoomTypeModel.exists({ code }) !== null) {
 		throw new RoomTypeAlreadyExistsError(code);
 	}
 	
@@ -128,7 +138,14 @@ async function createType(code: string, description: string) {
 async function createRoom(num: number, code: string) {
 	// This will throw an error if there isn't a room like that.
 	// We'll just ignore the return value.
-	await getDocumentById(num);
+	try {
+		await getRoomById(num);
+	} catch (err: any) {
+		if (!(err instanceof RoomDoesNotExistError)) {
+			throw err;
+		}
+		// Otherwise it is fine.
+	}
 	
 	const roomType = await RoomTypeModel.findOne({ code });
 	if (!roomType) {
@@ -136,7 +153,7 @@ async function createRoom(num: number, code: string) {
 	}
 	
 	await RoomModel.create({
-		roomNum: num,
+		roomId: num,
 		type: code,
 	});
 }
@@ -169,12 +186,12 @@ async function removeType(typeCode: string, newTypeCode: string) {
 }
 
 async function removeRoom(num: number) {
-	await getDocumentById(num);
-	await RoomModel.deleteOne({ roomNum: num });
+	await getRoomById(num);
+	await RoomModel.deleteOne({ roomId: num });
 }
 
 async function changeRoomState(num: number, state: RoomState) {
-	const room = await getDocumentById(num);
+	const room = await getRoomById(num);
 	
 	room.state = state;
 	await room.save();
@@ -186,7 +203,7 @@ async function changeRoomState(num: number, state: RoomState) {
  * @throws RoomDoesNotExistError
  */
 async function isRoomOccupied(num: number): Promise<boolean> {
-	const room = await getDocumentById(num);
+	const room = await getRoomById(num);
 	return room.occupied;
 }
 
@@ -202,7 +219,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(
-			{ roomNum: num },
+			{ roomId: num },
 			{ $set: { occupied: false, reservation: null } },
 			{ new: true },
 		);
@@ -225,7 +242,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	}
 	
 	const room = await RoomModel.findOneAndUpdate(
-		{ roomNum: num },
+		{ roomId: num },
 		{ $set: {
 			occupied: true,
 			reservation: reservationId,
@@ -244,12 +261,64 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
  * @throws RoomDoesNotExistError
  */
 async function getRoomReservation(num: number): Promise<number | null> {
-	const room = await getDocumentById(num);
+	const room = await getRoomById(num);
 	return room.reservation;
 }
 
+async function getRoomsByType(type: string) {
+    return await RoomModel.find({ type });
+}
+
+async function getAllRooms() {
+    return await RoomModel.find({});
+}
+
+async function getRoomsByState(state: RoomState) {
+    return await RoomModel.find({ state });
+}
+
+async function getRoomsByOccupation(occupied: boolean) {
+    return await RoomModel.find({ occupied });
+}
+
+async function getRoomByReservation(reservationId: number) {
+    return await RoomModel.findOne({ reservation: reservationId });
+}
+
+/**
+ * Get rooms based on multiple filters: type, state, occupied, reservationId.
+ * All filters are optional, and multiple filters can be combined.
+ * @param filters Object containing the optional filters: type, state, occupied, reservationId.
+ * @returns A list of rooms that match the filters.
+ */
+async function getFilteredRooms(filters: {
+    type?: string;
+    state?: RoomState;
+    occupied?: boolean;
+    reservationId?: number;
+}) {
+    const query: any = {};
+
+    // Add filters to the query if they are provided
+    if (filters.type) {
+        query.type = filters.type;
+    }
+    if (filters.state) {
+        query.state = filters.state;
+    }
+    if (typeof filters.occupied !== 'undefined') {
+        query.occupied = filters.occupied;
+    }
+    if (filters.reservationId) {
+        query.reservation = filters.reservationId;
+    }
+
+    // Execute the query with the built conditions
+    return await RoomModel.find(query);
+}
+
 export default {
-	getDocumentById,
+	getRoomById,
 	isValidRoom,
 	
 	createType,
@@ -262,4 +331,70 @@ export default {
 	isRoomOccupied,
 	setRoomOccupation,
 	getRoomReservation,
+	
+	getRoomsByType,
+	getAllRooms,
+	getRoomsByState,
+	getRoomsByOccupation,
+	getRoomByReservation,
+	getFilteredRooms,
 };
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     RoomState:
+ *       type: string
+ *       enum:
+ *         - Clean
+ *         - Inspected
+ *         - Dirty
+ *         - OutOfOrder
+ *       description: The state of a room.
+ *     RoomType:
+ *       type: object
+ *       required:
+ *         - code
+ *         - description
+ *       properties:
+ *         code:
+ *           type: string
+ *           description: The unique code of the room type.
+ *         description:
+ *           type: string
+ *           description: A description of the room type.
+ *       example:
+ *         code: "STD"
+ *         description: "Standard Room"
+ *     Room:
+ *       type: object
+ *       required:
+ *         - roomId
+ *         - type
+ *         - state
+ *         - occupied
+ *       properties:
+ *         roomId:
+ *           type: number
+ *           description: The unique identifier for the room.
+ *         type:
+ *           type: string
+ *           description: The type of the room (referencing RoomType).
+ *         state:
+ *           $ref: '#/components/schemas/RoomState'
+ *           description: The current state of the room.
+ *         occupied:
+ *           type: boolean
+ *           description: Whether the room is occupied.
+ *         reservation:
+ *           type: number
+ *           nullable: true
+ *           description: The reservation ID associated with the room, if any.
+ *       example:
+ *         roomId: 101
+ *         type: "STD"
+ *         state: "Clean"
+ *         occupied: false
+ *         reservation: null
+ */

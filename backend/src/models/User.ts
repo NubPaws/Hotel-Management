@@ -14,6 +14,7 @@ export class UserAlreadyExistsError extends Error {
 		super(`User ${username} already exists in the database.`)
 	}
 }
+export class UnauthorizedUserError extends Error {}
 
 export interface UserPayload {
 	user: string;
@@ -33,7 +34,7 @@ export enum Department {
 	Conceirge = "Conceirge",
 }
 
-interface User extends Document {
+export interface User extends Document {
 	user: string,
 	pass: string,
 	role: UserRole,
@@ -191,7 +192,7 @@ async function createUser(
 		throw new CreatorIsNotAdminError();
 	}
 	
-	if (await UserModel.exists({ user: username })) {
+	if (await UserModel.exists({ user: username }) !== null) {
 		throw new UserAlreadyExistsError(username);
 	}
 	
@@ -219,7 +220,7 @@ async function isUser(jwtToken: string) {
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	return UserModel.exists({user: payload.user}).exec();
+	return UserModel.exists({user: payload.user}) !== null;
 }
 
 /**

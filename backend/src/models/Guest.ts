@@ -94,8 +94,9 @@ async function create(
 	phone: string,
 	title: string = ""
 ) {
-	if (await GuestModel.exists({ identification }))
+	if (await GuestModel.findOne({ identification }) !== null) {
 		throw new GuestAlreadyExistsError();
+	}
 	
 	try {
 		return await GuestModel.create({
