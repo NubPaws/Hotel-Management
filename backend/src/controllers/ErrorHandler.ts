@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import Logger from "../utils/Logger.js";
-import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError } from "../models/Room.js";
+import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError, InvalidRoomNumberError } from "../models/Room.js";
 
 export enum ErrorCode {
 	Ok = 200,
@@ -70,7 +70,10 @@ function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
 		message = err.message;
 	} else if (err instanceof RoomTypeIsNotEmptyError) {
 		statusCode = ErrorCode.Unacceptable;
-		message = err.message
+		message = err.message;
+	} else if (err instanceof InvalidRoomNumberError) {
+		statusCode = ErrorCode.NotFound;
+		message = err.message;
 	} else {
 		next(err);
 		return;

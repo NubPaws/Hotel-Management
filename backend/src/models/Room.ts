@@ -31,6 +31,11 @@ export class RoomTypeIsNotEmptyError extends Error {
 		super(`Type ${type} is invalid`);
 	}
 }
+export class InvalidRoomNumberError extends Error {
+	constructor(num?: number) {
+		super(`Room #${num} is invalid`);
+	}
+}
 
 export enum RoomState {
 	Clean = "Clean",
