@@ -18,7 +18,7 @@ export class RoomTypeDoesNotExistError extends Error {
 }
 export class RoomTypeAlreadyExistsError extends Error {
 	constructor(rt: string) {
-		super(`Room type ${rt} does not exist.`);
+		super(`Room type ${rt} already exists.`);
 	}
 }
 export class MissingReservationIdError extends Error {
@@ -103,7 +103,7 @@ const RoomModel = mongoose.model<Room>("RoomModel", RoomSchema);
  * @throws RoomDoesNotExistError
  */
 async function getRoomById(roomId: number) {
-	const room = await RoomModel.findOne({ roomNum: roomId });
+	const room = await RoomModel.findOne({ roomId });
 	if (!room) {
 		throw new RoomDoesNotExistError(roomId);
 	}
@@ -133,7 +133,14 @@ async function createType(code: string, description: string) {
 async function createRoom(num: number, code: string) {
 	// This will throw an error if there isn't a room like that.
 	// We'll just ignore the return value.
-	await getRoomById(num);
+	try {
+		await getRoomById(num);
+	} catch (err: any) {
+		if (!(err instanceof RoomDoesNotExistError)) {
+			throw err;
+		}
+		// Otherwise it is fine.
+	}
 	
 	const roomType = await RoomTypeModel.findOne({ code });
 	if (!roomType) {
@@ -141,7 +148,7 @@ async function createRoom(num: number, code: string) {
 	}
 	
 	await RoomModel.create({
-		roomNum: num,
+		roomId: num,
 		type: code,
 	});
 }
@@ -175,7 +182,7 @@ async function removeType(typeCode: string, newTypeCode: string) {
 
 async function removeRoom(num: number) {
 	await getRoomById(num);
-	await RoomModel.deleteOne({ roomNum: num });
+	await RoomModel.deleteOne({ roomId: num });
 }
 
 async function changeRoomState(num: number, state: RoomState) {
@@ -207,7 +214,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(
-			{ roomNum: num },
+			{ roomId: num },
 			{ $set: { occupied: false, reservation: null } },
 			{ new: true },
 		);
@@ -230,7 +237,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	}
 	
 	const room = await RoomModel.findOneAndUpdate(
-		{ roomNum: num },
+		{ roomId: num },
 		{ $set: {
 			occupied: true,
 			reservation: reservationId,

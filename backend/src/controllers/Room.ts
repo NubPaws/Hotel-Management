@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import UserModel, { Department, InvalidUserCredentialsError, UnauthorizedUserError, User, UserRole } from "../models/User.js";
 import RoomModel, { RoomState, RoomTypeIsNotEmptyError } from "../models/Room.js";
+import Logger from "../utils/Logger.js";
 
 const router = Router();
 
@@ -42,7 +43,7 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
 
 /**
  * @swagger
- * /create-type/{type}:
+ * /api/Rooms/create-type/{type}:
  *   post:
  *     summary: Create a new room type
  *     tags: [Rooms]
@@ -76,8 +77,8 @@ router.post("/create-type/:type", verifyUser, async (req: Request, res: Response
 	const { user } = req as any;
 	const { type } = req.params;
 	const { description } = req.body;
-	
-	if (user.role !== UserRole.Admin || user.department !== Department.FrontDesk) {
+	Logger.info(`${user}`);
+	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
 		throw new UnauthorizedUserError()
 	}
 	
@@ -87,7 +88,7 @@ router.post("/create-type/:type", verifyUser, async (req: Request, res: Response
 
 /**
  * @swagger
- * /create-room:
+ * /api/Rooms/create-room:
  *   post:
  *     summary: Create a new room
  *     tags: [Rooms]
@@ -117,7 +118,7 @@ router.post("/create-room", verifyUser, async (req: Request, res: Response, next
 	const { user } = req as any;
 	const { type, room } = req.body;
 	
-	if (user.role !== UserRole.Admin || user.department !== Department.FrontDesk) {
+	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
 		throw new UnauthorizedUserError()
 	}
 	
@@ -127,7 +128,7 @@ router.post("/create-room", verifyUser, async (req: Request, res: Response, next
 
 /**
  * @swagger
- * /remove-type/{type}:
+ * /api/Rooms/remove-type/{type}:
  *   post:
  *     summary: Remove a room type
  *     tags: [Rooms]
@@ -162,7 +163,7 @@ router.post("/remove-type/:type", verifyUser, async (req: Request, res: Response
 	const { type } = req.params;
 	const { newType } = req.body;
 	
-	if (user.role !== UserRole.Admin || user.department !== Department.FrontDesk) {
+	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
 		return res.status(403).json({ message: "Forbidden" });
 	}
 	
@@ -177,7 +178,7 @@ router.post("/remove-type/:type", verifyUser, async (req: Request, res: Response
 
 /**
  * @swagger
- * /remove-room/{room}:
+ * /api/Rooms/remove-room/{room}:
  *   post:
  *     summary: Remove a room
  *     tags: [Rooms]
@@ -200,7 +201,7 @@ router.post("/remove-room/:room", verifyUser, async (req: Request, res: Response
 	const { user } = req as any;
 	const { room } = req.params;
 	
-	if (user.role !== UserRole.Admin || user.department !== Department.FrontDesk) {
+	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
 		return res.status(403).json({ message: "Forbidden" });
 	}
 	
@@ -210,7 +211,7 @@ router.post("/remove-room/:room", verifyUser, async (req: Request, res: Response
 
 /**
  * @swagger
- * /room:
+ * /api/Rooms/room:
  *   get:
  *     summary: Get rooms with optional filtering
  *     tags: [Rooms]
