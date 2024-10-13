@@ -1,22 +1,63 @@
+import cors from "cors";
 import express, { Request, Response } from "express";
-import dotenv from "dotenv";
-import { loadDatabase } from "./models/DatabaseConnector.js";
-
-dotenv.config();
+import SwaggerUI from 'swagger-ui-express';
+import ErrorHandler from "./controllers/ErrorHandler.js";
+import { TokensRouter } from "./controllers/Token.js";
+import { UsersRouter } from "./controllers/User.js";
+import { SwaggerSpecs, SwaggerUiOptions } from "./swagger.js";
+import { loadDatabase } from "./utils/DatabaseConnector.js";
+import Environment from "./utils/Environment.js";
+import Logger from "./utils/Logger.js";
 
 const app = express();
-const port = process.env.PORT || 8000;
+const port = Environment.port;
 
 // Connect to the database.
-const ipDatabase = process.env.MONGO_DB_IP || "localhost";
-const portDatabase = process.env.MONGO_DB_PORT || "27017";
-await loadDatabase(ipDatabase, portDatabase);
+loadDatabase();
 
-app.get('/', (req: Request, res: Response)=>{
+// Allow Cross Origin Resource Sharing (cors).
+app.use(cors());
+
+// Middleware to handle content-type: application/json.
+app.use(express.json());
+// Middleware to handle content-type: text/plain.
+app.use(express.text({ type: "text/*" }));
+// Middleware to handle anything that wasn't catched by the previous middlewares.
+app.use((req, res, next) => {
+    const contentType = req.headers["content-type"];
+    
+    if (contentType && contentType.startsWith("application/json")) {
+        if (typeof req.body !== "object") {
+            Logger.error("Invaild json body has been sent.");
+            return res.status(400).json({ error: "Invalid JSON body" });
+        }
+    }
+    
+    if (contentType && contentType.startsWith("text/")) {
+        if (typeof req.body !== "string") {
+            Logger.error("Invaild text body has been sent.");
+            return res.status(400).json({ error: "Invalid text body"});
+        }
+    }
+    
+    next();
+});
+
+// Load the routes.
+app.use("/api/Tokens", TokensRouter);
+app.use("/api/Users", UsersRouter);
+
+// Erro handling middleware.
+app.use(ErrorHandler.users);
+
+app.get('/', (req: Request, res: Response) => {
     res.status(200);
     res.send("Main page<br>Another line to test");
 });
 
+// Serve SwaggerUI.
+app.use("/api-docs", SwaggerUI.serve, SwaggerUI.setup(SwaggerSpecs, SwaggerUiOptions));
+
 app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
+    Logger.info(`Server is running at http://localhost:${port}`);
 });
