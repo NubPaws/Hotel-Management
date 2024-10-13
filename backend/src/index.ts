@@ -53,14 +53,19 @@ app.use("/api/Rooms", RoomsRouter);
 app.use(ErrorHandler.users);
 app.use(ErrorHandler.rooms);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
     res.status(200);
     res.send("Main page<br>Another line to test");
 });
 
 // Serve SwaggerUI.
-app.use("/api-docs", SwaggerUI.serve, SwaggerUI.setup(SwaggerSpecs, SwaggerUiOptions));
+app.use(
+    Environment.swaggerDir,
+    SwaggerUI.serve,
+    SwaggerUI.setup(SwaggerSpecs, SwaggerUiOptions)
+);
 
 app.listen(port, () => {
     Logger.info(`Server is running at http://localhost:${port}`);
+    Logger.info(`API Docs served at http://localhost:${port}${Environment.swaggerDir}`)
 });
