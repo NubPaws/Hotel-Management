@@ -3,7 +3,7 @@ import { StatusCode } from "../utils/StatusCode.js";
 import Logger from "../utils/Logger.js";
 import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError, InvalidRoomNumberError } from "../models/Room.js";
-import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, GuestUpdateError, InvalidGuestCredentialsError } from "../models/Guest.js";
+import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, GuestSearchFailedError, GuestUpdateError, InvalidGuestCredentialsError } from "../models/Guest.js";
 
 function users(err: any, _req: Request, res: Response, next: NextFunction) {
 	let statusCode = StatusCode.Ok;
@@ -93,6 +93,9 @@ function guests(err: any, _req: Request, res: Response, next: NextFunction) {
 	} else if (err instanceof InvalidGuestCredentialsError) {
 		statusCode = StatusCode.BadRequest;
 		message = err.message;
+	} else if (err instanceof GuestSearchFailedError) {
+		statusCode = StatusCode.BadRequest;
+		message = "Failed to perform the guest search";
 	} else {
 		return next(err);
 	}

@@ -56,8 +56,8 @@ const router = Router();
  *         description: Guest already exists
  */
 router.post("/create", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const { user }= req as AuthedRequest;
-	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
 		throw new UnauthorizedUserError();
 	}
 	
@@ -122,8 +122,8 @@ router.post("/create", verifyUser, async (req: Request, res: Response, next: Nex
  *         description: Guest not found
  */
 router.post("/update", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const { user }= req as AuthedRequest;
-	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
 		throw new UnauthorizedUserError();
 	}
 	
@@ -136,7 +136,7 @@ router.post("/update", verifyUser, async (req: Request, res: Response, next: Nex
 	}
 	
 	try {
-		const guest = await GuestModel.getById(guestId);
+		await GuestModel.getById(guestId);
 		
 		// Update the guest's information if fields are provided
 		if (fullName) {
@@ -156,5 +156,102 @@ router.post("/update", verifyUser, async (req: Request, res: Response, next: Nex
 		next(err);
 	}
 });
+
+/**
+ * @swagger
+ * /api/Guests/add-reservation:
+ *   post:
+ *     summary: Add a reservation to a guest
+ *     tags: [Guests]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               guestId:
+ *                 type: number
+ *                 description: The guest's ID
+ *               reservationId:
+ *                 type: number
+ *                 description: The reservation ID to be added
+ *     responses:
+ *       200:
+ *         description: Reservation added successfully
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Guest not found
+ */
+router.post("/add-reservation", async (req, res, next) => {
+	const { guestId, reservationId } = req.body;
+	
+	const validation = dataValidate({ guestId, reservationId });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		const updatedGuest = await GuestModel.addReservation(guestId, reservationId);
+		
+		res.status(StatusCode.Ok).json({
+			message: "Reservation added successfully",
+			guest: updatedGuest
+		});
+	} catch (err: any) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Guests/search:
+ *   get:
+ *     summary: Search for guests by partial fields (email, id, reservationId, phone, name)
+ *     tags: [Guests]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Partial email to search for
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: Partial ID (identification) to search for
+ *       - in: query
+ *         name: reservationId
+ *         schema:
+ *           type: number
+ *         description: Reservation ID to search for
+ *       - in: query
+ *         name: phone
+ *         schema:
+ *           type: string
+ *         description: Partial phone number to search for
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Partial full name to search for
+ *     responses:
+ *       200:
+ *         description: A list of matching guests
+ *       400:
+ *         description: Failed to perform the guest search
+ */
+router.get("/search", async (req, res, next) => {
+	const { email, id, reservationId, phone, fullName } = req.query;
+	
+	try {
+		const guests = await GuestModel.query(id, fullName, email, phone, reservationId);
+		
+		res.status(StatusCode.Ok).json(guests);
+	} catch (err: any) {
+		next(err);
+	}
+});  
 
 export const GuestsRouter = router;
