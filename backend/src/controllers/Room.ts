@@ -1,13 +1,10 @@
 import { NextFunction, Request, Response, Router } from "express";
-import UserModel, { Department, InvalidUserCredentialsError, UnauthorizedUserError, User, UserRole } from "../models/User.js";
+import { Department, UnauthorizedUserError, UserRole } from "../models/User.js";
 import RoomModel, { InvalidRoomNumberError, RoomState, RoomTypeIsNotEmptyError } from "../models/Room.js";
-import Logger from "../utils/Logger.js";
+import { AuthedRequest, verifyUser } from "./Validator.js";
+import { StatusCode } from "../utils/StatusCode.js";
 
 const router = Router();
-
-interface AuthedRequest extends Request {
-	user: User;
-}
 
 /**
  * @swagger
@@ -19,27 +16,6 @@ interface AuthedRequest extends Request {
 /**
  * Middleware to verify user and extract user information from JWT token.
  */
-async function verifyUser(req: Request, res: Response, next: NextFunction) {
-	const authHeader = req.headers.authorization;
-	if (!authHeader || !authHeader.startsWith("Bearer ")) {
-		return res.status(401).json({ message: "Unauthorized" });
-	}
-	
-	const token = authHeader.split(" ")[1];
-	const payload = UserModel.getJwtPayload(token);
-	
-	if (!payload) {
-		throw new InvalidUserCredentialsError()
-	}
-	
-	const user = await UserModel.getUser(payload.user);
-	if (!user) {
-		throw new InvalidUserCredentialsError()
-	}
-	
-	(req as AuthedRequest).user = user;
-	next();
-}
 
 /**
  * @swagger
@@ -73,17 +49,19 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
  *       400:
  *         description: Invalid input
  */
-router.post("/create-type/:type", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const { user } = req as any;
-	const { type } = req.params;
-	const { description } = req.body;
-	Logger.info(`${user}`);
-	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
-		throw new UnauthorizedUserError()
+router.post("/create-type/:type", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
 	}
 	
+	const { type } = req.params;
+	const { description } = req.body;
+	
 	await RoomModel.createType(type, description);
-	res.json({ message: `Room type ${type} created successfully` });
+	res.status(StatusCode.Created).json({
+		message: `Room type ${type} created successfully`
+	});
 });
 
 /**
@@ -114,16 +92,18 @@ router.post("/create-type/:type", verifyUser, async (req: Request, res: Response
  *       400:
  *         description: Invalid input
  */
-router.post("/create-room", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const { user } = req as any;
-	const { type, room } = req.body;
-	
-	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
-		throw new UnauthorizedUserError()
+router.post("/create-room", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
 	}
 	
+	const { type, room } = req.body;
+	
 	await RoomModel.createRoom(room, type);
-	res.json({ message: `Room ${room} created successfully` });
+	res.status(StatusCode.Created).json({
+		message: `Room ${room} created successfully`
+	});
 });
 
 /**
@@ -158,8 +138,13 @@ router.post("/create-room", verifyUser, async (req: Request, res: Response, next
  *       400:
  *         description: Invalid input
  */
-router.post("/remove-type/:type", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const { user } = req as any;
+router.post("/remove-type/:type", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
+	}
+	
+	const { user } = req as AuthedRequest;
 	const { type } = req.params;
 	const { newType } = req.body;
 	
@@ -173,7 +158,9 @@ router.post("/remove-type/:type", verifyUser, async (req: Request, res: Response
 	}
 	
 	await RoomModel.removeType(type, newType);
-	res.json({ message: `Room type ${type} removed successfully` });
+	res.status(StatusCode.Ok).json({
+		message: `Room type ${type} removed successfully`
+	});
 });
 
 /**
@@ -197,16 +184,18 @@ router.post("/remove-type/:type", verifyUser, async (req: Request, res: Response
  *       400:
  *         description: Invalid input
  */
-router.post("/remove-room/:room", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const { user } = req as any;
-	const { room } = req.params;
-	
-	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
-		return res.status(403).json({ message: "Forbidden" });
+router.post("/remove-room/:room", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
 	}
 	
+	const { room } = req.params;
+	
 	await RoomModel.removeRoom(Number(room));
-	res.json({ message: `Room ${room} removed successfully` });
+	res.status(StatusCode.Ok).json({
+		message: `Room ${room} removed successfully`
+	});
 });
 
 /**
@@ -255,7 +244,7 @@ router.get("/room", verifyUser, async (req: Request, res: Response, next: NextFu
 	
 	const rooms = await RoomModel.getFilteredRooms(filters);
 	
-	res.json(rooms);
+	res.status(StatusCode.Ok).json(rooms);
 });
 
 /**
@@ -315,13 +304,13 @@ router.get("/room", verifyUser, async (req: Request, res: Response, next: NextFu
  *         description: Server error
  */
 router.post("/update", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
-	const user = (req as any).user as User;
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
+	}
+	
 	const { room } = req.body;
 	const { state, occupied, reservationId } = req.body;
-	
-	if (user.role !== UserRole.Admin && user.department !== Department.FrontDesk) {
-		return next(new UnauthorizedUserError(`User ${user.user} is not authorized.`));
-	}
 	
 	if (!room) {
 		return next(new InvalidRoomNumberError());

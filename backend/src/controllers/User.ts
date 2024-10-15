@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
-import UsersModel, { CreatorIsNotAdminError, Department, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/User.js";
-import { dataValidate } from "./Validator.js";
+import UsersModel, { CreatorIsNotAdminError, Department, InvalidUserCredentialsError, UnauthorizedUserError, UserDoesNotExistError, UserRole } from "../models/User.js";
+import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 
 const router = Router();
 
@@ -33,7 +33,7 @@ function tokenRequired(res: Response) {
  *     tags:
  *       - Users
  */
-router.post("/login", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/login", async (req, res, next) => {
 	// Take the information that should be passed from the app.
 	const { username, password } = req.body;
 	
@@ -69,7 +69,7 @@ router.post("/login", async (req: Request, res: Response, next: NextFunction) =>
  *     tags:
  *       - Users
  */
-router.get("/initUsers", async (req: Request, res: Response) => {
+router.get("/initUsers", async (_req, res, _next) => {
 	const created = await UsersModel.initUsersModel();
 	if (created) {
 		res.send("Successfully initialized user model.");
@@ -123,17 +123,11 @@ router.get("/initUsers", async (req: Request, res: Response) => {
  *     tags:
  *       - Users
  */
-router.get("/:username", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
-	}
+router.get("/:username", verifyUser, async (req, res, next) => {
+	const requesting = (req as AuthedRequest).user;
 	
-	const token = req.headers.authorization.split(" ")[1] as string;
 	try {
-		const payload = UsersModel.getJwtPayload(token);
-		const requestingUser = await UsersModel.getUser(payload.user);
-		
-		if (req.params.username === requestingUser.user || requestingUser.role == UserRole.Admin) {
+		if (req.params.username === requesting.user || requesting.role == UserRole.Admin) {
 			const user = await UsersModel.getUser(req.params.username);
 			res.json(user);
 		} else {
@@ -193,11 +187,11 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *       409:
  *         description: A user with that username already exists.
  */ 
-router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
+router.post("/create", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new UnauthorizedUserError());
 	}
-	const token = req.headers.authorization.split(" ")[1] as string;
 	
 	const { username, password, role, department } = req.body;
 	const validation = dataValidate({ username, password, role });
@@ -211,8 +205,7 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
 			username,
 			password,
 			role as UserRole,
-			department as Department,
-			token
+			department as Department
 		);
 		
 		res.send(jwtToken);
@@ -264,16 +257,10 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
  *       401:
  *         description: Unauthorized requester.
  */
-router.post("/change-password", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
-	}
-	
-	const token = req.headers.authorization.split(" ")[1] as string;
-	
+router.post("/change-password", verifyUser, async (req, res, next) => {
 	const { username, oldPassword, newPassword } = req.body;
-	const validation = dataValidate({ username, oldPassword, newPassword });
 	
+	const validation = dataValidate({ username, oldPassword, newPassword });
 	if (validation.status) {
 		return validation.respond(res);
 	}
@@ -333,27 +320,20 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
  *       401:
  *         description: Unauthorized requester.
  */
-router.post("/change-password", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
+router.post("/change-password", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new CreatorIsNotAdminError());
 	}
 	
-	const token = req.headers.authorization.split(" ")[1] as string;
-	
 	const { username, newRole } = req.body;
-	const validation = dataValidate({ username, newRole });
 	
+	const validation = dataValidate({ username, newRole });
 	if (validation.status) {
 		return validation.respond(res);
 	}
 	
 	try {
-		const payload = await UsersModel.getJwtPayload(token);
-		const isAdmin = await UsersModel.isAdmin(payload.user);
-		if (!isAdmin) {
-			throw new CreatorIsNotAdminError();
-		}
-		
 		// Change role.
 		await UsersModel.changeRole(username, newRole);
 		res.send("Success");
@@ -405,27 +385,20 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
  *       404:
  *         description: User not found.
  */
-router.post("/change-role", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
+router.post("/change-role", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new CreatorIsNotAdminError());
 	}
 	
-	const token = req.headers.authorization.split(" ")[1] as string;
 	const { username, newRole } = req.body;
-	const validation = dataValidate({ username, newRole });
 	
+	const validation = dataValidate({ username, newRole });
 	if (validation.status) {
 		return validation.respond(res);
 	}
 	
 	try {
-		const payload = UsersModel.getJwtPayload(token);
-		const isAdmin = await UsersModel.isAdmin(payload.user);
-		
-		if (!isAdmin) {
-			throw new CreatorIsNotAdminError();
-		}
-		
 		await UsersModel.changeRole(username, newRole as UserRole);
 		res.send("Success");
 	} catch (err) {
@@ -476,27 +449,20 @@ router.post("/change-role", async (req: Request, res: Response, next: NextFuncti
  *       404:
  *         description: User not found.
  */
-router.post("/change-department", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
+router.post("/change-department", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new CreatorIsNotAdminError());
 	}
 	
-	const token = req.headers.authorization.split(" ")[1] as string;
 	const { username, newDepartment } = req.body;
-	const validation = dataValidate({ username, newDepartment });
 	
+	const validation = dataValidate({ username, newDepartment });
 	if (validation.status) {
 		return validation.respond(res);
 	}
 	
 	try {
-		const payload = UsersModel.getJwtPayload(token);
-		const isAdmin = await UsersModel.isAdmin(payload.user);
-		
-		if (!isAdmin) {
-			throw new CreatorIsNotAdminError();
-		}
-		
 		await UsersModel.changeDepartment(username, newDepartment as Department);
 		res.send("Success");
 	} catch (err) {

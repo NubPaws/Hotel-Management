@@ -177,21 +177,8 @@ async function createUser(
 	username: string,
 	password: string,
 	role: UserRole,
-	department: Department,
-	creatorToken: string
+	department: Department
 ): Promise<string> {
-	if (!getJwtPayload(creatorToken)) {
-		throw new JwtTokenIsNotValidError();
-	}
-	
-	const creator = getJwtPayload(creatorToken);
-	if (!creator) {
-		throw new CreatorDoesNotExistError();
-	}
-	if (!(await isAdmin(creator.user))) {
-		throw new CreatorIsNotAdminError();
-	}
-	
 	if (await UserModel.exists({ user: username }) !== null) {
 		throw new UserAlreadyExistsError(username);
 	}
