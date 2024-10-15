@@ -1,48 +1,40 @@
 import { NextFunction, Request, Response } from "express";
-import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
+import { StatusCode } from "../utils/StatusCode.js";
 import Logger from "../utils/Logger.js";
+import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError, InvalidRoomNumberError } from "../models/Room.js";
-
-export enum ErrorCode {
-	Ok = 200,
-	BadRequest = 400,
-	Unauthorized = 401,
-	NotFound = 404,
-	Conflict = 409,
-	Unacceptable = 406,
-}
+import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, GuestSearchFailedError, GuestUpdateError, InvalidGuestCredentialsError } from "../models/Guest.js";
 
 function users(err: any, _req: Request, res: Response, next: NextFunction) {
-	let statusCode = ErrorCode.Ok;
+	let statusCode = StatusCode.Ok;
 	let message = "";
 	
 	if (err instanceof InvalidUserCredentialsError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = "Incorrect username and/or password";
 	} else if (err instanceof UserDoesNotExistError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = "User does not exists"
 	} else if (err instanceof CreatorDoesNotExistError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = "Creator does not exists";
 	} else if (err instanceof CreatorIsNotAdminError) {
-		statusCode = ErrorCode.Unacceptable;
+		statusCode = StatusCode.Unacceptable;
 		message = "Creator is not an admin";
 	} else if (err instanceof JwtTokenIsNotValidError) {
-		statusCode = ErrorCode.Unauthorized;
+		statusCode = StatusCode.Unauthorized;
 		message = "Invalid token received";
 	} else if (err instanceof FailedToSignJwtTokenError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = "Couldn't sign jwt token for user";
 	} else if (err instanceof UserAlreadyExistsError) {
-		statusCode = ErrorCode.Conflict;
+		statusCode = StatusCode.Conflict;
 		message = "User already exists, username must be unique"
 	} else if (err instanceof UnauthorizedUserError) {
-		statusCode = ErrorCode.Unauthorized;
+		statusCode = StatusCode.Unauthorized;
 		message = "User is not authrozied."
 	} else {
-		next(err);
-		return;
+		return next(err);
 	}
 	
 	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
@@ -50,33 +42,62 @@ function users(err: any, _req: Request, res: Response, next: NextFunction) {
 }
 
 function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
-	let statusCode = ErrorCode.Ok;
+	let statusCode = StatusCode.Ok;
 	let message = "";
 	
 	if (err instanceof RoomDoesNotExistError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = err.message;
 	} else if (err instanceof RoomNumberAlreadyExistsError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = err.message;
 	} else if (err instanceof RoomTypeDoesNotExistError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = err.message;
 	} else if (err instanceof RoomTypeAlreadyExistsError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = err.message;
 	} else if (err instanceof MissingReservationIdError) {
-		statusCode = ErrorCode.BadRequest;
+		statusCode = StatusCode.BadRequest;
 		message = err.message;
 	} else if (err instanceof RoomTypeIsNotEmptyError) {
-		statusCode = ErrorCode.Unacceptable;
+		statusCode = StatusCode.Unacceptable;
 		message = err.message;
 	} else if (err instanceof InvalidRoomNumberError) {
-		statusCode = ErrorCode.NotFound;
+		statusCode = StatusCode.NotFound;
 		message = err.message;
 	} else {
-		next(err);
-		return;
+		return next(err);
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
+}
+
+function guests(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = StatusCode.Ok;
+	let message = "";
+	
+	if (err instanceof GuestAlreadyExistsError) {
+		statusCode = StatusCode.Conflict;
+		message = "Guest already exists";
+	} else if (err instanceof GuestDoesNotExistError) {
+		statusCode = StatusCode.Conflict;
+		message = "Guest does not exists";
+	} else if (err instanceof GuestCreationError) {
+		statusCode = StatusCode.BadRequest;
+		message = "Failed to create guest with the information provided";
+	} else if (err instanceof GuestUpdateError) {
+		statusCode = StatusCode.BadRequest;
+		message = "Failed to update guest with the information provided";
+	} else if (err instanceof InvalidGuestCredentialsError) {
+		statusCode = StatusCode.BadRequest;
+		message = err.message;
+	} else if (err instanceof GuestSearchFailedError) {
+		statusCode = StatusCode.BadRequest;
+		message = "Failed to perform the guest search";
+	} else {
+		return next(err);
 	}
 	
 	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
@@ -86,4 +107,5 @@ function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
 export default {
 	users,
 	rooms,
+	guests,
 }

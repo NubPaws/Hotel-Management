@@ -1,5 +1,6 @@
-import { Response } from "express";
-import { ErrorCode } from "./ErrorHandler.js";
+import { NextFunction, Request, Response } from "express";
+import { StatusCode } from "../utils/StatusCode.js";
+import UserModel, { Department, InvalidUserCredentialsError, User, UserRole } from "../models/User.js";
 
 interface ValidationResponse {
 	status: boolean,
@@ -50,7 +51,38 @@ export function dataValidate(items: Object): ValidationResponse {
 		status: true,
 		error,
 		respond: (res: Response) => {
-			return res.status(ErrorCode.BadRequest).json(Object.fromEntries(error))
+			return res.status(StatusCode.BadRequest).json(Object.fromEntries(error))
 		}
 	};
+}
+
+export interface AuthedRequest extends Request {
+	user: User;
+	isAdmin: boolean;
+	isFrontDesk: boolean;
+}
+
+export async function verifyUser(req: Request, res: Response, next: NextFunction) {
+	const authHeader = req.headers.authorization;
+	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
+	
+	const token = authHeader.split(" ")[1];
+	const payload = UserModel.getJwtPayload(token);
+	
+	if (!payload) {
+		throw new InvalidUserCredentialsError()
+	}
+	
+	const user = await UserModel.getUser(payload.user);
+	if (!user) {
+		throw new InvalidUserCredentialsError()
+	}
+	
+	const authedReq = req as AuthedRequest;
+	authedReq.user = user;
+	authedReq.isAdmin = user.role == UserRole.Admin;
+	authedReq.isFrontDesk = user.department === Department.FrontDesk;
+	next();
 }

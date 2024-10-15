@@ -7,6 +7,8 @@ export class GuestAlreadyExistsError extends Error {}
 export class GuestDoesNotExistError extends Error {}
 export class GuestCreationError extends Error {}
 export class GuestUpdateError extends Error {}
+export class InvalidGuestCredentialsError extends Error {}
+export class GuestSearchFailedError extends Error {}
 
 export interface Guest extends Document {
 	guestId: number,                     // System's ID for each guest.
@@ -49,7 +51,7 @@ const GuestSchema = new Schema<Guest>({
 		type: String,
 		required: false,
 		validate: {
-			validator: (value: string) => isEmailString(value),
+			validator: (value: string) => isEmailString(value) || value === "",
 			message: "Email is not in a valid format.",
 		},
 	},
@@ -228,6 +230,50 @@ async function setPhone(guestId: number, phone: string) {
 	return await updateGuestField(guestId, "phone", phone);
 }
 
+async function query(
+	identification?: string | any,
+	fullName?: string | any,
+	email?: string | any,
+	phone?: string | any,
+	reservationId?: number | any
+) {
+	// Build the search criteria dynamically based on the
+	// parameters that were passed.
+	const criteria: any = {};
+	
+	function addCriteria(criteria: any, field: keyof any, value: string) {
+		criteria[field] = {
+			$regex: new RegExp(value, "i")
+		};
+	}
+	
+	if (identification) {
+		addCriteria(criteria, "identification", identification as string);
+	}
+	if (fullName) {
+		addCriteria(criteria, "fullName", fullName as string);
+	}
+	if (email) {
+		addCriteria(criteria, "email", (email as string).replaceAll(".", "\\."));
+	}
+	if (phone) {
+		addCriteria(criteria, "phone", phone as string);
+	}
+	if (reservationId) {
+		criteria.reservations = Number(reservationId);
+	}
+	
+	try {
+		const guests = Object.keys(criteria).length === 0
+			? await GuestModel.find({})
+			: await GuestModel.find(criteria);
+		
+		return guests;
+	} catch (err: any) {
+		throw new GuestSearchFailedError(err.message);
+	}
+}
+
 export default {
 	create,
 	getById,
@@ -238,6 +284,7 @@ export default {
 	setEmail,
 	setName,
 	setPhone,
+	query,
 }
 
 /**

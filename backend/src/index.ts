@@ -8,6 +8,7 @@ import { loadDatabase } from "./utils/DatabaseConnector.js";
 import Environment from "./utils/Environment.js";
 import Logger from "./utils/Logger.js";
 import { RoomsRouter } from "./controllers/Room.js";
+import { GuestsRouter } from "./controllers/Guest.js";
 
 const app = express();
 const port = Environment.port;
@@ -43,13 +44,38 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware to notify about routes accessed.
+app.use((req, _res, next) => {
+    const { method, url, params, query, body } = req;
+    
+    let logMessage = `${method} ${url}`;
+    
+    
+    if (params && Object.keys(params).length > 0) {
+        logMessage += `\nParams: ${JSON.stringify(params, null, 2)}`;
+    }
+    
+    if (query && Object.keys(query).length > 0) {
+        logMessage += `\nQuery: ${JSON.stringify(query, null, 2)}`;
+    }
+    
+    if (body && Object.keys(body).length > 0) {
+        logMessage += `\nBody: ${JSON.stringify(body, null, 2)}`;
+    }
+    
+    Logger.log("request", logMessage);
+    next();
+});
+
 // Load the routes.
 app.use("/api/Users", UsersRouter);
 app.use("/api/Rooms", RoomsRouter);
+app.use("/api/Guests", GuestsRouter);
 
 // Error handling middleware.
 app.use(ErrorHandler.users);
 app.use(ErrorHandler.rooms);
+app.use(ErrorHandler.guests);
 
 app.get('/', (_req: Request, res: Response) => {
     res.status(200);
