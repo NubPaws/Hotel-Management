@@ -7,6 +7,7 @@ export class GuestAlreadyExistsError extends Error {}
 export class GuestDoesNotExistError extends Error {}
 export class GuestCreationError extends Error {}
 export class GuestUpdateError extends Error {}
+export class InvalidGuestCredentialsError extends Error {}
 
 export interface Guest extends Document {
 	guestId: number,                     // System's ID for each guest.
@@ -49,7 +50,7 @@ const GuestSchema = new Schema<Guest>({
 		type: String,
 		required: false,
 		validate: {
-			validator: (value: string) => isEmailString(value),
+			validator: (value: string) => isEmailString(value) || value === "",
 			message: "Email is not in a valid format.",
 		},
 	},
