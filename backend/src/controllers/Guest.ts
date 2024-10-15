@@ -1,9 +1,8 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Router } from "express";
 import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
-import { isEmailString } from "../utils/Email.js";
 import GuestModel, { InvalidGuestCredentialsError } from "../models/Guest.js";
 import { StatusCode } from "../utils/StatusCode.js";
-import { Department, InvalidUserCredentialsError, UnauthorizedUserError, UserRole } from "../models/User.js";
+import { UnauthorizedUserError, UserRole } from "../models/User.js";
 
 const router = Router();
 
@@ -55,7 +54,7 @@ const router = Router();
  *       409:
  *         description: Guest already exists
  */
-router.post("/create", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/create", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk } = req as AuthedRequest;
 	if (!isAdmin && !isFrontDesk) {
 		throw new UnauthorizedUserError();
@@ -121,7 +120,7 @@ router.post("/create", verifyUser, async (req: Request, res: Response, next: Nex
  *       404:
  *         description: Guest not found
  */
-router.post("/update", verifyUser, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/update", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk } = req as AuthedRequest;
 	if (!isAdmin && !isFrontDesk) {
 		throw new UnauthorizedUserError();
@@ -242,7 +241,7 @@ router.post("/add-reservation", async (req, res, next) => {
  *       400:
  *         description: Failed to perform the guest search
  */
-router.get("/search", async (req, res, next) => {
+router.get("/search", verifyUser, async (req, res, next) => {
 	const { email, id, reservationId, phone, fullName } = req.query;
 	
 	try {
