@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import Logger from "../utils/Logger.js";
 import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError, InvalidRoomNumberError } from "../models/Room.js";
+import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, GuestUpdateError } from "../models/Guest.js";
 
 export enum ErrorCode {
 	Ok = 200,
@@ -41,8 +42,7 @@ function users(err: any, _req: Request, res: Response, next: NextFunction) {
 		statusCode = ErrorCode.Unauthorized;
 		message = "User is not authrozied."
 	} else {
-		next(err);
-		return;
+		return next(err);
 	}
 	
 	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
@@ -75,8 +75,31 @@ function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
 		statusCode = ErrorCode.NotFound;
 		message = err.message;
 	} else {
-		next(err);
-		return;
+		return next(err);
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
+}
+
+function guests(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = ErrorCode.Ok;
+	let message = "";
+	
+	if (err instanceof GuestAlreadyExistsError) {
+		statusCode = ErrorCode.Conflict;
+		message = "Guest already exists";
+	} else if (err instanceof GuestDoesNotExistError) {
+		statusCode = ErrorCode.Conflict;
+		message = "Guest does not exists";
+	} else if (err instanceof GuestCreationError) {
+		statusCode = ErrorCode.BadRequest;
+		message = "Failed to create guest with the information provided";
+	} else if (err instanceof GuestUpdateError) {
+		statusCode = ErrorCode.BadRequest;
+		message = "Failed to update guest with the information provided";
+	} else {
+		return next(err);
 	}
 	
 	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
@@ -86,4 +109,5 @@ function rooms(err: any, _req: Request, res: Response, next: NextFunction) {
 export default {
 	users,
 	rooms,
+	guests,
 }
