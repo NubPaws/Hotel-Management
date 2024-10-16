@@ -501,10 +501,10 @@ async function setState(reservationId: number, state: ReservationState) {
  * @param description A description of the extra item, can be as long as possible
  * or can be an empty string.
  */
-async function addExtra(reservationId: number, item: string, description: string = "") {
+async function addExtra(reservationId: number, item: string, price: number, description: string = "") {
 	const reservation = await getById(reservationId);
 	
-	const extra = await Extra.create(item, description, reservationId);
+	const extra = await Extra.create(item, description, price, reservationId);
 	
 	reservation.extras.push(extra.extraId);
 	await reservation.save();
@@ -569,72 +569,75 @@ export default {
  *   schemas:
  *     Reservation:
  *       type: object
- *       properties:
- *         guest:
- *           type: string
- *           description: The ID of the guest who made the reservation.
- *           example: "605c73c4f0a5e71b34567891"
- *         reservationMade:
- *           type: string
- *           format: date-time
- *           readOnly: true
- *           description: The date and time when the reservation was made.
- *           example: "2023-09-16T15:00:00.000Z"
- *         startDate:
- *           type: string
- *           format: date-time
- *           description: The start date of the reservation.
- *           example: "2023-09-20T00:00:00.000Z"
- *         nightCount:
- *           type: integer
- *           description: The number of nights for the reservation.
- *           example: 3
- *         prices:
- *           type: array
- *           items:
- *             type: number
- *           description: The price for each night.
- *           example: [100, 100, 120]
- *         room:
- *           type: string
- *           description: The ID of the room assigned to the reservation.
- *           example: "605c73c4f0a5e71b34567891"
- *         state:
- *           type: string
- *           enum:
- *             - Pending
- *             - Active
- *             - Cancelled
- *             - Passed
- *           description: The state of the reservation.
- *           example: "Pending"
- *         email:
- *           type: string
- *           description: The email address associated with the reservation.
- *           example: "guest@example.com"
- *         phoneNumber:
- *           type: string
- *           description: The phone number associated with the reservation.
- *           example: "+123456789"
- *         endTime:
- *           type: string
- *           format: date-time
- *           description: The time the reservation ends on its last day.
- *           example: "2023-09-23T12:00:00.000Z"
- *         extras:
- *           type: array
- *           items:
- *             type: string
- *           description: An array of IDs referencing extra services or items.
- *           example: ["605c73c4f0a5e71b34567891", "605c73c4f0a5e71b34567892"]
  *       required:
- *         - guest
+ *         - reservationId
  *         - reservationMade
  *         - startDate
  *         - startTime
  *         - nightCount
  *         - endTime
  *         - prices
+ *         - guest
  *         - email
- *         - phoneNumber
+ *         - phone
+ *       properties:
+ *         reservationId:
+ *           type: integer
+ *           description: Unique identifier for the reservation.
+ *           example: 12345
+ *         reservationMade:
+ *           type: string
+ *           format: date-time
+ *           description: Date and time when the reservation was made.
+ *           example: "2024-10-16T10:30:00.000Z"
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *           description: Start date of the reservation.
+ *           example: "2024-11-01T00:00:00.000Z"
+ *         startTime:
+ *           type: string
+ *           description: Start time of the reservation in HH:mm format (24-hour).
+ *           example: "15:00"
+ *         nightCount:
+ *           type: integer
+ *           description: Number of nights for the reservation.
+ *           example: 3
+ *         endTime:
+ *           type: string
+ *           description: End time of the reservation in HH:mm format.
+ *           example: "12:00"
+ *         prices:
+ *           type: array
+ *           items:
+ *             type: number
+ *           description: Prices for each night of the stay.
+ *           example: [100, 120, 150]
+ *         guest:
+ *           type: integer
+ *           description: ID of the guest making the reservation.
+ *           example: 7890
+ *         email:
+ *           type: string
+ *           description: Email address of the guest.
+ *           example: "guest@example.com"
+ *         phone:
+ *           type: string
+ *           description: Phone number of the guest.
+ *           example: "+1-555-555-5555"
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: integer
+ *           description: Array of extra service IDs associated with the reservation.
+ *           example: [101, 102, 103]
+ *         room:
+ *           type: integer
+ *           description: Room ID assigned to the reservation.
+ *           example: 101
+ *         state:
+ *           type: string
+ *           enum: [Pending, Active, Cancelled, Passed]
+ *           description: Current state of the reservation.
+ *           example: "Active"
  */
