@@ -9,6 +9,8 @@ import Environment from "./utils/Environment.js";
 import Logger from "./utils/Logger.js";
 import { RoomsRouter } from "./controllers/Room.js";
 import { GuestsRouter } from "./controllers/Guest.js";
+import { ReservationsRouter } from "./controllers/Reservation.js";
+import { ExtrasRouter } from "./controllers/Extra.js";
 
 const app = express();
 const port = Environment.port;
@@ -71,11 +73,15 @@ app.use((req, _res, next) => {
 app.use("/api/Users", UsersRouter);
 app.use("/api/Rooms", RoomsRouter);
 app.use("/api/Guests", GuestsRouter);
+app.use("/api/Reservations", ReservationsRouter);
+app.use("/api/Extras", ExtrasRouter);
 
 // Error handling middleware.
 app.use(ErrorHandler.users);
 app.use(ErrorHandler.rooms);
 app.use(ErrorHandler.guests);
+app.use(ErrorHandler.reservations);
+app.use(ErrorHandler.extras);
 
 app.get('/', (_req: Request, res: Response) => {
     res.status(200);

@@ -6,10 +6,9 @@ import Counter from "./Counter.js";
 import Extra from "./Extra.js";
 import Room from "./Room.js";
 
-export class ReservationNotFoundError extends Error {}
+export class ReservationDoesNotExistError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
 export class ReservationCreationError extends Error {}
-export class ReservationDoesNotExistError extends Error {}
 export class ReservationFetchingError extends Error {}
 export class ReservationUpdateError extends Error {}
 
