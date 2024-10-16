@@ -30,6 +30,7 @@ export enum Department {
 	FrontDesk = "FrontDesk",
 	HouseKeeping = "HouseKeeping",
 	Maintenance = "Maintenance",
+	FoodAndBeverage = "FoodAndBeverage",
 	Security = "Security",
 	Conceirge = "Conceirge",
 }

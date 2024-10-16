@@ -60,6 +60,7 @@ export interface AuthedRequest extends Request {
 	user: User;
 	isAdmin: boolean;
 	isFrontDesk: boolean;
+	isFoodBeverage: boolean;
 }
 
 export async function verifyUser(req: Request, res: Response, next: NextFunction) {
@@ -84,5 +85,6 @@ export async function verifyUser(req: Request, res: Response, next: NextFunction
 	authedReq.user = user;
 	authedReq.isAdmin = user.role == UserRole.Admin;
 	authedReq.isFrontDesk = user.department === Department.FrontDesk;
+	authedReq.isFoodBeverage = user.department === Department.FoodAndBeverage;
 	next();
 }
