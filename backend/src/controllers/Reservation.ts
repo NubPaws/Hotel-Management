@@ -477,6 +477,64 @@ router.post("/cancel", verifyUser, async (req, res, next) => {
 	}
 });
 
+/**
+ * @swagger
+ * /api/Reservations/query:
+ *   get:
+ *     summary: Query reservations by guest identification, room, date range, email, phone, or guest name
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: guestIdentification
+ *         schema:
+ *           type: string
+ *         description: Guest identification number
+ *       - in: query
+ *         name: room
+ *         schema:
+ *           type: integer
+ *         description: Room number
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for the reservation range
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for the reservation range
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Guest email
+ *       - in: query
+ *         name: phone
+ *         schema:
+ *           type: string
+ *         description: Guest phone number
+ *       - in: query
+ *         name: guestName
+ *         schema:
+ *           type: string
+ *         description: Guest name
+ *     responses:
+ *       200:
+ *         description: List of matching reservations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid input or query parameters
+ */
 router.get("/query", verifyUser, async (req, res, next) => {
 	const {
 		guestId, room, startDate, endDate, email, phone, guestName
