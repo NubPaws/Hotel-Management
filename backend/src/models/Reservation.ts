@@ -576,9 +576,9 @@ async function isValidReservation(reservationId: number): Promise<boolean> {
 async function query(
 	guestId?: number,
 	room?: number,
-	startDate?: Date,
-	endDate?: Date,
-	email?: Email,
+	startDate?: string,
+	endDate?: string,
+	email?: string,
 	phone?: string,
 	guestName?: string
 ) {

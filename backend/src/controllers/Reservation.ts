@@ -538,7 +538,7 @@ router.post("/cancel", verifyUser, async (req, res, next) => {
 router.get("/query", verifyUser, async (req, res, next) => {
 	const {
 		guestId, room, startDate, endDate, email, phone, guestName
-	} = req.body;
+	} = req.query;
 	
 	const validate = dataValidate({
 		guestId, room, startDate, endDate, email, phone, guestName
@@ -549,7 +549,13 @@ router.get("/query", verifyUser, async (req, res, next) => {
 	
 	try {
 		const reservations = await ReservationModel.query(
-			guestId, room, startDate, endDate, email, phone, guestName
+			guestId   ? Number(guestId)   : undefined,
+			room      ? Number(room)      : undefined,
+			startDate ? String(startDate) : undefined,
+			endDate   ? String(endDate)   : undefined,
+			email     ? String(email)     : undefined,
+			phone     ? String(phone)     : undefined,
+			guestName ? String(guestName) : undefined
 		);
 		
 		res.status(StatusCode.Ok).json(reservations);
