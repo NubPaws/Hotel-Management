@@ -4,6 +4,8 @@ import Logger from "../utils/Logger.js";
 import { CreatorDoesNotExistError, CreatorIsNotAdminError, FailedToSignJwtTokenError, InvalidUserCredentialsError, JwtTokenIsNotValidError, UnauthorizedUserError, UserAlreadyExistsError, UserDoesNotExistError } from "../models/User.js";
 import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExistsError, RoomTypeAlreadyExistsError, RoomTypeDoesNotExistError, RoomTypeIsNotEmptyError, InvalidRoomNumberError } from "../models/Room.js";
 import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, GuestSearchFailedError, GuestUpdateError, InvalidGuestCredentialsError } from "../models/Guest.js";
+import { ReservationCreationError, ReservationDoesNotExistError, ReservationFetchingError, ReservationUpdateError, RoomIsAlreadyOccupiedAtThatTimeError } from "../models/Reservation.js";
+import { ExtraDoesNotExistError, ExtraPriceInvalidError } from "../models/Extra.js";
 
 function users(err: any, _req: Request, res: Response, next: NextFunction) {
 	let statusCode = StatusCode.Ok;
@@ -104,8 +106,55 @@ function guests(err: any, _req: Request, res: Response, next: NextFunction) {
 	res.status(statusCode).send(message);
 }
 
+function reservations(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = StatusCode.Ok;
+	let message = "";
+	
+	if (err instanceof ReservationDoesNotExistError) {
+		statusCode = StatusCode.NotFound;
+		message = "Reservation was not found";
+	} else if (err instanceof RoomIsAlreadyOccupiedAtThatTimeError) {
+		statusCode = StatusCode.Conflict;
+		message = "The room is already occupied at that time";
+	} else if (err instanceof ReservationCreationError) {
+		statusCode = StatusCode.BadRequest;
+		message = "Failed to create the reservation, a general error has occured";
+	} else if (err instanceof ReservationFetchingError) {
+		statusCode = StatusCode.BadRequest;
+		message = "There was an error fetching the reservation";
+	} else if (err instanceof ReservationUpdateError) {
+		statusCode = StatusCode.BadRequest;
+		message = "There was an error updating the reservation";
+	} else {
+		return next(err);
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
+}
+
+function extras(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = StatusCode.Ok;
+	let message = "";
+	
+	if (err instanceof ExtraDoesNotExistError) {
+		statusCode = StatusCode.NotFound;
+		message = err.message;
+	} else if (err instanceof ExtraPriceInvalidError) {
+		statusCode = StatusCode.Conflict;
+		message = err.message;
+	} else {
+		return next(err);
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
+}
+
 export default {
 	users,
 	rooms,
 	guests,
+	reservations,
+	extras,
 }

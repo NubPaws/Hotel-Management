@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import ReservationModel, { ReservationNotFoundError } from "./Reservation.js";
+import ReservationModel, { ReservationDoesNotExistError } from "./Reservation.js";
 
 export class RoomDoesNotExistError extends Error {
 	constructor(num: number) {
@@ -238,7 +238,7 @@ async function setRoomOccupation(num: number, occupied: boolean, reservationId?:
 	// Otherwise, we have to make sure that the reservation is valid.
 	const isValidReservation = await ReservationModel.isValidReservation(reservationId);
 	if (!isValidReservation) {
-		throw new ReservationNotFoundError();
+		throw new ReservationDoesNotExistError();
 	}
 	
 	const room = await RoomModel.findOneAndUpdate(

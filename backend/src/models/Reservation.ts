@@ -6,12 +6,12 @@ import Counter from "./Counter.js";
 import Extra from "./Extra.js";
 import Room from "./Room.js";
 
-export class ReservationNotFoundError extends Error {}
+export class ReservationDoesNotExistError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
 export class ReservationCreationError extends Error {}
-export class ReservationDoesNotExistError extends Error {}
 export class ReservationFetchingError extends Error {}
 export class ReservationUpdateError extends Error {}
+export class InvalidPricesArrayError extends Error {}
 
 export enum ReservationState {
 	Pending = "Pending",
@@ -21,20 +21,22 @@ export enum ReservationState {
 }
 
 export interface Reservation extends Document {
-	reservationId: number,
-	reservationMade: Date,
-	startDate: Date,
-	startTime: Time24,
-	nightCount: number,
-	endTime: Time24,
-	prices: number[],
-	room: number | null,
-	state: ReservationState,
-	extras: number[],
-	
-	guest: number | null,
-	email: string,
-	phone: string,
+	reservationId: number,			// Running counter of the reservations made.
+	reservationMade: Date,			// The time the reservation was made.
+	comment: string,				// Comment made on the reservation.
+	startDate: Date,				// The date the reservation was made to start at.
+	startTime: Time24,				// The time of day the reservation starts at.
+	nightCount: number,				// Number of nights the reservation is for.
+	endTime: Time24,				// Time the reservation should end on the last day.
+	prices: number[],				// Prices for each night, should be the same length as nightCount.
+	roomType: string,				// Type of the room requested in the reservation.
+	room: number | null,			// Room number assigned to the reservation, null otherwise.
+	state: ReservationState,		// The state of the reservation.
+	extras: number[],				// References to Extra's ID. Anything added to the reservation.
+	guest: number | null,			// The guest who booked the reservation.
+	guestName: string,				// The name the guest used for the reservation.
+	email: string,					// Email of the reservation.
+	phone: string,					// Phone number of the reservation.
 }
 
 const ReservationSchema = new Schema<Reservation>({
@@ -49,6 +51,10 @@ const ReservationSchema = new Schema<Reservation>({
 		required: true,
 		index: true,
 		immutable: true,
+	},
+	comment: {
+		type: String,
+		required: true,
 	},
 	startDate: {
 		type: Date,
@@ -86,6 +92,11 @@ const ReservationSchema = new Schema<Reservation>({
 			message: "Each price must be a non-negative number",
 		},
 	}],
+	roomType: {
+		type: String,
+		ref: "RoomTypeModel",
+		required: true,
+	},
 	room: {
 		type: Number,
 		ref: "RoomModel",
@@ -100,10 +111,14 @@ const ReservationSchema = new Schema<Reservation>({
 		type: Number,
 		ref: "ExtraModel",
 	}],
-	
 	guest: {
 		type: Number,
 		ref: "GuestModel",
+		required: true,
+		index: true,
+	},
+	guestName: {
+		type: String,
 		required: true,
 		index: true,
 	},
@@ -134,30 +149,34 @@ ReservationSchema.pre("save", async function (next) {
 
 /**
  * Create a new reservation in the reservation system. This function also
- * does validation checks to make sure that the information passed is
- * valid. Therefore, no validation checks are needed to be done outside
- * of this function.
+ * performs validation checks to ensure the provided information is valid.
+ * Therefore, no validation checks are needed outside of this function.
  * 
- * @param guest guest id.
- * @param startDate dd/MM/YYYY date.
- * @param startTime string of format HH:mm, to know more read Time24.
- * @param nightCount number of nights from startDate.
- * @param endTime On the last day, the time to checkout, like startTime.
- * to know more read Time24.
- * @param prices array of numbers, each number correspond with the price
- * of each night.
- * @param email string representing the email of the guest, read more at Email.
- * @param phone string representing the phone number of the guest.
+ * @param guest - The ID of the guest making the reservation.
+ * @param comment - Additional notes or comments about the reservation.
+ * @param startDate - The start date of the reservation (dd/MM/YYYY).
+ * @param startTime - The time of day the reservation starts (HH:mm, 24-hour format).
+ * @param nightCount - The number of nights for the reservation starting from the startDate.
+ * @param endTime - The time of day the reservation ends on the last day (HH:mm, 24-hour format).
+ * @param prices - An array of numbers where each corresponds to the price of a night.
+ * @param roomType - The type of room requested for the reservation.
+ * @param email - The email address of the guest.
+ * @param phone - The phone number of the guest.
+ * 
  * @returns The newly created reservation.
- * @throws ReservationCreationError
+ * 
+ * @throws ReservationCreationError - Throws an error if the reservation creation fails due to validation or database issues.
  */
 async function create(
 	guest: number,
+	comment: string,
 	startDate: Date,
 	startTime: Time24,
 	nightCount: number,
 	endTime: Time24,
 	prices: number[],
+	roomType: string,
+	guestName: string,
 	email: string,
 	phone: string
 ) {
@@ -186,11 +205,14 @@ async function create(
 		const reservation = await ReservationModel.create({
 			guest,
 			reservationMade: getTodaysDate(),
+			comment,
 			startDate,
 			startTime,
 			nightCount,
 			endTime,
 			prices,
+			roomType,
+			guestName,
 			email,
 			phone,
 			extras: [],
@@ -330,6 +352,10 @@ async function updateReservationField(
 	} catch (err: any) {
 		throw new ReservationUpdateError(`Failed to update ${field}: ${err.message}`);
 	}
+}
+
+async function setComment(reservationId: number, comment: string) {
+	return updateReservationField(reservationId, "comment", comment);
 }
 
 async function setEmail(reservationId: number, email: Email) {
@@ -494,6 +520,10 @@ async function setState(reservationId: number, state: ReservationState) {
 	return updateReservationField(reservationId, "state", state);
 }
 
+async function setRoomType(reservationId: number, roomType: string) {
+	return updateReservationField(reservationId, "roomType", roomType);
+}
+
 /**
  * Create a new extra and adds it to the reservation.
  * 
@@ -502,17 +532,25 @@ async function setState(reservationId: number, state: ReservationState) {
  * @param description A description of the extra item, can be as long as possible
  * or can be an empty string.
  */
-async function addExtra(reservationId: number, item: string, description: string = "") {
+async function addExtra(reservationId: number, item: string, price: number, description: string = "") {
 	const reservation = await getById(reservationId);
 	
-	const extra = await Extra.create(item, description, reservationId);
+	const extra = await Extra.create(item, description, price, reservationId);
 	
 	reservation.extras.push(extra.extraId);
 	await reservation.save();
 	return reservation as Reservation;
 }
 
-async function removeExtraById(reservationId: number, extraId: number) {
+/**
+ * Removes an extra from a reservation and deletes the extra from the database.
+ * 
+ * @param {number} reservationId - The ID of the reservation from which to remove the extra.
+ * @param {number} extraId - The ID of the extra to remove and delete.
+ * @returns {Reservation} - The updated reservation after the extra has been removed.
+ * @throws {ReservationUpdateError} - If the reservation or extra does not exist or cannot be updated.
+ */
+async function removeExtra(reservationId: number, extraId: number) {
 	const reservation = await getById(reservationId);
 	
 	if (reservation.extras.every((val: number) => val !== extraId)) {
@@ -535,6 +573,47 @@ async function isValidReservation(reservationId: number): Promise<boolean> {
 	}
 }
 
+async function query(
+	guestId?: number,
+	room?: number,
+	startDate?: string,
+	endDate?: string,
+	email?: string,
+	phone?: string,
+	guestName?: string
+) {
+	const filters: any = {};
+	
+	// Add filters based on query parameters provided
+	if (guestId) {
+		filters.guest = new RegExp(`${guestId}`, "i");
+	}
+	if (room) {
+		filters.room = new RegExp(`${room}`, "i");
+	}
+	
+	if (startDate && endDate) {
+		filters.startDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+	} else if (startDate) {
+		filters.startDate = { $gte: new Date(startDate) };
+	} else if (endDate) {
+		filters.startDate = { $lte: new Date(endDate) };
+	}
+	
+	if (email) {
+		filters.email = new RegExp(email.replaceAll(".", "\\."), "i");
+	}
+	if (phone) {
+		filters.phone = new RegExp(phone.replaceAll("+", "\\+"), "i");
+	}
+	if (guestName) {
+		filters.guestName = new RegExp(guestName, "i");
+	}
+	
+	const reservations = await ReservationModel.find(filters);
+	return reservations;
+}
+
 export default {
 	create,
 	
@@ -545,6 +624,7 @@ export default {
 	
 	updateReservationField,
 	
+	setComment,
 	setEmail,
 	setPhone,
 	setStartDate,
@@ -557,11 +637,14 @@ export default {
 	setPrice,
 	setRoom,
 	setState,
-	addExtra,
+	setRoomType,
 	
-	removeExtraById,
+	addExtra,
+	removeExtra,
 	
 	isValidReservation,
+	
+	query,
 }
 
 /**
@@ -570,72 +653,79 @@ export default {
  *   schemas:
  *     Reservation:
  *       type: object
- *       properties:
- *         guest:
- *           type: string
- *           description: The ID of the guest who made the reservation.
- *           example: "605c73c4f0a5e71b34567891"
- *         reservationMade:
- *           type: string
- *           format: date-time
- *           readOnly: true
- *           description: The date and time when the reservation was made.
- *           example: "2023-09-16T15:00:00.000Z"
- *         startDate:
- *           type: string
- *           format: date-time
- *           description: The start date of the reservation.
- *           example: "2023-09-20T00:00:00.000Z"
- *         nightCount:
- *           type: integer
- *           description: The number of nights for the reservation.
- *           example: 3
- *         prices:
- *           type: array
- *           items:
- *             type: number
- *           description: The price for each night.
- *           example: [100, 100, 120]
- *         room:
- *           type: string
- *           description: The ID of the room assigned to the reservation.
- *           example: "605c73c4f0a5e71b34567891"
- *         state:
- *           type: string
- *           enum:
- *             - Pending
- *             - Active
- *             - Cancelled
- *             - Passed
- *           description: The state of the reservation.
- *           example: "Pending"
- *         email:
- *           type: string
- *           description: The email address associated with the reservation.
- *           example: "guest@example.com"
- *         phoneNumber:
- *           type: string
- *           description: The phone number associated with the reservation.
- *           example: "+123456789"
- *         endTime:
- *           type: string
- *           format: date-time
- *           description: The time the reservation ends on its last day.
- *           example: "2023-09-23T12:00:00.000Z"
- *         extras:
- *           type: array
- *           items:
- *             type: string
- *           description: An array of IDs referencing extra services or items.
- *           example: ["605c73c4f0a5e71b34567891", "605c73c4f0a5e71b34567892"]
  *       required:
- *         - guest
+ *         - reservationId
  *         - reservationMade
  *         - startDate
  *         - startTime
  *         - nightCount
  *         - endTime
  *         - prices
+ *         - guest
  *         - email
- *         - phoneNumber
+ *         - phone
+ *       properties:
+ *         reservationId:
+ *           type: integer
+ *           description: Unique identifier for the reservation.
+ *           example: 12345
+ *         reservationMade:
+ *           type: string
+ *           format: date-time
+ *           description: Date and time when the reservation was made.
+ *           example: "2024-10-16T10:30:00.000Z"
+ *         comment:
+ *           type: string
+ *           description: Comment associated with the reservation.
+ *           example: "Late check-in requested."
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *           description: Start date of the reservation.
+ *           example: "2024-11-01T00:00:00.000Z"
+ *         startTime:
+ *           type: string
+ *           description: Start time of the reservation in HH:mm format (24-hour).
+ *           example: "15:00"
+ *         nightCount:
+ *           type: integer
+ *           description: Number of nights for the reservation.
+ *           example: 3
+ *         endTime:
+ *           type: string
+ *           description: End time of the reservation in HH:mm format.
+ *           example: "12:00"
+ *         prices:
+ *           type: array
+ *           items:
+ *             type: number
+ *           description: Prices for each night of the stay.
+ *           example: [100, 120, 150]
+ *         guest:
+ *           type: integer
+ *           description: ID of the guest making the reservation.
+ *           example: 7890
+ *         email:
+ *           type: string
+ *           description: Email address of the guest.
+ *           example: "guest@example.com"
+ *         phone:
+ *           type: string
+ *           description: Phone number of the guest.
+ *           example: "+972 50 123 4567"
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: integer
+ *           description: Array of extra service IDs associated with the reservation.
+ *           example: [101, 102, 103]
+ *         room:
+ *           type: integer
+ *           description: Room ID assigned to the reservation.
+ *           example: 101
+ *         state:
+ *           type: string
+ *           enum: [Pending, Active, Cancelled, Passed]
+ *           description: Current state of the reservation.
+ *           example: "Active"
  */
