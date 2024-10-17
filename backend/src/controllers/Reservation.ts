@@ -2,7 +2,7 @@ import { Router } from "express";
 import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 import { UnauthorizedUserError } from "../models/User.js";
 import { StatusCode } from "../utils/StatusCode.js";
-import ReservationModel, { InvalidPricesArrayError } from "../models/Reservation.js";
+import ReservationModel, { InvalidPricesArrayError, ReservationState } from "../models/Reservation.js";
 
 const router = Router();
 
@@ -44,11 +44,13 @@ router.post("/create", verifyUser, async (req, res, next) => {
 	}
 	
 	const {
-		guest, comment, startDate, startTime, nightCount, endTime, prices, roomType, email, phone
+		guest, comment, startDate, startTime, nightCount,
+		endTime, prices, roomType, guestName, email, phone,
 	} = req.body;
 	
 	const validation = dataValidate({
-		guest, comment, startDate, startTime, nightCount, endTime, prices, roomType, email, phone
+		guest, comment, startDate, startTime, nightCount,
+		endTime, prices, roomType, guestName, email, phone
 	});
 	if (validation.status) {
 		return validation.respond(res);
@@ -68,6 +70,7 @@ router.post("/create", verifyUser, async (req, res, next) => {
 			endTime,
 			prices,
 			roomType,
+			guestName,
 			email,
 			phone
 		);
@@ -415,9 +418,7 @@ router.post("/remove-extra", verifyUser, async (req, res, next) => {
 	
 	const validate = dataValidate({ reservationId, extraId });
 	if (validate.status) {
-		return res.status(StatusCode.BadRequest).json({
-			message: "Reservation ID and extra ID are required for removal"
-		});
+		return validate.respond(res);
 	}
 	
 	try {
@@ -427,6 +428,77 @@ router.post("/remove-extra", verifyUser, async (req, res, next) => {
 	} catch (error) {
 		next(error);
 	}
+});
+
+/**
+ * @swagger
+ * /api/Reservations/cancel:
+ *   post:
+ *     summary: Cancel an existing reservation by setting its state to "Cancelled"
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reservationId:
+ *                 type: integer
+ *                 description: ID of the reservation to cancel
+ *     responses:
+ *       200:
+ *         description: Reservation cancelled successfully
+ *       400:
+ *         description: Invalid input or missing required fields
+ *       403:
+ *         description: Unauthorized, requires admin or front desk
+ *       404:
+ *         description: Reservation not found
+ */
+router.post("/cancel", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new UnauthorizedUserError());
+	}
+	
+	const { reservationId } = req.body;
+	const validation = dataValidate({ reservationId });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		await ReservationModel.setState(reservationId, ReservationState.Cancelled);
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.get("/query", verifyUser, async (req, res, next) => {
+	const {
+		guestId, room, startDate, endDate, email, phone, guestName
+	} = req.body;
+	
+	const validate = dataValidate({
+		guestId, room, startDate, endDate, email, phone, guestName
+	});
+	if (validate.status) {
+		return validate.respond(res);
+	}
+	
+	try {
+		const reservations = await ReservationModel.query(
+			guestId, room, startDate, endDate, email, phone, guestName
+		);
+		
+		res.status(StatusCode.Ok).json(reservations);
+	} catch (error) {
+		next(error);
+	}
+	
 });
 
 export const ReservationsRouter = router;

@@ -34,6 +34,7 @@ export interface Reservation extends Document {
 	state: ReservationState,		// The state of the reservation.
 	extras: number[],				// References to Extra's ID. Anything added to the reservation.
 	guest: number | null,			// The guest who booked the reservation.
+	guestName: string,				// The name the guest used for the reservation.
 	email: string,					// Email of the reservation.
 	phone: string,					// Phone number of the reservation.
 }
@@ -116,6 +117,11 @@ const ReservationSchema = new Schema<Reservation>({
 		required: true,
 		index: true,
 	},
+	guestName: {
+		type: String,
+		required: true,
+		index: true,
+	},
 	email: {
 		type: String,
 		required: true,
@@ -170,6 +176,7 @@ async function create(
 	endTime: Time24,
 	prices: number[],
 	roomType: string,
+	guestName: string,
 	email: string,
 	phone: string
 ) {
@@ -205,6 +212,7 @@ async function create(
 			endTime,
 			prices,
 			roomType,
+			guestName,
 			email,
 			phone,
 			extras: [],
@@ -565,6 +573,47 @@ async function isValidReservation(reservationId: number): Promise<boolean> {
 	}
 }
 
+async function query(
+	guestId?: number,
+	room?: number,
+	startDate?: Date,
+	endDate?: Date,
+	email?: Email,
+	phone?: string,
+	guestName?: string
+) {
+	const filters: any = {};
+	
+	// Add filters based on query parameters provided
+	if (guestId) {
+		filters.guest = new RegExp(`${guestId}`, "i");
+	}
+	if (room) {
+		filters.room = new RegExp(`${room}`, "i");
+	}
+	
+	if (startDate && endDate) {
+		filters.startDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+	} else if (startDate) {
+		filters.startDate = { $gte: new Date(startDate) };
+	} else if (endDate) {
+		filters.startDate = { $lte: new Date(endDate) };
+	}
+	
+	if (email) {
+		filters.email = new RegExp(email.replaceAll(".", "\\."), "i");
+	}
+	if (phone) {
+		filters.phone = new RegExp(phone.replaceAll("+", "\\+"), "i");
+	}
+	if (guestName) {
+		filters.guestName = new RegExp(guestName, "i");
+	}
+	
+	const reservations = await ReservationModel.find(filters);
+	return reservations;
+}
+
 export default {
 	create,
 	
@@ -594,6 +643,8 @@ export default {
 	removeExtra,
 	
 	isValidReservation,
+	
+	query,
 }
 
 /**
