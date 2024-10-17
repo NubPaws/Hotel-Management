@@ -11,6 +11,7 @@ export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
 export class ReservationCreationError extends Error {}
 export class ReservationFetchingError extends Error {}
 export class ReservationUpdateError extends Error {}
+export class InvalidPricesArrayError extends Error {}
 
 export enum ReservationState {
 	Pending = "Pending",
@@ -20,20 +21,21 @@ export enum ReservationState {
 }
 
 export interface Reservation extends Document {
-	reservationId: number,
-	reservationMade: Date,
-	startDate: Date,
-	startTime: Time24,
-	nightCount: number,
-	endTime: Time24,
-	prices: number[],
-	room: number | null,
-	state: ReservationState,
-	extras: number[],
-	
-	guest: number | null,
-	email: string,
-	phone: string,
+	reservationId: number,			// Running counter of the reservations made.
+	reservationMade: Date,			// The time the reservation was made.
+	comment: string,				// Comment made on the reservation.
+	startDate: Date,				// The date the reservation was made to start at.
+	startTime: Time24,				// The time of day the reservation starts at.
+	nightCount: number,				// Number of nights the reservation is for.
+	endTime: Time24,				// Time the reservation should end on the last day.
+	prices: number[],				// Prices for each night, should be the same length as nightCount.
+	roomType: string,				// Type of the room requested in the reservation.
+	room: number | null,			// Room number assigned to the reservation, null otherwise.
+	state: ReservationState,		// The state of the reservation.
+	extras: number[],				// References to Extra's ID. Anything added to the reservation.
+	guest: number | null,			// The guest who booked the reservation.
+	email: string,					// Email of the reservation.
+	phone: string,					// Phone number of the reservation.
 }
 
 const ReservationSchema = new Schema<Reservation>({
@@ -48,6 +50,10 @@ const ReservationSchema = new Schema<Reservation>({
 		required: true,
 		index: true,
 		immutable: true,
+	},
+	comment: {
+		type: String,
+		required: true,
 	},
 	startDate: {
 		type: Date,
@@ -85,6 +91,11 @@ const ReservationSchema = new Schema<Reservation>({
 			message: "Each price must be a non-negative number",
 		},
 	}],
+	roomType: {
+		type: String,
+		ref: "RoomTypeModel",
+		required: true,
+	},
 	room: {
 		type: Number,
 		ref: "RoomModel",
@@ -99,7 +110,6 @@ const ReservationSchema = new Schema<Reservation>({
 		type: Number,
 		ref: "ExtraModel",
 	}],
-	
 	guest: {
 		type: Number,
 		ref: "GuestModel",
@@ -133,30 +143,33 @@ ReservationSchema.pre("save", async function (next) {
 
 /**
  * Create a new reservation in the reservation system. This function also
- * does validation checks to make sure that the information passed is
- * valid. Therefore, no validation checks are needed to be done outside
- * of this function.
+ * performs validation checks to ensure the provided information is valid.
+ * Therefore, no validation checks are needed outside of this function.
  * 
- * @param guest guest id.
- * @param startDate dd/MM/YYYY date.
- * @param startTime string of format HH:mm, to know more read Time24.
- * @param nightCount number of nights from startDate.
- * @param endTime On the last day, the time to checkout, like startTime.
- * to know more read Time24.
- * @param prices array of numbers, each number correspond with the price
- * of each night.
- * @param email string representing the email of the guest, read more at Email.
- * @param phone string representing the phone number of the guest.
+ * @param guest - The ID of the guest making the reservation.
+ * @param comment - Additional notes or comments about the reservation.
+ * @param startDate - The start date of the reservation (dd/MM/YYYY).
+ * @param startTime - The time of day the reservation starts (HH:mm, 24-hour format).
+ * @param nightCount - The number of nights for the reservation starting from the startDate.
+ * @param endTime - The time of day the reservation ends on the last day (HH:mm, 24-hour format).
+ * @param prices - An array of numbers where each corresponds to the price of a night.
+ * @param roomType - The type of room requested for the reservation.
+ * @param email - The email address of the guest.
+ * @param phone - The phone number of the guest.
+ * 
  * @returns The newly created reservation.
- * @throws ReservationCreationError
+ * 
+ * @throws ReservationCreationError - Throws an error if the reservation creation fails due to validation or database issues.
  */
 async function create(
 	guest: number,
+	comment: string,
 	startDate: Date,
 	startTime: Time24,
 	nightCount: number,
 	endTime: Time24,
 	prices: number[],
+	roomType: string,
 	email: string,
 	phone: string
 ) {
@@ -185,11 +198,13 @@ async function create(
 		const reservation = await ReservationModel.create({
 			guest,
 			reservationMade: getTodaysDate(),
+			comment,
 			startDate,
 			startTime,
 			nightCount,
 			endTime,
 			prices,
+			roomType,
 			email,
 			phone,
 			extras: [],
@@ -329,6 +344,10 @@ async function updateReservationField(
 	} catch (err: any) {
 		throw new ReservationUpdateError(`Failed to update ${field}: ${err.message}`);
 	}
+}
+
+async function setComment(reservationId: number, comment: string) {
+	return updateReservationField(reservationId, "comment", comment);
 }
 
 async function setEmail(reservationId: number, email: Email) {
@@ -493,6 +512,10 @@ async function setState(reservationId: number, state: ReservationState) {
 	return updateReservationField(reservationId, "state", state);
 }
 
+async function setRoomType(reservationId: number, roomType: string) {
+	return updateReservationField(reservationId, "roomType", roomType);
+}
+
 /**
  * Create a new extra and adds it to the reservation.
  * 
@@ -511,7 +534,15 @@ async function addExtra(reservationId: number, item: string, price: number, desc
 	return reservation as Reservation;
 }
 
-async function removeExtraById(reservationId: number, extraId: number) {
+/**
+ * Removes an extra from a reservation and deletes the extra from the database.
+ * 
+ * @param {number} reservationId - The ID of the reservation from which to remove the extra.
+ * @param {number} extraId - The ID of the extra to remove and delete.
+ * @returns {Reservation} - The updated reservation after the extra has been removed.
+ * @throws {ReservationUpdateError} - If the reservation or extra does not exist or cannot be updated.
+ */
+async function removeExtra(reservationId: number, extraId: number) {
 	const reservation = await getById(reservationId);
 	
 	if (reservation.extras.every((val: number) => val !== extraId)) {
@@ -544,6 +575,7 @@ export default {
 	
 	updateReservationField,
 	
+	setComment,
 	setEmail,
 	setPhone,
 	setStartDate,
@@ -556,9 +588,10 @@ export default {
 	setPrice,
 	setRoom,
 	setState,
-	addExtra,
+	setRoomType,
 	
-	removeExtraById,
+	addExtra,
+	removeExtra,
 	
 	isValidReservation,
 }
@@ -590,6 +623,10 @@ export default {
  *           format: date-time
  *           description: Date and time when the reservation was made.
  *           example: "2024-10-16T10:30:00.000Z"
+ *         comment:
+ *           type: string
+ *           description: Comment associated with the reservation.
+ *           example: "Late check-in requested."
  *         startDate:
  *           type: string
  *           format: date-time
@@ -624,7 +661,7 @@ export default {
  *         phone:
  *           type: string
  *           description: Phone number of the guest.
- *           example: "+1-555-555-5555"
+ *           example: "+972 50 123 4567"
  *         extras:
  *           type: array
  *           items:

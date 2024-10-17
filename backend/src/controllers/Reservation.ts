@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { AuthedRequest, verifyUser } from "./Validator.js";
+import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 import { UnauthorizedUserError } from "../models/User.js";
 import { StatusCode } from "../utils/StatusCode.js";
-import ReservationModel from "../models/Reservation.js";
-import ExtraModel from "../models/Extra.js";
+import ReservationModel, { InvalidPricesArrayError } from "../models/Reservation.js";
 
 const router = Router();
 
@@ -45,17 +44,30 @@ router.post("/create", verifyUser, async (req, res, next) => {
 	}
 	
 	const {
-		guest, startDate, startTime, nightCount, endTime, prices, email, phone
+		guest, comment, startDate, startTime, nightCount, endTime, prices, roomType, email, phone
 	} = req.body;
+	
+	const validation = dataValidate({
+		guest, comment, startDate, startTime, nightCount, endTime, prices, roomType, email, phone
+	});
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	if (!Array.isArray(prices)) {
+		return next(new InvalidPricesArrayError());
+	}
 	
 	try {
 		const reservation = await ReservationModel.create(
 			guest,
+			comment,
 			new Date(startDate),
 			startTime,
 			nightCount,
 			endTime,
 			prices,
+			roomType,
 			email,
 			phone
 		);
@@ -84,6 +96,10 @@ router.post("/create", verifyUser, async (req, res, next) => {
  *               reservationId:
  *                 type: integer
  *                 description: ID of the reservation to update
+ *               comment:
+ *                 type: string
+ *                 description: Updated comment for the reservation
+ *                 example: "Late check-in requested."
  *               email:
  *                 type: string
  *                 description: Updated email of the guest
@@ -91,7 +107,7 @@ router.post("/create", verifyUser, async (req, res, next) => {
  *               phone:
  *                 type: string
  *                 description: Updated phone number of the guest
- *                 example: "+1-555-555-5555"
+ *                 example: "+972 50 555 5555"
  *               startDate:
  *                 type: string
  *                 format: date-time
@@ -105,6 +121,10 @@ router.post("/create", verifyUser, async (req, res, next) => {
  *                 type: string
  *                 description: Updated end time of the reservation (HH:mm)
  *                 example: "12:00"
+ *               roomType:
+ *                 type: string
+ *                 description: Updated room type for the reservation
+ *                 example: "Deluxe"
  *               prices:
  *                 type: array
  *                 items:
@@ -134,7 +154,7 @@ router.post("/update", verifyUser, async (req, res, next) => {
 	}
 	
 	const {
-		reservationId, email, phone, startDate, startTime, endTime, prices, room
+		reservationId, comment, email, phone, startDate, startTime, endTime, roomType, prices, room
 	} = req.body;
 	
 	try {
@@ -143,6 +163,9 @@ router.post("/update", verifyUser, async (req, res, next) => {
 		
 		const updatePromises = [];
 		
+		if (comment) {
+			updatePromises.push(ReservationModel.setComment(reservationId, comment));
+		}
 		if (email) {
 			updatePromises.push(ReservationModel.setEmail(reservationId, email));
 		}
@@ -157,6 +180,9 @@ router.post("/update", verifyUser, async (req, res, next) => {
 		}
 		if (endTime) {
 			updatePromises.push(ReservationModel.setEndTime(reservationId, endTime));
+		}
+		if (roomType) {
+			updatePromises.push(ReservationModel.setRoomType(reservationId, roomType));
 		}
 		if (prices && Array.isArray(prices)) {
 			prices.forEach((price, night) => {
@@ -325,8 +351,8 @@ router.post("/add-nights", verifyUser, async (req, res, next) => {
  *         description: Invalid input
  */
 router.post("/add-extra", verifyUser, async (req, res, next) => {
-	const { isAdmin, isFrontDesk } = req as AuthedRequest;
-	if (!isAdmin && !isFrontDesk) {
+	const { isAdmin, isFrontDesk, isFoodBeverage } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk && !isFoodBeverage) {
 		return next(new UnauthorizedUserError());
 	}
 	
@@ -340,6 +366,63 @@ router.post("/add-extra", verifyUser, async (req, res, next) => {
 	
 	try {
 		const reservation = await ReservationModel.addExtra(reservationId, item, price, description);
+		res.status(StatusCode.Ok).json(reservation);
+	} catch (error) {
+		next(error);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Reservations/remove-extra:
+ *   post:
+ *     summary: Remove an extra from a reservation and delete it
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reservationId:
+ *                 type: integer
+ *                 description: ID of the reservation to update
+ *               extraId:
+ *                 type: integer
+ *                 description: ID of the extra to remove and delete
+ *     responses:
+ *       200:
+ *         description: Extra removed and deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid input or missing required fields
+ *       403:
+ *         description: Unauthorized, requires front desk or admin
+ */
+router.post("/remove-extra", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk, isFoodBeverage } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk && !isFoodBeverage) {
+		return next(new UnauthorizedUserError());
+	}
+	
+	const { reservationId, extraId } = req.body;
+	
+	const validate = dataValidate({ reservationId, extraId });
+	if (validate.status) {
+		return res.status(StatusCode.BadRequest).json({
+			message: "Reservation ID and extra ID are required for removal"
+		});
+	}
+	
+	try {
+		const reservation = await ReservationModel.removeExtra(reservationId, extraId);
+		
 		res.status(StatusCode.Ok).json(reservation);
 	} catch (error) {
 		next(error);
