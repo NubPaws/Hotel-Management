@@ -167,6 +167,11 @@ async function tasks(err: any, _req: Request, res: Response, next: NextFunction)
 	res.status(statusCode).send(message);
 }
 
+async function counters(err: any, _req: Request, res: Response, next: NextFunction) {
+	// No errors!
+	return next(err);
+}
+
 export default {
 	users,
 	rooms,
@@ -174,4 +179,5 @@ export default {
 	reservations,
 	extras,
 	tasks,
+	counters,
 }
