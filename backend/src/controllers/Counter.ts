@@ -25,7 +25,7 @@ const router = Router();
  *                 description: The name of the counter to increment
  *               value:
  *                 type: number
- *                 description: The amount to increment the counter by (default: 1)
+ *                 description: The amount to increment the counter by. Default is 1.
  *                 example: 1
  *     responses:
  *       200:
@@ -69,7 +69,7 @@ router.post("/increment", verifyUser, async (req, res, next) => {
  *                 description: The name of the counter to decrement
  *               value:
  *                 type: number
- *                 description: The amount to decrement the counter by (default: 1)
+ *                 description: The amount to decrement the counter by. Default is 1.
  *                 example: 1
  *     responses:
  *       200:
