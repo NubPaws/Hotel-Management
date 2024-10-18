@@ -52,6 +52,10 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Task created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Task'
  *       400:
  *         description: Invalid input
  */
@@ -99,6 +103,10 @@ router.post("/", verifyUser, async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Task retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Task'
  *       404:
  *         description: Task not found
  */
@@ -149,6 +157,10 @@ router.get("/:taskId", verifyUser, async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Task updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Task'
  *       400:
  *         description: Invalid input
  */
@@ -197,6 +209,10 @@ router.post("/:taskId", verifyUser, async (req, res, next) => {
  *     responses:
  *       200:
  *         description: List of tasks retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Task'
  */
 router.get("/department/:department", verifyUser, async (req, res, next) => {
 	const department = req.params.department as Department;
