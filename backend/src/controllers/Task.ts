@@ -63,14 +63,14 @@ router.post("/", verifyUser, async (req, res, next) => {
 	const {
 		room, description, urgency, department, creator
 	} = req.body;
-
+	
 	const validation = dataValidate(
 		{ room, description, urgency, department, creator}
 	);
 	if (validation.status) {
 		return validation.respond(res);
 	}
-
+	
 	try {
 		const task = await TaskModel.create(
 			room,
@@ -112,7 +112,7 @@ router.post("/", verifyUser, async (req, res, next) => {
  */
 router.get("/:taskId", verifyUser, async (req, res, next) => {
 	const { taskId } = req.params;
-
+	
 	try {
 		const task = await TaskModel.getTask(Number(taskId));
 		res.status(StatusCode.Ok).json(task);
@@ -169,7 +169,7 @@ router.post("/:taskId", verifyUser, async (req, res, next) => {
 	
 	const { taskId } = req.params;
 	const { description, urgency, department, status } = req.body;
-
+	
 	try {
 		if (description) {
 			await TaskModel.setDescription(Number(taskId), user.user, description);
@@ -183,7 +183,7 @@ router.post("/:taskId", verifyUser, async (req, res, next) => {
 		if (status) {
 			await TaskModel.setStatus(Number(taskId), user.user, status);
 		}
-
+		
 		const task = await TaskModel.getTask(Number(taskId));
 		res.status(StatusCode.Ok).json(task);
 	} catch (error) {
@@ -216,7 +216,7 @@ router.post("/:taskId", verifyUser, async (req, res, next) => {
  */
 router.get("/department/:department", verifyUser, async (req, res, next) => {
 	const department = req.params.department as Department;
-
+	
 	try {
 		const tasks = await TaskModel.getTasksByDepartment(department);
 		res.status(StatusCode.Ok).json(tasks);
@@ -251,9 +251,9 @@ router.post("/remove/:taskId", verifyUser, async (req, res, next) => {
 	if (!isAdmin) {
 		return next(new UnauthorizedUserError());
 	}
-
+	
 	const taskId = Number(req.params.taskId);
-
+	
 	try {
 		await TaskModel.remove(taskId);
 		res.status(StatusCode.Ok).send("Task removed successfully");
