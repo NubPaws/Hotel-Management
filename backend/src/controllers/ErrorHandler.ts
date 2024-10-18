@@ -6,6 +6,7 @@ import { MissingReservationIdError, RoomDoesNotExistError, RoomNumberAlreadyExis
 import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, GuestSearchFailedError, GuestUpdateError, InvalidGuestCredentialsError } from "../models/Guest.js";
 import { ReservationCreationError, ReservationDoesNotExistError, ReservationFetchingError, ReservationUpdateError, RoomIsAlreadyOccupiedAtThatTimeError } from "../models/Reservation.js";
 import { ExtraDoesNotExistError, ExtraPriceInvalidError } from "../models/Extra.js";
+import { TaskDoesNotExistError } from "../models/Task.js";
 
 function users(err: any, _req: Request, res: Response, next: NextFunction) {
 	let statusCode = StatusCode.Ok;
@@ -151,10 +152,26 @@ function extras(err: any, _req: Request, res: Response, next: NextFunction) {
 	res.status(statusCode).send(message);
 }
 
+async function tasks(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = StatusCode.Ok;
+	let message = "";
+	
+	if (err instanceof TaskDoesNotExistError) {
+		statusCode = StatusCode.NotFound;
+		message = err.message;
+	} else {
+		return next(err);
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
+}
+
 export default {
 	users,
 	rooms,
 	guests,
 	reservations,
 	extras,
+	tasks,
 }
