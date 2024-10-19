@@ -11,6 +11,8 @@ import { RoomsRouter } from "./controllers/Room.js";
 import { GuestsRouter } from "./controllers/Guest.js";
 import { ReservationsRouter } from "./controllers/Reservation.js";
 import { ExtrasRouter } from "./controllers/Extra.js";
+import { TasksRouter } from "./controllers/Task.js";
+import { CountersRouter } from "./controllers/Counter.js";
 
 const app = express();
 const port = Environment.port;
@@ -75,6 +77,8 @@ app.use("/api/Rooms", RoomsRouter);
 app.use("/api/Guests", GuestsRouter);
 app.use("/api/Reservations", ReservationsRouter);
 app.use("/api/Extras", ExtrasRouter);
+app.use("/api/Tasks", TasksRouter);
+app.use("/api/Counters", CountersRouter);
 
 // Error handling middleware.
 app.use(ErrorHandler.users);
@@ -82,6 +86,8 @@ app.use(ErrorHandler.rooms);
 app.use(ErrorHandler.guests);
 app.use(ErrorHandler.reservations);
 app.use(ErrorHandler.extras);
+app.use(ErrorHandler.tasks);
+app.use(ErrorHandler.counters);
 
 app.get('/', (_req: Request, res: Response) => {
     res.status(200);
