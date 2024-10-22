@@ -317,6 +317,14 @@ async function getFilteredRooms(filters: {
     return await RoomModel.find(query);
 }
 
+async function find(filter: mongoose.RootFilterQuery<Room>) {
+	return RoomModel.find(filter);
+}
+
+async function count(filter: mongoose.RootFilterQuery<Room>) {
+	return RoomModel.countDocuments(filter);
+}
+
 export default {
 	getRoomById,
 	isValidRoom,
@@ -338,6 +346,9 @@ export default {
 	getRoomsByOccupation,
 	getRoomByReservation,
 	getFilteredRooms,
+	
+	find,
+	count,
 };
 
 /**
