@@ -88,8 +88,8 @@ async function initUsersModel(): Promise<boolean> {
 		Logger.warn("Admin user doesn't exists.")
 		Logger.info("Starting creation of default admin user.");
 		await UserModel.create({
-			user: "admin",
-			pass: "admin",
+			user: Environment.defaultAdminCreds.user,
+			pass: Environment.defaultAdminCreds.pass,
 			role: UserRole.Admin,
 		});
 		

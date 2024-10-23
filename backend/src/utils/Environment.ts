@@ -12,4 +12,9 @@ export default {
 	},
 	
 	swaggerDir: process.env.SWAGGER_DIR || "/api-docs",
+	
+	defaultAdminCreds: {
+		user: process.env.DEFAULT_ADMIN_USER || "admin",
+		pass: process.env.DEFAULT_ADMIN_PASS || "admin",
+	},
 }

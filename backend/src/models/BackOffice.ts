@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { addDaysToDate, arrayToDate, compareDate, dateToArray } from "../utils/Clock.js";
-import Reservation, { ReservationState, ReservationState as ReserveState } from "./Reservation.js";
+import Reservation, { ReservationState as ReserveState } from "./Reservation.js";
+import Logger from "../utils/Logger.js";
 
-export class BackOfficeHasAlreadyBeenInitializedError extends Error {}
 export class BackOfficeHasNotBeenInitializedError extends Error {}
 
 interface BackOffice extends Document {
@@ -23,20 +23,26 @@ const BackOfficeModel = mongoose.model<BackOffice>("BackOfficeModel", BackOffice
 
 /**
  * Initialize the system for the first time.
- * 
- * @throws BackOfficeHasAlreadyBeenInitializedError
  */
-async function initBackOffice(): Promise<void> {
+async function initBackOffice(): Promise<boolean> {
 	const backOffice = await BackOfficeModel.find();
 	if (backOffice.length > 0) {
-		throw new BackOfficeHasAlreadyBeenInitializedError();
+		Logger.info("Back office has been already initialized.");
+		return true;
 	}
 	
 	const today = new Date();
-	
-	await BackOfficeModel.create({
-		systemDate: [ today.getDay(), today.getMonth() + 1, today.getFullYear() ],
-	});
+	try {
+		await BackOfficeModel.create({
+			systemDate: dateToArray(today),
+		});
+		
+		Logger.info("Initialized backoffice.");
+	} catch (error: any) {
+		Logger.error(`Failed initializing backoffice: ${error.messag}`);
+		return false;
+	}
+	return true;
 }
 
 async function updateReservations(date: Date): Promise<void> {

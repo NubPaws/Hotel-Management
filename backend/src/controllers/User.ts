@@ -54,32 +54,6 @@ router.post("/login", async (req, res, next) => {
 
 /**
  * @swagger
- * /api/Users/initUsers:
- *   get:
- *     summary: Initializes the users database with the first admin.
- *     description:
- *       Creates a default admin. This api endpoint should be called once when the
- *       system is deployed and the admin's password should be changed.
- *       Calling this API endpoint more than once will not do anything.
- *     responses:
- *       200:
- *         description:
- *           This endpoint always returns a 200 error unless an internal server
- *           has occured.
- *     tags:
- *       - Users
- */
-router.get("/initUsers", async (_req, res, _next) => {
-	const created = await UsersModel.initUsersModel();
-	if (created) {
-		res.send("Successfully initialized user model.");
-	} else {
-		res.send("Failed initializeding user model.");
-	}
-});
-
-/**
- * @swagger
  * /api/Users/{username}:
  *   get:
  *     summary: Retrieve user information by username.
