@@ -1,12 +1,8 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Router } from "express";
 import UsersModel, { CreatorIsNotAdminError, Department, InvalidUserCredentialsError, UnauthorizedUserError, UserDoesNotExistError, UserRole } from "../models/User.js";
 import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 
 const router = Router();
-
-function tokenRequired(res: Response) {
-	return res.status(403).send("Token required");
-}
 
 /**
  * @swagger

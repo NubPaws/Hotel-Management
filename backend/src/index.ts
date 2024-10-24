@@ -88,6 +88,7 @@ app.use(ErrorHandler.reservations);
 app.use(ErrorHandler.extras);
 app.use(ErrorHandler.tasks);
 app.use(ErrorHandler.counters);
+app.use(ErrorHandler.backOffice);
 
 app.get('/', (_req: Request, res: Response) => {
     res.status(200);

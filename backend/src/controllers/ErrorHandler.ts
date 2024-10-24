@@ -7,6 +7,7 @@ import { GuestAlreadyExistsError, GuestCreationError, GuestDoesNotExistError, Gu
 import { ReservationCreationError, ReservationDoesNotExistError, ReservationFetchingError, ReservationUpdateError, RoomIsAlreadyOccupiedAtThatTimeError } from "../models/Reservation.js";
 import { ExtraDoesNotExistError, ExtraPriceInvalidError } from "../models/Extra.js";
 import { TaskDoesNotExistError } from "../models/Task.js";
+import { BackOfficeHasNotBeenInitializedError } from "../models/BackOffice.js";
 
 function users(err: any, _req: Request, res: Response, next: NextFunction) {
 	let statusCode = StatusCode.Ok;
@@ -167,9 +168,24 @@ async function tasks(err: any, _req: Request, res: Response, next: NextFunction)
 	res.status(statusCode).send(message);
 }
 
-async function counters(err: any, _req: Request, res: Response, next: NextFunction) {
+async function counters(err: any, _req: Request, _res: Response, next: NextFunction) {
 	// No errors!
 	return next(err);
+}
+
+async function backOffice(err: any, _req: Request, res: Response, next: NextFunction) {
+	let statusCode = StatusCode.Ok;
+	let message = "";
+	
+	if (err instanceof BackOfficeHasNotBeenInitializedError) {
+		statusCode = StatusCode.Forbidden;
+		message = "Back office hasn't been initialized";
+	} else {
+		return next(err);
+	}
+	
+	Logger.info(`Responding to user with: (${statusCode}) ${message}`);
+	res.status(statusCode).send(message);
 }
 
 export default {
@@ -180,4 +196,5 @@ export default {
 	extras,
 	tasks,
 	counters,
+	backOffice,
 }
