@@ -27,5 +27,7 @@ export default {
 	error: (text: string) => display(text, ERROR_FROM),
 	warn: (text: string) => display(text, WARN_FROM),
 	
+	log: (source: string, text: string) => display(text, source),
+	
 	setLogFile: setOutputFile,
 }

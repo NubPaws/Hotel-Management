@@ -1,37 +1,50 @@
-import { NextFunction, Request, Response, Router } from "express";
-import UsersModel, { CreatorIsNotAdminError, InvalidUserCredentialsError, UserDoesNotExistError, UserRole } from "../models/User.js";
-import { dataValidate } from "./Validator.js";
-import Logger from "../utils/Logger.js";
+import { Router } from "express";
+import UsersModel, { CreatorIsNotAdminError, Department, InvalidUserCredentialsError, UnauthorizedUserError, UserDoesNotExistError, UserRole } from "../models/User.js";
+import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 
 const router = Router();
 
-function tokenRequired(res: Response) {
-	return res.status(403).send("Token required");
-}
-
 /**
  * @swagger
- * /api/Users/initUsers:
- *   get:
- *     summary: Initializes the users database with the first admin.
- *     description:
- *       Creates a default admin. This api endpoint should be called once when the
- *       system is deployed and the admin's password should be changed.
- *       Calling this API endpoint more than once will not do anything.
+ * /api/Users/login:
+ *   post:
+ *     summary: Post username and password for a jwt token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
- *         description:
- *           This endpoint always returns a 200 error unless an internal server
- *           has occured.
+ *         type: string
+ *         description: JWT token for the user to authenticate with in front of the api.
+ *       404:
+ *         description: User was not found.
  *     tags:
  *       - Users
  */
-router.get("/initUsers", async (req: Request, res: Response) => {
-	const created = await UsersModel.initUsersModel();
-	if (created) {
-		res.send("Successfully initialized user model.");
-	} else {
-		res.send("Failed initializeding user model.");
+router.post("/login", async (req, res, next) => {
+	// Take the information that should be passed from the app.
+	const { username, password } = req.body;
+	
+	const validation = dataValidate({username, password});
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		// Get the token.
+		const token = await UsersModel.authenticate(username, password);
+		// Send the token to the user.
+		res.send(token);
+	} catch (err) {
+		next(err);
 	}
 });
 
@@ -68,6 +81,9 @@ router.get("/initUsers", async (req: Request, res: Response) => {
  *                 role:
  *                   type: string
  *                   enum: [Admin, User]
+ *                 department:
+ *                   type: string
+ *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
  *       401:
  *         description: Unauthorized request. Occurs when the requesting user is not authorized to view the data.
  *       403:
@@ -77,17 +93,11 @@ router.get("/initUsers", async (req: Request, res: Response) => {
  *     tags:
  *       - Users
  */
-router.get("/:username", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
-	}
+router.get("/:username", verifyUser, async (req, res, next) => {
+	const requesting = (req as AuthedRequest).user;
 	
-	const token = req.headers.authorization.split(" ")[1] as string;
 	try {
-		const payload = UsersModel.getJwtPayload(token);
-		const requestingUser = await UsersModel.getUser(payload.user);
-		
-		if (req.params.username === requestingUser.user || requestingUser.role == UserRole.Admin) {
+		if (req.params.username === requesting.user || requesting.role == UserRole.Admin) {
 			const user = await UsersModel.getUser(req.params.username);
 			res.json(user);
 		} else {
@@ -129,6 +139,9 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *               role:
  *                 type: string
  *                 enum: [Admin, User]
+ *               department:
+ *                   type: string
+ *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
  *     responses:
  *       200:
  *         description: User created successfully and returns JWT token.
@@ -144,13 +157,13 @@ router.get("/:username", async (req: Request, res: Response, next: NextFunction)
  *       409:
  *         description: A user with that username already exists.
  */ 
-router.post("/create", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
+router.post("/create", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new UnauthorizedUserError());
 	}
-	const token = req.headers.authorization.split(" ")[1] as string;
 	
-	const { username, password, role } = req.body;
+	const { username, password, role, department } = req.body;
 	const validation = dataValidate({ username, password, role });
 	
 	if (validation.status) {
@@ -158,7 +171,12 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
 	}
 	
 	try {
-		const jwtToken = await UsersModel.createUser(username, password, role as UserRole, token);
+		const jwtToken = await UsersModel.createUser(
+			username,
+			password,
+			role as UserRole,
+			department as Department
+		);
 		
 		res.send(jwtToken);
 	} catch (err) {
@@ -209,16 +227,10 @@ router.post("/create", async (req: Request, res: Response, next: NextFunction) =
  *       401:
  *         description: Unauthorized requester.
  */
-router.post("/change-password", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
-	}
-	
-	const token = req.headers.authorization.split(" ")[1] as string;
-	
+router.post("/change-password", verifyUser, async (req, res, next) => {
 	const { username, oldPassword, newPassword } = req.body;
-	const validation = dataValidate({ username, oldPassword, newPassword });
 	
+	const validation = dataValidate({ username, oldPassword, newPassword });
 	if (validation.status) {
 		return validation.respond(res);
 	}
@@ -278,29 +290,150 @@ router.post("/change-password", async (req: Request, res: Response, next: NextFu
  *       401:
  *         description: Unauthorized requester.
  */
-router.post("/change-password", async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.headers.authorization) {
-		return tokenRequired(res);
+router.post("/change-password", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new CreatorIsNotAdminError());
 	}
 	
-	const token = req.headers.authorization.split(" ")[1] as string;
-	
 	const { username, newRole } = req.body;
-	const validation = dataValidate({ username, newRole });
 	
+	const validation = dataValidate({ username, newRole });
 	if (validation.status) {
 		return validation.respond(res);
 	}
 	
 	try {
-		const payload = await UsersModel.getJwtPayload(token);
-		const isAdmin = await UsersModel.isAdmin(payload.user);
-		if (!isAdmin) {
-			throw new CreatorIsNotAdminError();
-		}
-		
 		// Change role.
 		await UsersModel.changeRole(username, newRole);
+		res.send("Success");
+	} catch (err) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Users/change-role:
+ *   post:
+ *     summary: Changes a user's role.
+ *     description: This endpoint changes a user's role. For the role, Admin or User can be assigned.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - newRole
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: username
+ *               newRole:
+ *                 type: string
+ *                 enum: [Admin, User]
+ *     responses:
+ *       200:
+ *         description: User's role changed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Success
+ *       400:
+ *         description: Invalid body inserted or invalid requester.
+ *       401:
+ *         description: Unauthorized requester.
+ *       403:
+ *         description: Forbidden. Occurs when the authorization token is missing or invalid.
+ *       404:
+ *         description: User not found.
+ */
+router.post("/change-role", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new CreatorIsNotAdminError());
+	}
+	
+	const { username, newRole } = req.body;
+	
+	const validation = dataValidate({ username, newRole });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		await UsersModel.changeRole(username, newRole as UserRole);
+		res.send("Success");
+	} catch (err) {
+		next(err);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Users/change-department:
+ *   post:
+ *     summary: Changes a user's department.
+ *     description: This endpoint changes a user's department.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - newDepartment
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: username
+ *               newDepartment:
+ *                 type: string
+ *                 enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
+ *     responses:
+ *       200:
+ *         description: User's department changed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Success
+ *       400:
+ *         description: Invalid body inserted or invalid requester.
+ *       401:
+ *         description: Unauthorized requester.
+ *       403:
+ *         description: Forbidden. Occurs when the authorization token is missing or invalid.
+ *       404:
+ *         description: User not found.
+ */
+router.post("/change-department", verifyUser, async (req, res, next) => {
+	const { isAdmin } = req as AuthedRequest;
+	if (!isAdmin) {
+		return next(new CreatorIsNotAdminError());
+	}
+	
+	const { username, newDepartment } = req.body;
+	
+	const validation = dataValidate({ username, newDepartment });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	try {
+		await UsersModel.changeDepartment(username, newDepartment as Department);
 		res.send("Success");
 	} catch (err) {
 		next(err);

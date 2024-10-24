@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 import Environment from '../utils/Environment.js';
 import Logger from '../utils/Logger.js';
 
@@ -14,6 +14,7 @@ export class UserAlreadyExistsError extends Error {
 		super(`User ${username} already exists in the database.`)
 	}
 }
+export class UnauthorizedUserError extends Error {}
 
 export interface UserPayload {
 	user: string;
@@ -24,10 +25,21 @@ export enum UserRole {
 	User = "User",
 }
 
-interface User extends Document {
+export enum Department {
+	General = "General",
+	FrontDesk = "FrontDesk",
+	HouseKeeping = "HouseKeeping",
+	Maintenance = "Maintenance",
+	FoodAndBeverage = "FoodAndBeverage",
+	Security = "Security",
+	Conceirge = "Conceirge",
+}
+
+export interface User extends Document {
 	user: string,
 	pass: string,
 	role: UserRole,
+	department: Department,
 }
 
 const UserSchema = new Schema<User>({
@@ -45,6 +57,11 @@ const UserSchema = new Schema<User>({
 		type: String,
 		enum: Object.values(UserRole),
 		default: UserRole.User,
+	},
+	department: {
+		type: String,
+		enum: Object.values(Department),
+		default: Department.General,
 	},
 });
 
@@ -71,8 +88,8 @@ async function initUsersModel(): Promise<boolean> {
 		Logger.warn("Admin user doesn't exists.")
 		Logger.info("Starting creation of default admin user.");
 		await UserModel.create({
-			user: "admin",
-			pass: "admin",
+			user: Environment.defaultAdminCreds.user,
+			pass: Environment.defaultAdminCreds.pass,
 			role: UserRole.Admin,
 		});
 		
@@ -161,21 +178,9 @@ async function createUser(
 	username: string,
 	password: string,
 	role: UserRole,
-	creatorToken: string
+	department: Department
 ): Promise<string> {
-	if (!getJwtPayload(creatorToken)) {
-		throw new JwtTokenIsNotValidError();
-	}
-	
-	const creator = getJwtPayload(creatorToken);
-	if (!creator) {
-		throw new CreatorDoesNotExistError();
-	}
-	if (!(await isAdmin(creator.user))) {
-		throw new CreatorIsNotAdminError();
-	}
-	
-	if (await UserModel.exists({ user: username })) {
+	if (await UserModel.exists({ user: username }) !== null) {
 		throw new UserAlreadyExistsError(username);
 	}
 	
@@ -186,6 +191,7 @@ async function createUser(
 		user: username,
 		pass: password,
 		role: role,
+		department: department,
 	});
 	
 	return token;
@@ -202,7 +208,7 @@ async function isUser(jwtToken: string) {
 		throw new JwtTokenIsNotValidError();
 	}
 	
-	return UserModel.exists({user: payload.user}).exec();
+	return UserModel.exists({user: payload.user}) !== null;
 }
 
 /**
@@ -218,6 +224,16 @@ async function getUser(username: string): Promise<User> {
 		throw new UserDoesNotExistError();
 	}
 	return user as User;
+}
+
+/**
+ * Checks whether a user exists or not based on the username.
+ * 
+ * @param username The username to check if it exists.
+ * @returns true if the user exists, false otherwise.
+ */
+async function doesUserExist(username: string): Promise<boolean> {
+	return await UserModel.exists({ user: username }) !== null;
 }
 
 /**
@@ -256,6 +272,24 @@ async function changeRole(username: string, newRole: UserRole) {
 	await user.save();
 }
 
+/**
+ * Change the user's department.
+ * @param username
+ * @param newDepartment
+ * @throws UserDoesNotExistError
+ */
+async function changeDepartment(username: string, newDepartment: Department) {
+	const user = await UserModel.findOne({ user: username });
+	
+	if (!user) {
+		throw new UserDoesNotExistError();
+	}
+	
+	user.department = newDepartment;
+	
+	await user.save();
+}
+
 export default {
 	initUsersModel,
 	getJwtPayload,
@@ -264,8 +298,10 @@ export default {
 	isAdmin,
 	isUser,
 	getUser,
+	doesUserExist,
 	changePassword,
 	changeRole,
+	changeDepartment,
 };
 
 /**
@@ -290,4 +326,15 @@ export default {
  *             - User
  *           description: The role assigned to the user.
  *           example: "User"
+ *         department:
+ *           type: string
+ *           enum:
+ *             - General
+ *             - FrontDesk
+ *             - HouseKeeping
+ *             - Maintenance
+ *             - Security
+ *             - Conceirge
+ *           description: The department the user works in.
+ *           example: "FrontDesk"
  */

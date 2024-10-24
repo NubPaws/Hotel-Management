@@ -9,5 +9,12 @@ export default {
 	db: {
 		host: process.env.MONGO_DB_IP || "localhost",
 		port: (process.env.MONGO_DB_PORT || 27017) as number,
-	}
+	},
+	
+	swaggerDir: process.env.SWAGGER_DIR || "/api-docs",
+	
+	defaultAdminCreds: {
+		user: process.env.DEFAULT_ADMIN_USER || "admin",
+		pass: process.env.DEFAULT_ADMIN_PASS || "admin",
+	},
 }

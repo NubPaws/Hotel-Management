@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import Counter from "./Counter.js";
 import Reservation, { ReservationDoesNotExistError } from "./Reservation.js";
 
@@ -17,6 +17,7 @@ export interface Extra extends Document {
 	extraId: number
 	item: string,
 	description: string,
+	price: number,
 	reservationId: number,
 }
 
@@ -35,6 +36,14 @@ const ExtraSchema = new Schema<Extra>({
 		type: String,
 		required: true,
 		default: "",
+	},
+	price: {
+		type: Number,
+		required: true,
+		validate: {
+			validator: (value: number) => value >= 0,
+			message: "Price must be >= 0",
+		},
 	},
 	reservationId: {
 		type: Number,
@@ -64,7 +73,7 @@ ExtraSchema.pre("save", async function (next) {
  * @returns The created extra document.
  * @throws ReservationDoesNotExistError
  */
-async function create(item: string, description: string, reservationId: number) {
+async function create(item: string, description: string, price: number, reservationId: number) {
 	if (!(await Reservation.isValidReservation(reservationId))) {
 		throw new ReservationDoesNotExistError();
 	}
@@ -72,8 +81,10 @@ async function create(item: string, description: string, reservationId: number) 
 	const extra = await ExtraModel.create({
 		item,
 		description,
-		reservationId
+		price,
+		reservationId,
 	});
+	
 	return extra;
 }
 
@@ -180,25 +191,32 @@ export default {
  *   schemas:
  *     Extra:
  *       type: object
+ *       required:
+ *         - extraId
+ *         - item
+ *         - description
+ *         - price
+ *         - reservationId
  *       properties:
  *         extraId:
  *           type: integer
- *           description: The unique auto-incrementing ID of the extra.
- *           example: 1
+ *           description: Unique identifier for the extra.
+ *           example: 101
  *         item:
  *           type: string
- *           description: The name of the extra item.
+ *           description: Name of the extra item (e.g., breakfast, spa service).
  *           example: "Breakfast"
  *         description:
  *           type: string
- *           description: A description of the extra item.
+ *           description: Detailed description of the extra service or item.
  *           example: "Continental breakfast included."
- *         reservationId:
- *           type: integer
- *           description: The ID of the reservation this extra belongs to.
- *           example: 101
+ *           default: ""
  *         price:
  *           type: number
- *           description: The price of the extra item.
- *           example: 20.50
+ *           description: Price for the extra service or item. Must be greater than or equal to 0.
+ *           example: 25.50
+ *         reservationId:
+ *           type: integer
+ *           description: The reservation ID that the extra is associated with.
+ *           example: 12345
  */

@@ -1,5 +1,6 @@
-import { Response } from "express";
-import { ErrorCode } from "./ErrorHandler.js";
+import { NextFunction, Request, Response } from "express";
+import { StatusCode } from "../utils/StatusCode.js";
+import UserModel, { Department, InvalidUserCredentialsError, User, UserRole } from "../models/User.js";
 
 interface ValidationResponse {
 	status: boolean,
@@ -21,21 +22,23 @@ export function isEmpty(thing: any): boolean {
 
 /**
  * This function takes in an object and checks if all of the arguments
- * that were passed in that object are valid, meaning they are not empty.
- * For the definition of empty see the function isEmpty.
- * If at least on of the items is empty then the function generates and
- * error object accourdingly that can be passed back to the cllient that made
- * the request.
- * @param {Object} items Needs to be an object containing key value pairs
- * where the key is the name of the field and the value is the value of said
- * field.
- * @param res The item to send the error over if an error did occur.
- * @returns True if an error was generates and false otherwise.
+ * provided in that object are valid, meaning they are not empty. For the
+ * definition of empty, see the `isEmpty` function. If any item is empty, 
+ * the function generates an error object accordingly, which can be passed 
+ * back to the client that made the request.
+ * 
+ * @param {Object} items - An object containing key-value pairs where the key is 
+ * the name of the field and the value is the value of the field.
+ * 
+ * @returns {ValidationResponse} - Returns an object with a `status` indicating 
+ * whether an error was found. If there is an error, an error map is returned, and 
+ * a function to respond with the error is provided.
  */
 export function dataValidate(items: Object): ValidationResponse {
 	const error = new Map<string, string>();
 	for (const key in items) {
-		if (isEmpty(items[key as keyof Object])) {
+		const item = items[key as keyof Object];
+		if (isEmpty(item)) {
 			error.set(key, `The ${key} field is required.`);
 		}
 	}
@@ -50,7 +53,40 @@ export function dataValidate(items: Object): ValidationResponse {
 		status: true,
 		error,
 		respond: (res: Response) => {
-			return res.status(ErrorCode.BadRequest).json(Object.fromEntries(error))
+			return res.status(StatusCode.BadRequest).json(Object.fromEntries(error))
 		}
 	};
+}
+
+export interface AuthedRequest extends Request {
+	user: User;
+	isAdmin: boolean;
+	isFrontDesk: boolean;
+	isFoodBeverage: boolean;
+}
+
+export async function verifyUser(req: Request, res: Response, next: NextFunction) {
+	const authHeader = req.headers.authorization;
+	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
+	
+	const token = authHeader.split(" ")[1];
+	const payload = UserModel.getJwtPayload(token);
+	
+	if (!payload) {
+		throw new InvalidUserCredentialsError()
+	}
+	
+	const user = await UserModel.getUser(payload.user);
+	if (!user) {
+		throw new InvalidUserCredentialsError()
+	}
+	
+	const authedReq = req as AuthedRequest;
+	authedReq.user = user;
+	authedReq.isAdmin = user.role == UserRole.Admin;
+	authedReq.isFrontDesk = user.department === Department.FrontDesk;
+	authedReq.isFoodBeverage = user.department === Department.FoodAndBeverage;
+	next();
 }
