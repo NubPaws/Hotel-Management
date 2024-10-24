@@ -109,3 +109,24 @@ export default {
 	initBackOffice,
 	endOfDay,
 }
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     BackOffice:
+ *       type: object
+ *       required:
+ *         - systemDate
+ *       properties:
+ *         systemDate:
+ *           type: array
+ *           items:
+ *             type: integer
+ *           description:
+ *             The system date stored as an array of numbers
+ *             representing [day, month, year] in dd/MM/YYYY format.
+ *           example: [24, 10, 2024]
+ *       example:
+ *         systemDate: [24, 10, 2024]
+ */
