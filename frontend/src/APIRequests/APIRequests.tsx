@@ -12,5 +12,4 @@ async function getUserDetails(username: string, token: string) {
     return await res.json()
 }
 
-
 export { getUserDetails };

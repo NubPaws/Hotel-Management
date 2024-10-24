@@ -26,7 +26,7 @@ export function LoginScreen(props: {
     return (
         <>
             <CenteredLabel labelName="Login" />
-            <form id="loginForm" className="fieldsContainer" action="http://localhost:8000/api/Tokens">
+            <form id="loginForm" className="fieldsContainer" action="http://localhost:8000/api/Users/login">
                 <Input id="username" className="field" type="text" name="username"
                     placeholder="Username" errorMessageId="usernameErrorMessage">
                     Username

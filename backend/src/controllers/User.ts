@@ -83,7 +83,7 @@ router.post("/login", async (req, res, next) => {
  *                   enum: [Admin, User]
  *                 department:
  *                   type: string
- *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
+ *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Concierge]
  *       401:
  *         description: Unauthorized request. Occurs when the requesting user is not authorized to view the data.
  *       403:
@@ -141,7 +141,7 @@ router.get("/:username", verifyUser, async (req, res, next) => {
  *                 enum: [Admin, User]
  *               department:
  *                   type: string
- *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
+ *                   enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Concierge]
  *     responses:
  *       200:
  *         description: User created successfully and returns JWT token.
@@ -401,7 +401,7 @@ router.post("/change-role", verifyUser, async (req, res, next) => {
  *                 example: username
  *               newDepartment:
  *                 type: string
- *                 enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Conceirge]
+ *                 enum: [General, FrontDesk, HouseKeeping, Maintenance, Security, Concierge]
  *     responses:
  *       200:
  *         description: User's department changed successfully.

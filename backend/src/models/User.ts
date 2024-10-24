@@ -32,7 +32,7 @@ export enum Department {
 	Maintenance = "Maintenance",
 	FoodAndBeverage = "FoodAndBeverage",
 	Security = "Security",
-	Conceirge = "Conceirge",
+	Concierge = "Concierge",
 }
 
 export interface User extends Document {
@@ -334,7 +334,7 @@ export default {
  *             - HouseKeeping
  *             - Maintenance
  *             - Security
- *             - Conceirge
+ *             - Concierge
  *           description: The department the user works in.
  *           example: "FrontDesk"
  */

@@ -59,9 +59,31 @@ function validateUserRole() {
     return validChoice;
 }
 
+function validateUserDepartment() {
+    const userDepartment: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[name="department"]');
+
+    let validChoice = false;
+    let userDepartmentErrorMessage = document.getElementById("userDepartmentErrorMessage") as HTMLInputElement;
+
+    for (let i = 0; i < userDepartment.length; i++) {
+        if (userDepartment[i].checked) {
+            validChoice = true;
+        }
+    }
+    if (!validChoice) {
+        userDepartmentErrorMessage.innerText = "Role must be chosen";
+        return false;
+    }
+    else {
+        userDepartmentErrorMessage.innerText = "";
+    }
+    return validChoice;
+}
+
 export {
     validateUsername,
     validatePassword,
     confirmPassword,
-    validateUserRole
+    validateUserRole,
+    validateUserDepartment
 }
