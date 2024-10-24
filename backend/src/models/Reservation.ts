@@ -15,9 +15,12 @@ export class InvalidPricesArrayError extends Error {}
 
 export enum ReservationState {
 	Pending = "Pending",
+	Arriving = "Arriving",
 	Active = "Active",
-	Cancelled = "Cancelled",
+	Departing = "Departing",
 	Passed = "Passed",
+	NoShow = "NoShow",
+	Cancelled = "Cancelled",
 }
 
 export interface Reservation extends Document {
@@ -28,6 +31,7 @@ export interface Reservation extends Document {
 	startTime: Time24,				// The time of day the reservation starts at.
 	nightCount: number,				// Number of nights the reservation is for.
 	endTime: Time24,				// Time the reservation should end on the last day.
+	endDate: Date,					// The date the reservation ends.
 	prices: number[],				// Prices for each night, should be the same length as nightCount.
 	roomType: string,				// Type of the room requested in the reservation.
 	room: number | null,			// Room number assigned to the reservation, null otherwise.
@@ -84,6 +88,10 @@ const ReservationSchema = new Schema<Reservation>({
 			message: "Invalid time format. Make sure it HH:mm (24 time format).",
 		},
 	},
+	endDate: {
+		type: Date,
+		required: true,
+	},
 	prices: [{
 		type: Number,
 		required: true,
@@ -139,11 +147,16 @@ const ReservationSchema = new Schema<Reservation>({
 const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
 
 ReservationSchema.pre("save", async function (next) {
-	const doc = this;
-	if (doc.isNew) {
+	if (this.isNew) {
 		const counter = await Counter.increment("reservationId");
-		doc.reservationId = counter;
+		this.reservationId = counter;
 	}
+	
+	// Update the endDate.
+	if (this.startDate && this.nightCount >= 0) {
+		this.endDate = addDaysToDate(this.startDate, this.nightCount);
+	}
+	
 	next();
 });
 
@@ -614,6 +627,22 @@ async function query(
 	return reservations;
 }
 
+async function find(filter: mongoose.RootFilterQuery<Reservation>) {
+	return ReservationModel.find(filter);
+}
+
+async function count(filter: mongoose.RootFilterQuery<Reservation>) {
+	return ReservationModel.countDocuments(filter);
+}
+
+/**
+ * Checks out the reservation off the system.
+ * @param reservationId The reservation to check out.
+ */
+async function checkout(reservationId: number) {
+	// TODO: Write this function.
+}
+
 export default {
 	create,
 	
@@ -645,6 +674,10 @@ export default {
 	isValidReservation,
 	
 	query,
+	find,
+	count,
+	
+	checkout,
 }
 
 /**
@@ -725,7 +758,7 @@ export default {
  *           example: 101
  *         state:
  *           type: string
- *           enum: [Pending, Active, Cancelled, Passed]
+ *           enum: [Pending, Arriving, Active, Departing, Passed, NoShow, Cancelled]
  *           description: Current state of the reservation.
  *           example: "Active"
  */
