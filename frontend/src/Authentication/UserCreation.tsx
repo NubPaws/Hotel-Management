@@ -1,16 +1,18 @@
-import { confirmPassword, validatePassword, validateUsername, validateUserRole } from "./Validation";
+import { confirmPassword, validatePassword, validateUsername, validateUserRole, validateUserDepartment } from "./Validation";
 
 async function createUser(event : any,
     token: string,
     setShowErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
     setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-    setShowSuccessMessage: React.Dispatch<React.SetStateAction<boolean>>
+    setShowSuccessMessage: React.Dispatch<React.SetStateAction<boolean>>,
+    setShowUserExistsErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 ) {
     event.preventDefault();
     if (validateUsername()
         && validatePassword("password", "passwordErrorMessage")
         && confirmPassword("password", "confirmPassword", "confirmPasswordErrorMessage")
-        && validateUserRole()) {
+        && validateUserRole()
+        && validateUserDepartment()) {
         let enteredUsername = document.getElementById("username") as HTMLInputElement;
         let enteredPassword = document.getElementById("password") as HTMLInputElement;
 
@@ -23,10 +25,20 @@ async function createUser(event : any,
             }
         }
 
+        const userDepartment: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[name="department"]');
+        let userDepartmentIndex = 0;
+
+        for (let i = 0; i < userDepartment.length; i++) {
+            if (userDepartment[i].checked) {
+                userDepartmentIndex = i;
+            }
+        }
+
         let userData = {
             "username": enteredUsername.value,
             "password": enteredPassword.value,
-            "Role": userRole[userRoleIndex].value
+            "Role": userRole[userRoleIndex].value,
+            "department": userDepartment[userDepartmentIndex].value
         };
 
         let res = null;
@@ -47,16 +59,22 @@ async function createUser(event : any,
             }
         }
 
-        if (res!.status !== 200) {
+        let status = res!.status;
+        if (status === 400) {
             setShowErrorMessage(true);
-        } else {
-            setShowSuccessMessage(true);
+        }
+        if (status === 409) {
+            setShowUserExistsErrorMessage(true);
+        }
+        if (status == 200) {
+            setShowSuccessMessage(true)
             // Clearing the form
             let confirmPassword = document.getElementById("confirmPassword") as HTMLInputElement;
             enteredUsername.value = "";
             enteredPassword.value = "";
             confirmPassword.value = "";
             userRole[userRoleIndex].checked = false;
+            userDepartment[userDepartmentIndex].checked = false;
         }
     }
 }

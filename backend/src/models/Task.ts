@@ -304,7 +304,7 @@ export default {
  *             - HouseKeeping
  *             - Maintenance
  *             - Security
- *             - Conceirge
+ *             - Concierge
  *           description: The department responsible for the task.
  *           example: "Maintenance"
  *         creator:
