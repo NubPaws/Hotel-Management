@@ -37,7 +37,7 @@ async function createUser(event : any,
         let userData = {
             "username": enteredUsername.value,
             "password": enteredPassword.value,
-            "Role": userRole[userRoleIndex].value,
+            "role": userRole[userRoleIndex].value,
             "department": userDepartment[userDepartmentIndex].value
         };
 
@@ -66,7 +66,7 @@ async function createUser(event : any,
         if (status === 409) {
             setShowUserExistsErrorMessage(true);
         }
-        if (status == 200) {
+        if (status === 200) {
             setShowSuccessMessage(true)
             // Clearing the form
             let confirmPassword = document.getElementById("confirmPassword") as HTMLInputElement;

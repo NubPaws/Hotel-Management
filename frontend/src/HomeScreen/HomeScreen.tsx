@@ -22,6 +22,8 @@ export function HomeScreen(props: {
             <Link to="/change-password">Change Password</Link>
             <br></br>
             <Link to="/user-creation">Create new user</Link>
+            <br></br>
+            <Link to="/room-type">Create or Delete rooms types</Link>
         </>
     )
 }
