@@ -12,4 +12,27 @@ async function getUserDetails(username: string, token: string) {
     return await res.json()
 }
 
-export { getUserDetails };
+async function authorizedPostRequest(
+    token: string,
+    data: string,
+    url: string,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>) {
+    let res = null;
+    try {
+        res = await fetch(url, {
+            'method': 'POST',
+            'headers': {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            'body': data
+        });
+    } catch (error) {
+        if (error instanceof TypeError) {
+            setShowConnectionErrorMessage(true);
+            return null;
+        }
+    }
+    return res;
+}
+export { getUserDetails, authorizedPostRequest };

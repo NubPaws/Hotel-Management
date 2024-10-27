@@ -43,7 +43,8 @@ async function changePassword(event : any,
             setUserCredentials({
                 token: "Bearer " + res!.text(),
                 username: userCredentials.username,
-                role: userCredentials.role
+                role: userCredentials.role,
+                department: userCredentials.department
             })
             // Clearing the form
             let confirmPassword = document.getElementById("confirmPassword") as HTMLInputElement;
