@@ -12,7 +12,7 @@ async function getUserDetails(username: string, token: string) {
     return await res.json()
 }
 
-async function authorizedPostRequest(
+async function authorizedPostRequestWithBody(
     token: string,
     data: string,
     url: string,
@@ -35,4 +35,28 @@ async function authorizedPostRequest(
     }
     return res;
 }
-export { getUserDetails, authorizedPostRequest };
+
+async function authorizedPostRequestWithoutBody(
+    token: string,
+    url: string,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>) {
+    let res = null;
+    try {
+        res = await fetch(url, {
+            'method': 'POST',
+            'headers': {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            }
+        });
+    } catch (error) {
+        if (error instanceof TypeError) {
+            setShowConnectionErrorMessage(true);
+            return null;
+        }
+    }
+    return res;
+}
+export { getUserDetails,
+    authorizedPostRequestWithBody,
+    authorizedPostRequestWithoutBody };

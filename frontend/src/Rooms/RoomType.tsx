@@ -1,7 +1,7 @@
-import { authorizedPostRequest } from "../APIRequests/APIRequests";
+import { authorizedPostRequestWithBody, authorizedPostRequestWithoutBody } from "../APIRequests/APIRequests";
 
 async function createRoomType(
-    event : any,
+    event: any,
     token: string,
     setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
     setShowRoomTypeCreationSuccessMessage: React.Dispatch<React.SetStateAction<boolean>>,
@@ -12,14 +12,14 @@ async function createRoomType(
     let roomDescriptionInput = document.getElementById("roomDescription") as HTMLInputElement;
 
     let roomTypeCreateForm = document.getElementById("roomTypeCreateForm") as HTMLFormElement;
-    let url = roomTypeCreateForm.action +roomTypeInput.value;
+    let url = roomTypeCreateForm.action + roomTypeInput.value;
 
     let roomCreationData = {
         "description": roomDescriptionInput.value
     }
 
     if (validateRoomTypeCreation()) {
-        let res = await authorizedPostRequest(token, JSON.stringify(roomCreationData), url, setShowConnectionErrorMessage);
+        let res = await authorizedPostRequestWithBody(token, JSON.stringify(roomCreationData), url, setShowConnectionErrorMessage);
         if (res === null) {
             return;
         }
@@ -31,7 +31,6 @@ async function createRoomType(
             setShowRoomTypeCreationErrorMessage(true);
         }
     }
-
 }
 
 function validateRoomTypeCreation() {
@@ -44,7 +43,7 @@ function validateRoomTypeCreation() {
     let regex = /^[a-zA-Z]+(-[a-zA-Z]+)?$/;
 
     if (!regex.test(roomTypeInput.value)) {
-        roomTypeErrorMessage.innerText = "Room type must contain letters only";
+        roomTypeErrorMessage.innerText = "Room type must contain letters or dash only";
         return false;
     } else {
         roomTypeErrorMessage.innerText = "";
@@ -58,4 +57,65 @@ function validateRoomTypeCreation() {
     return true;
 }
 
-export { createRoomType };
+async function removeRoomType(
+    event: any,
+    token: string,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
+    setShowRoomTypeRemovalSuccessMessage: React.Dispatch<React.SetStateAction<boolean>>,
+    setShowRoomTypeRemovalErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
+
+) {
+    event.preventDefault();
+    let roomTypeToRemoveInput = document.getElementById("roomTypeToRemove") as HTMLInputElement;
+    let roomNewTypeInput = document.getElementById("roomNewType") as HTMLInputElement;
+
+
+    let roomTypeRemovalForm = document.getElementById("roomTypeRemovalForm") as HTMLFormElement;
+    let url = roomTypeRemovalForm.action + roomTypeToRemoveInput.value;
+
+    let roomRemovalData = {
+        "newType": roomNewTypeInput.value
+    }
+
+    if (validateRoomTypeToRemove()) {
+        let res = await authorizedPostRequestWithBody(token, JSON.stringify(roomRemovalData), url, setShowConnectionErrorMessage);
+        if (res === null) {
+            return;
+        }
+        let status = res.status;
+        if (status === 200) {
+            setShowRoomTypeRemovalSuccessMessage(true);
+        } else {
+            setShowRoomTypeRemovalErrorMessage(true);
+        }
+    }
+}
+
+function validateRoomTypeToRemove() {
+    let roomTypeToRemoveInput = document.getElementById("roomTypeToRemove") as HTMLInputElement;
+    let roomTypeToRemoveErrorMessage = document.getElementById("roomTypeToRemoveErrorMessage") as HTMLInputElement;
+
+    let roomNewTypeInput = document.getElementById("roomNewType") as HTMLInputElement;
+    let roomNewTypeErrorMessage = document.getElementById("roomNewTypeErrorMessage") as HTMLInputElement;
+
+
+    // Validation for only characters - both lowercase and uppercase allowed
+    let regex = /^[a-zA-Z]+(-[a-zA-Z]+)?$/;
+
+    if (!regex.test(roomTypeToRemoveInput.value)) {
+        roomTypeToRemoveErrorMessage.innerText = "Room type must contain letters or dash only";
+        return false;
+    } else {
+        roomTypeToRemoveErrorMessage.innerText = "";
+    }
+
+    if (roomNewTypeInput.value === "") {
+        roomNewTypeErrorMessage.innerText = "Room type must not be empty";
+        return false;
+    } else {
+        roomNewTypeErrorMessage.innerText = "";
+    }
+
+    return true;
+}
+export { createRoomType, removeRoomType };
