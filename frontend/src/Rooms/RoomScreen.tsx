@@ -4,7 +4,7 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input } from "../UIElements/Input";
 import { Button } from "../UIElements/Button";
-import { createRoom } from "./Rooms";
+import { createRoom, removeRoom } from "./Rooms";
 import { Modal } from "../UIElements/Modal";
 
 export function RoomScreen(props: {
@@ -13,6 +13,8 @@ export function RoomScreen(props: {
     const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
     const [showRoomCreationSuccessMessage, setShowRoomCreationSuccessMessage] = useState(false);
     const [showRoomCreationErrorMessage, setShowRoomCreationErrorMessage] = useState(false);
+    const [showRoomRemovalSuccessMessage, setShowRoomRemovalSuccessMessage] = useState(false);
+    const [showRoomRemovalErrorMessage, setShowRoomRemovalErrorMessage] = useState(false);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -43,10 +45,10 @@ export function RoomScreen(props: {
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => createRoom(event,
-                                                   props.userCredentials.token,
-                                                   setShowConnectionErrorMessage,
-                                                   setShowRoomCreationSuccessMessage,
-                                                   setShowRoomCreationErrorMessage)}>
+                        props.userCredentials.token,
+                        setShowConnectionErrorMessage,
+                        setShowRoomCreationSuccessMessage,
+                        setShowRoomCreationErrorMessage)}>
                     Create Room
                 </Button>
             </form>
@@ -58,6 +60,32 @@ export function RoomScreen(props: {
             </Modal>
             <Modal title="Room Creation Failed" show={showRoomCreationErrorMessage} onClose={() => { setShowRoomCreationErrorMessage(false) }}>
                 <h5>Failed to create room.</h5>
+            </Modal>
+
+            <CenteredLabel labelName="Remove Room"></CenteredLabel>
+            <form id="roomRemovalForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/remove-room/">
+                <Input id="roomNumberToRemove" className="field" type="number" name="roomNumberToRemove"
+                    placeholder="Enter room number" errorMessageId="roomNumberToRemoveErrorMessage">
+                    Room number
+                </Input>
+                <Button
+                    className="fieldLabel"
+                    bgColor="white"
+                    textColor="black"
+                    borderWidth="1px"
+                    onClick={(event) => removeRoom(event,
+                        props.userCredentials.token,
+                        setShowConnectionErrorMessage,
+                        setShowRoomRemovalSuccessMessage,
+                        setShowRoomRemovalErrorMessage)}>
+                    Remove Room
+                </Button>
+            </form>
+            <Modal title="Room Removal Succeeded" show={showRoomRemovalSuccessMessage} onClose={() => { setShowRoomRemovalSuccessMessage(false) }}>
+                <h5>Room was removed successfully.</h5>
+            </Modal>
+            <Modal title="Room Removal Failed" show={showRoomRemovalErrorMessage} onClose={() => { setShowRoomRemovalErrorMessage(false) }}>
+                <h5>Failed to remove room.</h5>
             </Modal>
         </>
     )

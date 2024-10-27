@@ -1,4 +1,5 @@
-import { authorizedPostRequestWithBody, authorizedPostRequestWithoutBody } from "../APIRequests/APIRequests";
+import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
+import { ROOM_TYPE_REGEX, ROOM_NUMBER_REGEX } from "./RoomsRegex";
 
 async function createRoomType(
     event: any,
@@ -39,10 +40,7 @@ function validateRoomTypeCreation() {
     let roomTypeErrorMessage = document.getElementById("roomTypeErrorMessage") as HTMLInputElement;
     let roomDescriptionErrorMessage = document.getElementById("roomDescriptionErrorMessage") as HTMLInputElement;
 
-    // Validation for only characters - both lowercase and uppercase allowed
-    let regex = /^[a-zA-Z]+(-[a-zA-Z]+)?$/;
-
-    if (!regex.test(roomTypeInput.value)) {
+    if (!ROOM_TYPE_REGEX.test(roomTypeInput.value)) {
         roomTypeErrorMessage.innerText = "Room type must contain letters or dash only";
         return false;
     } else {
@@ -68,7 +66,6 @@ async function removeRoomType(
     event.preventDefault();
     let roomTypeToRemoveInput = document.getElementById("roomTypeToRemove") as HTMLInputElement;
     let roomNewTypeInput = document.getElementById("roomNewType") as HTMLInputElement;
-
 
     let roomTypeRemovalForm = document.getElementById("roomTypeRemovalForm") as HTMLFormElement;
     let url = roomTypeRemovalForm.action + roomTypeToRemoveInput.value;
@@ -98,11 +95,7 @@ function validateRoomTypeToRemove() {
     let roomNewTypeInput = document.getElementById("roomNewType") as HTMLInputElement;
     let roomNewTypeErrorMessage = document.getElementById("roomNewTypeErrorMessage") as HTMLInputElement;
 
-
-    // Validation for only characters - both lowercase and uppercase allowed
-    let regex = /^[a-zA-Z]+(-[a-zA-Z]+)?$/;
-
-    if (!regex.test(roomTypeToRemoveInput.value)) {
+    if (!ROOM_TYPE_REGEX.test(roomTypeToRemoveInput.value)) {
         roomTypeToRemoveErrorMessage.innerText = "Room type must contain letters or dash only";
         return false;
     } else {
