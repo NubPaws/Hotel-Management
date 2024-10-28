@@ -1,5 +1,5 @@
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { ROOM_TYPE_REGEX, ROOM_NUMBER_REGEX } from "./RoomsRegex";
+import { ROOM_TYPE_REGEX } from "./RoomsRegex";
 
 async function createRoomType(
     event: any,

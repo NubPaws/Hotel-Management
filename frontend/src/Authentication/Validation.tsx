@@ -39,43 +39,25 @@ function confirmPassword(passwordId: string, confirmPasswordId: string, confirmP
     return true;
 }
 
-function validateUserRole() {
-    const userRole: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[name="role"]');
-    let validChoice = false;
-    let userRoleErrorMessage = document.getElementById("userRoleErrorMessage") as HTMLInputElement;
 
-    for (let i = 0; i < userRole.length; i++) {
-        if (userRole[i].checked) {
+function validateRadioButton(radioName: string, errorMessageId: string, errorMessageContent: string) {
+    let selector = 'input[name="' + radioName + '"]'
+    const radioOptions: NodeListOf<HTMLInputElement> = document.querySelectorAll(selector);
+
+    let validChoice = false;
+    let errorMessage = document.getElementById(errorMessageId) as HTMLInputElement;
+
+    for (let i = 0; i < radioOptions.length; i++) {
+        if (radioOptions[i].checked) {
             validChoice = true;
         }
     }
     if (!validChoice) {
-        userRoleErrorMessage.innerText = "Role must be chosen";
+        errorMessage.innerText = errorMessageContent;
         return false;
     }
     else {
-        userRoleErrorMessage.innerText = "";
-    }
-    return validChoice;
-}
-
-function validateUserDepartment() {
-    const userDepartment: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[name="department"]');
-
-    let validChoice = false;
-    let userDepartmentErrorMessage = document.getElementById("userDepartmentErrorMessage") as HTMLInputElement;
-
-    for (let i = 0; i < userDepartment.length; i++) {
-        if (userDepartment[i].checked) {
-            validChoice = true;
-        }
-    }
-    if (!validChoice) {
-        userDepartmentErrorMessage.innerText = "Role must be chosen";
-        return false;
-    }
-    else {
-        userDepartmentErrorMessage.innerText = "";
+        errorMessage.innerText = "";
     }
     return validChoice;
 }
@@ -84,6 +66,5 @@ export {
     validateUsername,
     validatePassword,
     confirmPassword,
-    validateUserRole,
-    validateUserDepartment
+    validateRadioButton,
 }

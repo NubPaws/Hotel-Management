@@ -7,6 +7,7 @@ import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
 import { RoomScreen } from './Rooms/RoomScreen';
+import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -28,6 +29,7 @@ function App() {
                     <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
                     <Route path='/room-type' element={<RoomTypeScreen userCredentials={userCredentials} />}></Route>
                     <Route path='/rooms' element={<RoomScreen userCredentials={userCredentials} />}></Route>
+                    <Route path='/room-update' element={<RoomUpdateScreen userCredentials={userCredentials} />}></Route>
                 </Routes>
             </BrowserRouter>
         </div>
