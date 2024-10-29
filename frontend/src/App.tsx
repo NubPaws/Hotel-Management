@@ -8,6 +8,7 @@ import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
 import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
+import { Modal } from './UIElements/Modal';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -16,22 +17,59 @@ function App() {
         role: "",
         department: ""
     });
+    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
 
 
     return (
         <div className="appContainer">
             <BrowserRouter>
                 <Routes>
-                    <Route path='/' element={<LoginScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    <Route path='/login' element={<LoginScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    <Route path='/user-creation' element={<UserCreationScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    <Route path='/change-password' element={<ChangePasswordScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
+                    <Route path='/'
+                        element={<LoginScreen
+                                    userCredentials={userCredentials}
+                                    setUserCredentials={setUserCredentials}
+                                    setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
+                    </Route>
+                    <Route path='/login'
+                        element={<LoginScreen
+                                    userCredentials={userCredentials}
+                                    setUserCredentials={setUserCredentials}
+                                    setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>}>
+                    </Route>
+                    <Route path='/user-creation'
+                        element={<UserCreationScreen
+                            userCredentials={userCredentials}
+                            setUserCredentials={setUserCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>}>
+                    </Route>
+                    <Route path='/change-password'
+                        element={<ChangePasswordScreen
+                                    userCredentials={userCredentials}
+                                    setUserCredentials={setUserCredentials}
+                                    setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
+                    </Route>
                     <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    <Route path='/room-type' element={<RoomTypeScreen userCredentials={userCredentials} />}></Route>
-                    <Route path='/rooms' element={<RoomScreen userCredentials={userCredentials} />}></Route>
-                    <Route path='/room-update' element={<RoomUpdateScreen userCredentials={userCredentials} />}></Route>
+                    <Route path='/room-type'
+                        element={<RoomTypeScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>}>
+                    </Route>
+                    <Route path='/rooms'
+                        element={<RoomScreen
+                        userCredentials={userCredentials}
+                        setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>}>
+
+                    </Route>
+                    <Route path='/room-update'
+                        element={<RoomUpdateScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>}>
+                    </Route>
                 </Routes>
             </BrowserRouter>
+            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
+                <h5>Unfortunately, we failed to reach our server.</h5>
+            </Modal>
         </div>
     )
 }

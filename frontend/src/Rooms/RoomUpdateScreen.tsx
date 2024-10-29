@@ -9,8 +9,8 @@ import { updateRoom } from "./RoomUpdate";
 
 export function RoomUpdateScreen(props: {
     userCredentials: UserCredentials,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
     const [showRoomUpdateSuccessMessage, setShowRoomUpdateSuccessMessage] = useState(false);
     const [showRoomUpdateErrorMessage, setShowRoomUpdateErrorMessage] = useState(false);
     const [showRoomNotFoundErrorMessage, setShowRoomNotFoundErrorMessage] = useState(false);
@@ -78,16 +78,13 @@ export function RoomUpdateScreen(props: {
                     borderWidth="1px"
                     onClick={(event) => updateRoom(event,
                         props.userCredentials.token,
-                        setShowConnectionErrorMessage,
+                        props.setShowConnectionErrorMessage,
                         setShowRoomUpdateSuccessMessage,
                         setShowRoomUpdateErrorMessage,
                         setShowRoomNotFoundErrorMessage)}>
                     Update Room
                 </Button>
             </form>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
-            </Modal>
             <Modal title="Room Update Succeeded" show={showRoomUpdateSuccessMessage} onClose={() => { setShowRoomUpdateSuccessMessage(false) }}>
                 <h5>Room was updated successfully.</h5>
             </Modal>

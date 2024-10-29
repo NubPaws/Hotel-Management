@@ -9,8 +9,8 @@ import { Modal } from "../UIElements/Modal";
 
 export function RoomScreen(props: {
     userCredentials: UserCredentials,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
     const [showRoomCreationSuccessMessage, setShowRoomCreationSuccessMessage] = useState(false);
     const [showRoomCreationErrorMessage, setShowRoomCreationErrorMessage] = useState(false);
     const [showRoomRemovalSuccessMessage, setShowRoomRemovalSuccessMessage] = useState(false);
@@ -46,15 +46,12 @@ export function RoomScreen(props: {
                     borderWidth="1px"
                     onClick={(event) => createRoom(event,
                         props.userCredentials.token,
-                        setShowConnectionErrorMessage,
+                        props.setShowConnectionErrorMessage,
                         setShowRoomCreationSuccessMessage,
                         setShowRoomCreationErrorMessage)}>
                     Create Room
                 </Button>
             </form>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
-            </Modal>
             <Modal title="Room Creation Succeeded" show={showRoomCreationSuccessMessage} onClose={() => { setShowRoomCreationSuccessMessage(false) }}>
                 <h5>Room was created successfully.</h5>
             </Modal>
@@ -75,7 +72,7 @@ export function RoomScreen(props: {
                     borderWidth="1px"
                     onClick={(event) => removeRoom(event,
                         props.userCredentials.token,
-                        setShowConnectionErrorMessage,
+                        props.setShowConnectionErrorMessage,
                         setShowRoomRemovalSuccessMessage,
                         setShowRoomRemovalErrorMessage)}>
                     Remove Room

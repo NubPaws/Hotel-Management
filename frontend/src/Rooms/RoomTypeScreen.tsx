@@ -9,8 +9,8 @@ import { Modal } from "../UIElements/Modal";
 
 export function RoomTypeScreen(props: {
     userCredentials: UserCredentials,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
     const [showRoomTypeCreationSuccessMessage, setShowRoomTypeCreationSuccessMessage] = useState(false);
     const [showRoomTypeCreationErrorMessage, setShowRoomTypeCreationErrorMessage] = useState(false);
     const [showRoomTypeRemovalSuccessMessage, setShowRoomTypeRemovalSuccessMessage] = useState(false);
@@ -45,15 +45,12 @@ export function RoomTypeScreen(props: {
                     borderWidth="1px"
                     onClick={(event) => createRoomType(event,
                         props.userCredentials.token,
-                        setShowConnectionErrorMessage,
+                        props.setShowConnectionErrorMessage,
                         setShowRoomTypeCreationSuccessMessage,
                         setShowRoomTypeCreationErrorMessage)}>
                     Create Room Type
                 </Button>
             </form>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
-            </Modal>
             <Modal title="Room Type Successfully created" show={showRoomTypeCreationSuccessMessage} onClose={() => { setShowRoomTypeCreationSuccessMessage(false) }}>
                 <h5>Succeeded in creating room type</h5>
             </Modal>
@@ -78,7 +75,7 @@ export function RoomTypeScreen(props: {
                     borderWidth="1px"
                     onClick={(event) => removeRoomType(event,
                                                        props.userCredentials.token,
-                                                       setShowConnectionErrorMessage,
+                                                       props.setShowConnectionErrorMessage,
                                                        setShowRoomTypeRemovalSuccessMessage,
                                                        setShowRoomTypeRemovalErrorMessage)}>
                     Remove Room Type
