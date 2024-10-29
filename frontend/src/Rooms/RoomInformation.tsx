@@ -4,6 +4,8 @@ async function searchRoom(
     event: any,
     token: string,
     setShowRoomSearchErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
+    setRoomNotFoundErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
+    setRooms: React.Dispatch<React.SetStateAction<Room[]>>
 ) {
     event.preventDefault();
     let url = buildRoomInformationURL();
@@ -14,6 +16,10 @@ async function searchRoom(
     let status = res.status;
     if (status === 200) {
         let rooms = await res.json();
+        setRooms(rooms);
+        if (rooms.length === 0) {
+            setRoomNotFoundErrorMessage(true);
+        }
     } else {
         setShowRoomSearchErrorMessage(true);
     }

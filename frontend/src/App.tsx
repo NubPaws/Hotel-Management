@@ -9,7 +9,7 @@ import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
 import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import { Modal } from './UIElements/Modal';
-import { RoomInformationScreen } from './Rooms/RoomInformtaionScreen';
+import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({

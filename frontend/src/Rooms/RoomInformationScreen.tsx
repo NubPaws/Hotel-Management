@@ -5,13 +5,15 @@ import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input } from "../UIElements/Input";
 import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
 import { Button } from "../UIElements/Button";
-import { searchRoom } from "./RoomInformtaion";
+import { searchRoom } from "./RoomInformation";
 import { Modal } from "../UIElements/Modal";
 
 export function RoomInformationScreen(props: {
     userCredentials: UserCredentials,
 }) {
     const [showRoomSearchErrorMessage, setShowRoomSearchErrorMessage] = useState(false);
+    const [showRoomNotFoundErrorMessage, setRoomNotFoundErrorMessage] = useState(false);
+    const [rooms, setRooms] = useState<Room[]>([]);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -43,13 +45,48 @@ export function RoomInformationScreen(props: {
                     borderWidth="1px"
                     onClick={(event) => searchRoom(event,
                         props.userCredentials.token,
-                        setShowRoomSearchErrorMessage)}>
+                        setShowRoomSearchErrorMessage,
+                        setRoomNotFoundErrorMessage,
+                        setRooms,)}>
                     Search room
                 </Button>
             </form>
             <Modal title="Failed to retrieve room" show={showRoomSearchErrorMessage} onClose={() => { setShowRoomSearchErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
+                <h5>Invalid Input.</h5>
             </Modal>
+            <Modal title="Room Not Found" show={showRoomNotFoundErrorMessage} onClose={() => { setRoomNotFoundErrorMessage(false) }}>
+                <h5>Failed to find room with the specified features.</h5>
+            </Modal>
+
+            {rooms.length > 0 && (
+                <ul>
+                    {rooms.map((room) => (
+                        <RoomEntry
+                            key={room.roomId}
+                            roomId={room.roomId}
+                            type={room.type}
+                            state={room.state}
+                            occupied={room.occupied}
+                            reservation={room.reservation}>
+                        </RoomEntry>
+                    ))}
+                </ul>
+            )}
+
         </>
     )
 }
+
+
+function RoomEntry(room: Room) {
+    return (
+        <div className="fieldsContainer">
+            <p>Room Id: {room.roomId}</p>
+            <p>Room Type: {room.type}</p>
+            <p>Room State: {room.state}</p>
+            <p>Room Occupation: {room.occupied ? "Occupied" : "Free"}</p>
+            <p>Room Reservation Id: {room.reservation ? room.reservation : "No Reservation"}</p>
+        </div>
+    )
+}
+
