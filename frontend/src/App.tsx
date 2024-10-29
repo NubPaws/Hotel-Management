@@ -9,6 +9,7 @@ import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
 import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import { Modal } from './UIElements/Modal';
+import { RoomInformationScreen } from './Rooms/RoomInformtaionScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -64,6 +65,10 @@ function App() {
                         element={<RoomUpdateScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>}>
+                    </Route>
+                    <Route path='/room-information'
+                        element={<RoomInformationScreen
+                            userCredentials={userCredentials}/>}>
                     </Route>
                 </Routes>
             </BrowserRouter>

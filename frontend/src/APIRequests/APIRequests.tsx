@@ -12,6 +12,16 @@ async function getUserDetails(username: string, token: string) {
     return await res.json()
 }
 
+async function authorizedGetRequest(url: string, token: string) {
+    const res = await fetch(url, {
+        'method': 'GET',
+        'headers': {
+            'Authorization': token
+        }
+    })
+    return res;
+}
+
 async function authorizedPostRequestWithBody(
     token: string,
     data: string,
@@ -57,6 +67,9 @@ async function authorizedPostRequestWithoutBody(
     }
     return res;
 }
-export { getUserDetails,
+export {
+    getUserDetails,
     authorizedPostRequestWithBody,
-    authorizedPostRequestWithoutBody };
+    authorizedPostRequestWithoutBody,
+    authorizedGetRequest
+};

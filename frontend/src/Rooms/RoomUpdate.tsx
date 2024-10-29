@@ -1,5 +1,5 @@
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { getRadioButtonValue, validateRadioButton } from "../Authentication/Validation";
+import { validateRadioButton } from "../Authentication/Validation";
 import { ROOM_NUMBER_REGEX } from "./RoomsRegex";
 
 async function updateRoom(
@@ -12,8 +12,6 @@ async function updateRoom(
 ) {
     event.preventDefault();
     let roomNumberInput = document.getElementById("roomNumber") as HTMLInputElement;
-    let roomStateInput = document.getElementById("state") as HTMLInputElement;
-    let roomOccupationInput = document.getElementById("occupation") as HTMLInputElement;
     let reservationIdInput = document.getElementById("reservationId") as HTMLInputElement;
 
     let roomUpdateForm = document.getElementById("roomUpdateForm") as HTMLFormElement;
