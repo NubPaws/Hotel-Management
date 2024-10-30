@@ -1,4 +1,4 @@
-import { confirmPassword, validatePassword, validateUsername, validateUserRole, validateUserDepartment } from "./Validation";
+import { confirmPassword, validatePassword, validateUsername, validateRadioButton } from "./Validation";
 
 async function createUser(event : any,
     token: string,
@@ -11,8 +11,8 @@ async function createUser(event : any,
     if (validateUsername()
         && validatePassword("password", "passwordErrorMessage")
         && confirmPassword("password", "confirmPassword", "confirmPasswordErrorMessage")
-        && validateUserRole()
-        && validateUserDepartment()) {
+        && validateRadioButton("role", "userRoleErrorMessage", "Role must be chosen")
+        && validateRadioButton("department", "userDepartmentErrorMessage", "Role must be chosen")) {
         let enteredUsername = document.getElementById("username") as HTMLInputElement;
         let enteredPassword = document.getElementById("password") as HTMLInputElement;
 
@@ -37,7 +37,7 @@ async function createUser(event : any,
         let userData = {
             "username": enteredUsername.value,
             "password": enteredPassword.value,
-            "Role": userRole[userRoleIndex].value,
+            "role": userRole[userRoleIndex].value,
             "department": userDepartment[userDepartmentIndex].value
         };
 
@@ -66,7 +66,7 @@ async function createUser(event : any,
         if (status === 409) {
             setShowUserExistsErrorMessage(true);
         }
-        if (status == 200) {
+        if (status === 200) {
             setShowSuccessMessage(true)
             // Clearing the form
             let confirmPassword = document.getElementById("confirmPassword") as HTMLInputElement;

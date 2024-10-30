@@ -41,7 +41,8 @@ async function loginUser(event : any,
                 setUserCredentials({
                     token: "Bearer " + token,
                     username: userDetails.user,
-                    role: userDetails.role
+                    role: userDetails.role,
+                    department: userDetails.department
                 })
             }
         }

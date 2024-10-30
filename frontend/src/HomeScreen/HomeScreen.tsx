@@ -19,9 +19,17 @@ export function HomeScreen(props: {
         <>
             <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Home" />
-            <Link to="/change-password">Change Password</Link>
+            <Link to="/change-password">Change password</Link>
             <br></br>
             <Link to="/user-creation">Create new user</Link>
+            <br></br>
+            <Link to="/room-type">Create or delete room types</Link>
+            <br></br>
+            <Link to="/rooms">Create or delete rooms</Link>
+            <br></br>
+            <Link to="/room-update">Update room state</Link>
+            <br></br>
+            <Link to="/room-information">Search rooms</Link>
         </>
     )
 }

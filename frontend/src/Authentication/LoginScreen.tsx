@@ -10,11 +10,11 @@ import { Modal } from "../UIElements/Modal";
 
 export function LoginScreen(props: {
     userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>
+    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const navigate = useNavigate();
     const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
 
     // Will change after successful login attempt
     useEffect(() => {
@@ -43,7 +43,7 @@ export function LoginScreen(props: {
                     onClick={(event) => {
                         loginUser(event,
                             setShowErrorMessage,
-                            setShowConnectionErrorMessage,
+                            props.setShowConnectionErrorMessage,
                             props.setUserCredentials)
                     }}>
                     Login
@@ -51,9 +51,6 @@ export function LoginScreen(props: {
             </form>
             <Modal title="Login Failed" show={showErrorMessage} onClose={() => { setShowErrorMessage(false) }}>
                 <h5>Incorrect username/password</h5>
-            </Modal>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
             </Modal>
         </>
     )

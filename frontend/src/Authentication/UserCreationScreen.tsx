@@ -10,11 +10,11 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 
 export function UserCreationScreen(props: {
     userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>
+    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const [showErrorMessage, setShowErrorMessage] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
     const [showUserExistsErrorMessage, setShowUserExistsErrorMessage] = useState(false);
 
     const navigate = useNavigate();
@@ -93,7 +93,7 @@ export function UserCreationScreen(props: {
                     onClick={(event) => createUser(event,
                                                    props.userCredentials.token,
                                                    setShowErrorMessage,
-                                                   setShowConnectionErrorMessage,
+                                                   props.setShowConnectionErrorMessage,
                                                    setShowSuccessMessage,
                                                    setShowUserExistsErrorMessage)}>
                     Create User
@@ -104,9 +104,6 @@ export function UserCreationScreen(props: {
             </Modal>
             <Modal title="User Creation Success" show={showSuccessMessage} onClose={() => { setShowSuccessMessage(false) }}>
                 <h5>Succeeded in creating a new user</h5>
-            </Modal>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
             </Modal>
             <Modal title="User Already Exists" show={showUserExistsErrorMessage} onClose={() => { setShowUserExistsErrorMessage(false) }}>
                 <h5>User already exists</h5>

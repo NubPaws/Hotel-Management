@@ -9,12 +9,12 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 
 export function ChangePasswordScreen(props: {
     userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>
+    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>,
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const navigate = useNavigate();
     const [showErrorMessage, setShowErrorMessage] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
 
     useEffect(() => {
         if (props.userCredentials.username === "") {
@@ -48,14 +48,11 @@ export function ChangePasswordScreen(props: {
                                                          props.userCredentials,
                                                          props.setUserCredentials,
                                                          setShowErrorMessage,
-                                                         setShowConnectionErrorMessage,
+                                                         props.setShowConnectionErrorMessage,
                                                          setShowSuccessMessage)}}>
                     Change Password
                 </Button>
             </form>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
-            </Modal>
             <Modal title="Password Change Failed" show={showErrorMessage} onClose={() => { setShowErrorMessage(false) }}>
                 <h5>Failed to change user's password</h5>
             </Modal>
