@@ -51,6 +51,9 @@ function validateGuestCreation() {
     let guestNameInput = document.getElementById("guestName") as HTMLInputElement;
     let guestNameErrorMessage = document.getElementById("guestNameErrorMessage") as HTMLInputElement;
 
+    let guestTitleInput = document.getElementById("guestTitle") as HTMLInputElement;
+    let guestTitleErrorMessage = document.getElementById("guestTitleErrorMessage") as HTMLInputElement;
+
     if (identificationInput.value === "") {
         identificationErrorMessage.innerText = "Guest id must be filled";
         return false;
@@ -63,6 +66,13 @@ function validateGuestCreation() {
         return false;
     } else {
         guestNameErrorMessage.innerText = "";
+    }
+
+    if (guestTitleInput.value === "") {
+        guestTitleErrorMessage.innerText = "Title must be filled";
+        return false;
+    } else {
+        guestTitleErrorMessage.innerText = "";
     }
 
     return true;
