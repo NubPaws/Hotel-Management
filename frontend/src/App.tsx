@@ -10,6 +10,7 @@ import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import { Modal } from './UIElements/Modal';
 import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
+import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -70,6 +71,13 @@ function App() {
                         element={<RoomInformationScreen
                             userCredentials={userCredentials}/>}>
                     </Route>
+                    <Route path='/create-guest'
+                        element={<CreateGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+
                 </Routes>
             </BrowserRouter>
             <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
