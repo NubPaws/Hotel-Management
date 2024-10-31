@@ -146,20 +146,6 @@ const ReservationSchema = new Schema<Reservation>({
 
 const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
 
-ReservationSchema.pre("save", async function (next) {
-	if (this.isNew) {
-		const counter = await Counter.increment("reservationId");
-		this.reservationId = counter;
-	}
-	
-	// Update the endDate.
-	if (this.startDate && this.nightCount >= 0) {
-		this.endDate = addDaysToDate(this.startDate, this.nightCount);
-	}
-	
-	next();
-});
-
 /**
  * Create a new reservation in the reservation system. This function also
  * performs validation checks to ensure the provided information is valid.
@@ -215,7 +201,12 @@ async function create(
 	startDate.setHours(0, 0, 0, 0);
 	
 	try {
+		const reservationId = await Counter.increment("reservationId");
+		
+		const endDate = addDaysToDate(startDate, nightCount);
+		
 		const reservation = await ReservationModel.create({
+			reservationId,
 			guest,
 			reservationMade: getTodaysDate(),
 			comment,
@@ -223,6 +214,7 @@ async function create(
 			startTime,
 			nightCount,
 			endTime,
+			endDate,
 			prices,
 			roomType,
 			guestName,

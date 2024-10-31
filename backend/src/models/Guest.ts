@@ -65,15 +65,6 @@ const GuestSchema = new Schema<Guest>({
 	}],
 });
 
-GuestSchema.pre("save", async function (next) {
-	const doc = this;
-	if (doc.isNew) {
-		const counter = await Counter.increment("guestId");
-		doc.guestId = counter;
-	}
-	next();
-});
-
 const GuestModel = mongoose.model<Guest>("GuestModel", GuestSchema);
 
 /**
@@ -101,7 +92,10 @@ async function create(
 	}
 	
 	try {
+		const guestId = await Counter.increment("guestId");
+		
 		return await GuestModel.create({
+			guestId,
 			identification,
 			fullName,
 			title,

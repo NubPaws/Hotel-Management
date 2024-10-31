@@ -84,15 +84,6 @@ const TaskSchema = new Schema<Task>({
 
 const TaskModel = mongoose.model<Task>("TaskModel", TaskSchema);
 
-TaskSchema.pre("save", async function (next) {
-	const doc = this;
-	if (doc.isNew) {
-		const counter = await Counter.increment("taskId");
-		doc.taskId = counter;
-	}
-	next();
-});
-
 /**
  * Creates a string represting an action. This enforces a single format for action strings.
  * 
@@ -148,7 +139,10 @@ async function create(
 	
 	const timeCreated = new Date;
 	
+	const taskId = await Counter.increment("taskId");
+	
 	await TaskModel.create({
+		taskId,
 		room,
 		timeCreated,
 		description,

@@ -55,15 +55,6 @@ const ExtraSchema = new Schema<Extra>({
 
 const ExtraModel = mongoose.model<Extra>("ExtraModel", ExtraSchema);
 
-ExtraSchema.pre("save", async function (next) {
-	const doc = this;
-	if (doc.isNew) {
-		const counter = await Counter.increment("extraId");
-		doc.extraId = counter;
-	}
-	next();
-});
-
 /**
  * Create a new extra and associate it with a reservation.
  * 
@@ -78,7 +69,10 @@ async function create(item: string, description: string, price: number, reservat
 		throw new ReservationDoesNotExistError();
 	}
 	
+	const extraId = await Counter.increment("extraId");
+	
 	const extra = await ExtraModel.create({
+		extraId,
 		item,
 		description,
 		price,
