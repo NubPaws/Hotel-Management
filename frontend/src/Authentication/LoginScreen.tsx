@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 import { Input } from "../UIElements/Input"
 import { Button } from "../UIElements/Button"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { loginUser } from "./Login";
 import { Modal } from "../UIElements/Modal";
+import { ReactSetStateDispatch } from "../Utils/Types";
 
-export function LoginScreen(props: {
-    userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export interface LoginScreenProps {
+    userCredentials: UserCredentials;
+    setUserCredentials: ReactSetStateDispatch<UserCredentials>;
+    setShowConnectionErrorMessage: ReactSetStateDispatch<boolean>;
+}
+
+export function LoginScreen(props: LoginScreenProps) {
     const navigate = useNavigate();
     const [showErrorMessage, setShowErrorMessage] = useState(false);
 

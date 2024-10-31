@@ -1,9 +1,13 @@
 import './CenteredLabel.css'
 
-export function CenteredLabel(props : {labelName: string}) {
+export interface CenteredLabelProp {
+    labelName: string;
+}
+
+export function CenteredLabel(props: CenteredLabelProp) {
     return (
         <div className="centeredLabel">
-            <span className="centeredLabelText">{props.labelName}</span>
+            <u>{props.labelName}</u>
         </div>
     )
 }
