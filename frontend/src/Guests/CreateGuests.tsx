@@ -1,6 +1,6 @@
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
 
-async function createGuests(
+async function createGuest(
     event: any,
     token: string,
     setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
@@ -78,4 +78,4 @@ function validateGuestCreation() {
     return true;
 }
 
-export {createGuests}
+export { createGuest }

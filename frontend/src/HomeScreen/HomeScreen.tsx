@@ -32,6 +32,8 @@ export function HomeScreen(props: {
             <Link to="/room-information">Search rooms</Link>
             <br></br>
             <Link to="/create-guest">Create Guests</Link>
+            <br></br>
+            <Link to="/update-guest">Update Guests</Link>
         </>
     )
 }
