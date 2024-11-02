@@ -34,6 +34,12 @@ async function createGuest(
         let status = res.status;
         if (status === 201) {
             setShowGuestCreatedSuccessMessage(true);
+            identificationInput.value = "";
+            guestNameInput.value = "";
+            guestEmailInput.value = "";
+            guestPhoneInput.value = "";
+            guestTitle.value = "";
+
         } else if (status === 400) {
             setShowInvalidInputErrorMessage(true);
         } else if (status === 409) {

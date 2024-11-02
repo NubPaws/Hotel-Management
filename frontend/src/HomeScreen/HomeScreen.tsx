@@ -31,11 +31,13 @@ export function HomeScreen(props: {
             <br></br>
             <Link to="/room-information">Search rooms</Link>
             <br></br>
-            <Link to="/create-guest">Create Guests</Link>
+            <Link to="/create-guest">Create guests</Link>
             <br></br>
-            <Link to="/update-guest">Update Guests</Link>
+            <Link to="/update-guest">Update guests</Link>
             <br></br>
-            <Link to="/add-reservation">Add Reservation to guest</Link>
+            <Link to="/add-reservation">Add reservation to guest</Link>
+            <br></br>
+            <Link to="/search-guest">Search guest</Link>
         </>
     )
 }
