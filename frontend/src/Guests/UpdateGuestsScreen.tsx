@@ -30,7 +30,7 @@ export function UpdateGuestScreen(props: {
             <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Update Guest Information"></CenteredLabel>
             <form id="guestUpdateForm" className="fieldsContainer" action="http://localhost:8000/api/Guests/update">
-            <Input id="guestId" className="field" type="text" name="guestId"
+                <Input id="guestId" className="field" type="text" name="guestId"
                     placeholder="Enter guest Id" errorMessageId="guestIdErrorMessage">
                     Guest Id
                 </Input>
@@ -57,7 +57,7 @@ export function UpdateGuestScreen(props: {
                         setShowInvalidInputErrorMessage,
                         setShowGuestUpdatedMessage,
                         setShowGuestNotFoundErrorMessage,
-                        )}>
+                    )}>
                     UpdateGuest
                 </Button>
             </form>
@@ -72,5 +72,4 @@ export function UpdateGuestScreen(props: {
             </Modal>
         </>
     )
-
 }

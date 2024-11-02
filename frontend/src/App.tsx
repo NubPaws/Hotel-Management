@@ -12,6 +12,7 @@ import { Modal } from './UIElements/Modal';
 import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
+import { AddReservationScreen } from './Guests/AddReservationScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -80,6 +81,12 @@ function App() {
                     </Route>
                     <Route path='/update-guest'
                         element={<UpdateGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/add-reservation'
+                        element={<AddReservationScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />}>
