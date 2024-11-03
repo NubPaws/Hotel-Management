@@ -6,11 +6,9 @@ import { Input } from "../UIElements/Input";
 import { Button } from "../UIElements/Button";
 import { createGuest } from "./CreateGuests";
 import { Modal } from "../UIElements/Modal";
+import { AuthenticatedUserProps } from "../Utils/Props";
 
-export function CreateGuestScreen(props: {
-    userCredentials: UserCredentials,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export function CreateGuestScreen(props: AuthenticatedUserProps) {
     const [showInvalidInputErrorMessage, setShowInvalidInputErrorMessage] = useState(false);
     const [showGuestExistsErrorMessage, setShowGuestExistsErrorMessage] = useState(false);
     const [showGuestCreatedSuccessMessage, setShowGuestCreatedSuccessMessage] = useState(false);

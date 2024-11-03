@@ -6,11 +6,9 @@ import { Input } from "../UIElements/Input";
 import { Button } from "../UIElements/Button";
 import { addReservation } from "./AddReservation";
 import { Modal } from "../UIElements/Modal";
+import { AuthenticatedUserProps } from "../Utils/Props";
 
-export function AddReservationScreen(props: {
-    userCredentials: UserCredentials,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export function AddReservationScreen(props: AuthenticatedUserProps) {
     const [showAddReservationSuccessMessage, setShowAddReservationSuccessMessage] = useState(false);
     const [showInvalidInputMessage, setShowInvalidInputMessage] = useState(false);
     const [showGuestNotFoundMessage, setShowGuestNotFoundMessage] = useState(false);
