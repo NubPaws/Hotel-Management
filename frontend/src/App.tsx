@@ -10,6 +10,10 @@ import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import { Modal } from './UIElements/Modal';
 import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
+import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
+import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
+import { AddReservationScreen } from './Guests/AddReservationScreen';
+import { SearchGuestScreen } from './Guests/SearchGuestScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -69,6 +73,30 @@ function App() {
                     <Route path='/room-information'
                         element={<RoomInformationScreen
                             userCredentials={userCredentials}/>}>
+                    </Route>
+                    <Route path='/create-guest'
+                        element={<CreateGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/update-guest'
+                        element={<UpdateGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/add-reservation'
+                        element={<AddReservationScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/search-guest'
+                        element={<SearchGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
                     </Route>
                 </Routes>
             </BrowserRouter>

@@ -52,7 +52,7 @@ export function RoomInformationScreen(props: {
                 </Button>
             </form>
             <Modal title="Failed to retrieve room" show={showRoomSearchErrorMessage} onClose={() => { setShowRoomSearchErrorMessage(false) }}>
-                <h5>Invalid Input.</h5>
+                <h5>Failed to retrieve room.</h5>
             </Modal>
             <Modal title="Room Not Found" show={showRoomNotFoundErrorMessage} onClose={() => { setRoomNotFoundErrorMessage(false) }}>
                 <h5>Failed to find room with the specified features.</h5>
