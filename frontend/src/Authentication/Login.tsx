@@ -1,23 +1,20 @@
 import { getUserDetails } from "../APIRequests/APIRequests";
+import { ReactSetStateDispatch } from "../Utils/Types";
 import { validatePassword, validateUsername } from "./Validation";
 
-async function loginUser(event : any,
-                        setShowErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-                        setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-                        setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>) {
-    event.preventDefault();
-    if (validateUsername() && validatePassword("password", "passwordErrorMessage")) {
-        let enteredUsername = document.getElementById("username") as HTMLInputElement;
-        let enteredPassword = document.getElementById("password") as HTMLInputElement;
-        let userData = {
-            "username": enteredUsername.value,
-            "password": enteredPassword.value,
-        };
+export async function loginUser(
+    username: string,
+    password: string,
+    setShowErrorMessage: ReactSetStateDispatch<boolean>,
+    setShowConnectionErrorMessage: ReactSetStateDispatch<boolean>,
+    setUserCredentials: ReactSetStateDispatch<UserCredentials>
+) {
+    if (true || (validateUsername(username) && validatePassword(password))) {
+        const userData = { username, password };
 
-        let res = null;
+        let res;
         try {
-            let loginForm = document.getElementById("loginForm") as HTMLFormElement;
-            res = await fetch(loginForm.action, {
+            res = await fetch("http://localhost:8000/api/Users/login", {
                 'method': 'POST',
                 'headers': {
                     'Content-Type': 'application/json',
@@ -31,22 +28,19 @@ async function loginUser(event : any,
             }
         }
 
-        if (res!.status !== 200) {
+        if (res?.status !== 200) {
             setShowErrorMessage(true);
+            return;
         }
-        else {
-            const token = await res!.text();
-            const userDetails = await getUserDetails(enteredUsername.value, "Bearer " + token,);
-            if (token !== null && userDetails !== null) {
-                setUserCredentials({
-                    token: "Bearer " + token,
-                    username: userDetails.user,
-                    role: userDetails.role,
-                    department: userDetails.department
-                })
-            }
+        const token = await res.text();
+        const userDetails = await getUserDetails(username, "Bearer " + token);
+        if (token && userDetails) {
+            setUserCredentials({
+                token: "Bearer " + token,
+                username: userDetails.user,
+                role: userDetails.role,
+                department: userDetails.department
+            })
         }
     }
 }
-
-export { loginUser };

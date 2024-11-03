@@ -1,13 +1,14 @@
+import React from 'react'
 import './CenteredLabel.css'
 
 export interface CenteredLabelProp {
-    labelName: string;
+    children: React.ReactNode;
 }
 
 export function CenteredLabel(props: CenteredLabelProp) {
     return (
         <div className="centeredLabel">
-            <u>{props.labelName}</u>
+            <u>{props.children}</u>
         </div>
     )
 }

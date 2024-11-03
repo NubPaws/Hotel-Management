@@ -1,23 +1,55 @@
-import { ChangeEventHandler } from "react";
+import React, { ChangeEventHandler } from "react";
 import './Input.css'
 
-export function Input(props : {className: string,
-                               id: string,
-                               children: React.ReactNode,
-                               type: string,
-                               name: string,
-                               placeholder: string,
-                               onChange?: ChangeEventHandler<HTMLInputElement>,
-                               errorMessageId: string
-                            }) {
-    return (
-        <div className={props.className}>
-            <label className="fieldLabel" htmlFor={props.id}>{props.children}</label>
-            <div className="fieldInputContainer">
-                <input className="fieldInput" type={props.type}  name={props.name} id={props.id}
-                    placeholder={props.placeholder} onChange={props.onChange} required/>
-                    <div id={props.errorMessageId}></div>
-            </div>
-        </div>
-    );
+export enum InputType {
+    Button = "button",
+    Checkbox = "checkbox",
+    Color = "color",
+    Date = "date",
+    DatetimeLocal = "datetime-local",
+    Email = "email",
+    File = "file",
+    Hidden = "hidden",
+    Image = "image",
+    Month = "month",
+    Number = "number",
+    Password = "password",
+    Radio = "radio",
+    Range = "range",
+    Reset = "reset",
+    Search = "search",
+    Submit = "submit",
+    Tel = "tel",
+    Text = "text",
+    Time = "time",
+    Url = "url",
+    Week = "week",
 }
+
+interface InputProps {
+    id: string;
+    label?: string;
+    type: InputType;
+    value?: string;
+    placeholder?: string;
+    onChange?: ChangeEventHandler<HTMLInputElement>;
+}
+
+export const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, onChange }) => (
+    <div className="input-field-wrapper">
+        {label && (
+            <label htmlFor={id} className="input-label">
+                {label}
+            </label>)
+        }
+        <input
+            id={id}
+            className="input-field"
+            type={type}
+            value={value}
+            placeholder={placeholder}
+            onChange={onChange}
+            required
+        />
+    </div>
+);

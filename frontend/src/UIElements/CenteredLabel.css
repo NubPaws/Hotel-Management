@@ -1,11 +1,11 @@
 .centeredLabel {
 	margin: 1.5rem auto 0 auto;
     text-align: center;
-    font-family: "League Spartan", sans-serif;
+    font-family: var(--font-league-spartan-family);
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
     font-size: 36px;
-    color: #000000;
+    color: var(--color-black);
     white-space: nowrap;
 }
