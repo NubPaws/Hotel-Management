@@ -14,6 +14,7 @@ import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
 import { SearchGuestScreen } from './Guests/SearchGuestScreen';
+import { CreateTaskScreen } from './Tasks/CreateTask';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -94,6 +95,12 @@ function App() {
                     </Route>
                     <Route path='/search-guest'
                         element={<SearchGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/create-task'
+                        element={<CreateTaskScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />}>
