@@ -42,6 +42,8 @@ export function HomeScreen(props: {
             <Link to="/create-task">Create tasks</Link>
             <br></br>
             <Link to="/update-task">Update tasks</Link>
+            <br></br>
+            <Link to="/remove-task">Remove tasks</Link>
         </>
     )
 }

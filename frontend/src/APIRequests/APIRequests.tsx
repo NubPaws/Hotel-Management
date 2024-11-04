@@ -26,7 +26,8 @@ async function authorizedPostRequestWithBody(
     token: string,
     data: string,
     url: string,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>) {
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
+) {
     let res = null;
     try {
         res = await fetch(url, {
@@ -49,7 +50,8 @@ async function authorizedPostRequestWithBody(
 async function authorizedPostRequestWithoutBody(
     token: string,
     url: string,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>) {
+    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
+) {
     let res = null;
     try {
         res = await fetch(url, {

@@ -26,7 +26,7 @@ export function UpdateTaskScreen(props: AuthenticatedUserProps) {
             <form id="taskUpdateForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/">
                 <Input id="taskId" className="field" type="number" name="taskId"
                     placeholder="Enter task Id" errorMessageId="taskIdErrorMessage">
-                    Room number
+                    Task Id
                 </Input>
                 <Input id="taskDescription" className="field" type="text" name="taskDescription"
                     placeholder="Enter task description" errorMessageId="taskDescriptionErrorMessage">
