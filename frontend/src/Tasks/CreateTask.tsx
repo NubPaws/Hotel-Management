@@ -51,7 +51,7 @@ export function CreateTaskScreen(props: AuthenticatedUserProps) {
                         setShowTaskCreateMessage,
                         setShowInvalidInputErrorMessage
                     )}>
-                    Create User
+                    Create task
                 </Button>
             </form>
             <Modal title="Invalid input in task creation" show={showInvalidInputErrorMessage} onClose={() => { setShowInvalidInputErrorMessage(false) }}>
