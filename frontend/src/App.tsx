@@ -14,6 +14,10 @@ import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
 import { SearchGuestScreen } from './Guests/SearchGuestScreen';
+import { CreateTaskScreen } from './Tasks/CreateTask';
+import { UpdateTaskScreen } from './Tasks/UpdateTask';
+import { RemoveTaskScreen } from './Tasks/RemoveTask';
+import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -94,6 +98,36 @@ function App() {
                     </Route>
                     <Route path='/search-guest'
                         element={<SearchGuestScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/create-task'
+                        element={<CreateTaskScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/update-task'
+                        element={<UpdateTaskScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/remove-task'
+                        element={<RemoveTaskScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/search-task-by-id'
+                        element={<SearchTaskByIdScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/search-task-by-department'
+                        element={<SearchTaskByDepartmentScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />}>

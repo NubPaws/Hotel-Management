@@ -38,6 +38,16 @@ export function HomeScreen(props: {
             <Link to="/add-reservation">Add reservation to guest</Link>
             <br></br>
             <Link to="/search-guest">Search guest</Link>
+            <br></br>
+            <Link to="/create-task">Create tasks</Link>
+            <br></br>
+            <Link to="/update-task">Update tasks</Link>
+            <br></br>
+            <Link to="/remove-task">Remove tasks</Link>
+            <br></br>
+            <Link to="/search-task-by-id">Search task by Id</Link>
+            <br></br>
+            <Link to="/search-task-by-department">Search task by department</Link>
         </>
     )
 }
