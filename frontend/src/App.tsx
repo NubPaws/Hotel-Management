@@ -17,7 +17,7 @@ import { SearchGuestScreen } from './Guests/SearchGuestScreen';
 import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
-import { SearchTaskByIdScreen } from './Tasks/SearchTask';
+import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -126,7 +126,12 @@ function App() {
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />}>
                     </Route>
-
+                    <Route path='/search-task-by-department'
+                        element={<SearchTaskByDepartmentScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
                 </Routes>
             </BrowserRouter>
             <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>

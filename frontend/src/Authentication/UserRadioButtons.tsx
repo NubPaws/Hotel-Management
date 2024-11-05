@@ -35,4 +35,21 @@ function UserDepartmentRadioButton() {
     )
 }
 
+export function getUserDepartment() {
+    const userDepartment: NodeListOf<HTMLInputElement> = document.querySelectorAll('input[name="department"]');
+    let userDepartmentIndex = -1;
+
+    for (let i = 0; i < userDepartment.length; i++) {
+        if (userDepartment[i].checked) {
+            userDepartmentIndex = i;
+        }
+    }
+
+    if (userDepartmentIndex  === -1) {
+        return null;
+    }
+
+    return userDepartment[userDepartmentIndex];
+}
+
 export { UserDepartmentRadioButton }
