@@ -22,3 +22,15 @@ interface Guest {
     phone: string,
     reservations: number[]
 }
+
+interface Task {
+    taskId: number,
+    timeCreated: string
+    room: number,
+    description: string,
+    urgency: number,
+    department: string,
+    creator: string,
+    status: string,
+    history: string[]
+}
