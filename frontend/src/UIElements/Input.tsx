@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler } from "react";
+import React, { ChangeEventHandler, MouseEventHandler } from "react";
 import './Input.css'
 
 export enum InputType {
@@ -33,9 +33,10 @@ interface InputProps {
     value?: string;
     placeholder?: string;
     onChange?: ChangeEventHandler<HTMLInputElement>;
+    onClick?: MouseEventHandler<HTMLInputElement>;
 }
 
-export const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, onChange }) => (
+export const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, onChange, onClick }) => (
     <div className="input-field-wrapper">
         {label && (
             <label htmlFor={id} className="input-label">
@@ -49,6 +50,7 @@ export const Input: React.FC<InputProps> = ({ id, label, type, value, placeholde
             value={value}
             placeholder={placeholder}
             onChange={onChange}
+            onClick={onClick}
             required
         />
     </div>

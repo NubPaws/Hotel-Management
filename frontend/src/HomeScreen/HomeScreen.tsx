@@ -18,7 +18,7 @@ export function HomeScreen(props: {
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Home" />
+            <CenteredLabel>Home</CenteredLabel>
             <Link to="/change-password">Change password</Link>
             <br></br>
             <Link to="/user-creation">Create new user</Link>
@@ -48,6 +48,8 @@ export function HomeScreen(props: {
             <Link to="/search-task-by-id">Search task by Id</Link>
             <br></br>
             <Link to="/search-task-by-department">Search task by department</Link>
+            <br></br>
+            <Link to="/create-reservation">Create reservation</Link>
         </>
     )
 }

@@ -39,7 +39,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
     
     return  <>
         <CenteredLabel>Hotel Management System</CenteredLabel>
-        <FormContainer onSubmit={(e) => handleSubmit(e).then(() => console.log("Taters"))}>
+        <FormContainer onSubmit={(e) => handleSubmit(e)}>
             <Input
                 id="username"
                 label="Username"

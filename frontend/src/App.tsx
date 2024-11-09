@@ -18,6 +18,7 @@ import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
+import { CreateReservationScreen } from './Reservations/CreateReservation';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -128,6 +129,12 @@ function App() {
                     </Route>
                     <Route path='/search-task-by-department'
                         element={<SearchTaskByDepartmentScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />}>
+                    </Route>
+                    <Route path='/create-reservation'
+                        element={<CreateReservationScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />}>

@@ -92,7 +92,7 @@ const ReservationSchema = new Schema<Reservation>({
 		type: Date,
 		required: true,
 	},
-	prices: [{
+	prices: {
 		type: [Number],
 		required: true,
 		validate: {
@@ -100,7 +100,7 @@ const ReservationSchema = new Schema<Reservation>({
 			message: "Each price must be a non-negative number",
 		},
 		default: [],
-	}],
+	},
 	roomType: {
 		type: String,
 		ref: "RoomTypeModel",
