@@ -11,10 +11,10 @@ export async function changePassword(
     setShowSuccessMessage: ReactSetStateDispatch<boolean>,
     setShowConnectionErrorMessage: ReactSetStateDispatch<boolean>,
     setUserCredentials: ReactSetStateDispatch<UserCredentials>
-): Promise<boolean> {
+): Promise<void> {
     if (!validatePassword(newPass) || !validateUsername(userCredentials.username) || newPass !== confirmPass) {
         setShowErrorMessage(true);
-        return false;
+        return;
     }
     
     const { token, username } = userCredentials;
@@ -27,11 +27,13 @@ export async function changePassword(
     
     try {
         const res = await makeRequest("api/Users/change-password", "POST", "json", data, token);
+        if (res.status !== 200) {
+            throw new RequestError("Invalid request made to the server");
+        }
         const newToken = await res.text();
         
         setShowSuccessMessage(true);
-        setUserCredentials({ ...userCredentials, token: newToken });
-        return true;
+        setUserCredentials({ ...userCredentials, token: `Bearer ${newToken}` });
     } catch (error) {
         if (error instanceof FetchError) {
             setShowConnectionErrorMessage(true);
@@ -39,6 +41,5 @@ export async function changePassword(
         if (error instanceof RequestError) {
             setShowErrorMessage(true);
         }
-        return false;
     }
 }
