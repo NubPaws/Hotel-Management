@@ -40,7 +40,7 @@ export async function loginUser(
     setShowConnectionErrorMessage: ReactSetStateDispatch<boolean>,
     setUserCredentials: ReactSetStateDispatch<UserCredentials>
 ) {
-    if (!validateUsername(username) && !validatePassword(password)) {
+    if (!validateUsername(username) || !validatePassword(password)) {
         setShowErrorMessage(true);
         return;
     }

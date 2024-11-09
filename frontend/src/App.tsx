@@ -134,9 +134,11 @@ function App() {
                     </Route>
                 </Routes>
             </BrowserRouter>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
-            </Modal>
+            {showConnectionErrorMessage && (
+                <Modal title="Failed to connect to server" onClose={() => { setShowConnectionErrorMessage(false) }}>
+                    Unfortunately, we failed to reach our server.
+                </Modal>
+            )}
         </div>
     )
 }

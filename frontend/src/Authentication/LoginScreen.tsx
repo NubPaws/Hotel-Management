@@ -39,7 +39,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
     
     return  <>
         <CenteredLabel>Hotel Management System</CenteredLabel>
-        <FormContainer onSubmit={(e) => handleSubmit(e).then(() => console.log("Taters"))}>
+        <FormContainer onSubmit={(e) => handleSubmit(e)}>
             <Input
                 id="username"
                 label="Username"
@@ -60,12 +60,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
                 value="Login"
             />
         </FormContainer>
-        <Modal
-            title="Login Failed"
-            show={showErrorMessage}
-            onClose={() => setShowErrorMessage(false)}
-        >
-            <h1>Incorrect username/password</h1>
-        </Modal>
+        {showErrorMessage && (
+            <Modal title="Login Failed" onClose={() => setShowErrorMessage(false)}>
+                Incorrect username/password
+            </Modal>
+        )}
     </>;
 }

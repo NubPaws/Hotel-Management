@@ -1,4 +1,4 @@
-import { confirmPassword, validatePassword, validateUsername, validateRadioButton } from "./Validation";
+import { validatePassword, validateUsername, validateRadioButton } from "./Validation";
 
 async function createUser(event : any,
     token: string,
@@ -10,7 +10,7 @@ async function createUser(event : any,
     event.preventDefault();
     if (validateUsername()
         && validatePassword("password", "passwordErrorMessage")
-        && confirmPassword("password", "confirmPassword", "confirmPasswordErrorMessage")
+        // && confirmPassword("password", "confirmPassword", "confirmPasswordErrorMessage")
         && validateRadioButton("role", "userRoleErrorMessage", "Role must be chosen")
         && validateRadioButton("department", "userDepartmentErrorMessage", "Role must be chosen")) {
         let enteredUsername = document.getElementById("username") as HTMLInputElement;

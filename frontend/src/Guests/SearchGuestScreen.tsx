@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Input";
+import { Input, InputType } from "../UIElements/Input";
 import { Button } from "../UIElements/Button";
 import { searchGuest } from "./SearchGuest";
 import { Modal } from "../UIElements/Modal";
@@ -23,31 +23,41 @@ export function SearchGuestScreen(props: AuthenticatedUserProps) {
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Search Guest Information"></CenteredLabel>
+            <CenteredLabel>Search Guest Information</CenteredLabel>
             <form id="guestSearchForm" className="fieldsContainer" action="http://localhost:8000/api/Guests/search">
-                <Input id="guestId" className="field" type="text" name="guestId"
-                    placeholder="Enter guest Id" errorMessageId="guestIdErrorMessage">
-                    Guest Identification
-                </Input>
-                <Input id="guestName" className="field" type="text" name="guestName"
-                    placeholder="Enter guest name" errorMessageId="guestNameErrorMessage">
-                    Guest Name
-                </Input>
-                <Input id="guestEmail" className="field" type="email" name="guestEmail"
-                    placeholder="Enter guest email" errorMessageId="guestEmailErrorMessage">
-                    Guest Email
-                </Input>
-                <Input id="guestPhone" className="field" type="text" name="guestPhone"
-                    placeholder="Enter guest phone" errorMessageId="guestPhoneErrorMessage">
-                    Guest Phone
-                </Input>
-                <Input id="reservationId" className="field" type="number" name="reservationId"
-                    placeholder="Enter reservation Id" errorMessageId="reservationIdErrorMessage">
-                    Reservation Id
-                </Input>
+                <Input
+                    id="guestId"
+                    label="Guest Identification"
+                    type={InputType.Text}
+                    placeholder="Enter guest Id"
+                />
+                <Input
+                    id="guestName"
+                    label="Guest Name"
+                    type={InputType.Text}
+                    placeholder="Enter guest name"
+                />
+                <Input
+                    id="guestEmail"
+                    label="Guest Email"
+                    type={InputType.Email}
+                    placeholder="Enter guest email"
+                />
+                <Input
+                    id="guestPhone"
+                    label="Guest Phone"
+                    type={InputType.Tel}
+                    placeholder="Enter guest phone"
+                />
+                <Input
+                    id="reservationId"
+                    label="Reservation Id"
+                    type={InputType.Number}
+                    placeholder="Enter reservation Id"
+                />
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => searchGuest(event,
@@ -59,12 +69,16 @@ export function SearchGuestScreen(props: AuthenticatedUserProps) {
                     Search Guest
                 </Button>
             </form>
-            <Modal title="Failed to retrieve guest" show={showGuestSearchErrorMessage} onClose={() => { setShowGuestSearchErrorMessage(false) }}>
-                <h5>Error when trying to search for guest.</h5>
-            </Modal>
-            <Modal title="Guest Not Found" show={showGuestNotFoundErrorMessage} onClose={() => { setGuestNotFoundErrorMessage(false) }}>
-                <h5>Failed to find guest with the specified features.</h5>
-            </Modal>
+            {showGuestSearchErrorMessage && (
+                <Modal title="Failed to retrieve guest" onClose={() => { setShowGuestSearchErrorMessage(false) }}>
+                    Error when trying to search for guest.
+                </Modal>
+            )}
+            {showGuestNotFoundErrorMessage && (
+                <Modal title="Guest Not Found" onClose={() => { setGuestNotFoundErrorMessage(false) }}>
+                    Failed to find guest with the specified features.
+                </Modal>
+            )}
             {guests.length > 0 && (
                 <ul>
                     {guests.map((guest) => (

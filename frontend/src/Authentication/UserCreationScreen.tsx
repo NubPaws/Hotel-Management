@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
 
-import { Input } from "../UIElements/Input"
+import { Input, InputType } from "../UIElements/Input"
 import { Button } from "../UIElements/Button"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { createUser } from "./UserCreation";
@@ -25,59 +25,69 @@ export function UserCreationScreen(props: {
         }
     }, [props.userCredentials, props.setUserCredentials, navigate]);
 
-    return (
-        <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Create User" />
-            <form id="createUserForm" className="fieldsContainer" action="http://localhost:8000/api/Users/create">
-                <Input id="username" className="field" type="text" name="username"
-                    placeholder="Username" errorMessageId="usernameErrorMessage">
-                    Username<br/>
-                    <span className="note">At least 4 characters long</span>
-                </Input>
-                <Input id="password" className="field" type="password" name="password"
-                    placeholder="Password" errorMessageId="passwordErrorMessage">
-                    Password<br/>
-                </Input>
-                <span className="note">At least 4 characters long</span>
-                <Input id="confirmPassword" className="field" type="password" name="confirmPassword"
-                    placeholder="Confirm Password" errorMessageId="confirmPasswordErrorMessage">
-                    Confirm Password
-                </Input>
-                <div className="userRoleContainer" >
-                    <p>Select user role:</p>
-                    <input type="radio" id="user" name="role" value="User"></input>
-                    <label htmlFor="user">User</label>
-                    <br />
-                    <input type="radio" id="admin" name="role" value="Admin"></input>
-                    <label htmlFor="admin">Admin</label>
-                    <div id="userRoleErrorMessage"></div>
-                </div>
-                <UserDepartmentRadioButton></UserDepartmentRadioButton>
+    return <>
+        <NavigationBar></NavigationBar>
+        <CenteredLabel>Create User</CenteredLabel>
+        <form id="createUserForm" className="fieldsContainer" action="http://localhost:8000/api/Users/create">
+            <Input
+                id="username"
+                label="Username"
+                type={InputType.Text}
+                placeholder="Username"
+            />
+            <span className="note">At least 4 characters long</span>
+            <Input
+                id="password"
+                label="Password"
+                type={InputType.Password}
+                placeholder="Password"
+            />
+            <span className="note">At least 4 characters long</span>
+            <Input
+                id="confirmPassword"
+                label="Confirm Password"
+                type={InputType.Password}
+                placeholder="Confirm Password"
+            />
+            <div className="userRoleContainer" >
+                <p>Select user role:</p>
+                <input type="radio" id="user" name="role" value="User"></input>
+                <label htmlFor="user">User</label>
+                <br />
+                <input type="radio" id="admin" name="role" value="Admin"></input>
+                <label htmlFor="admin">Admin</label>
+                <div id="userRoleErrorMessage"></div>
+            </div>
+            <UserDepartmentRadioButton />
 
-                <Button
-                    className="fieldLabel"
-                    bgColor="white"
-                    textColor="black"
-                    borderWidth="1px"
-                    onClick={(event) => createUser(event,
-                                                   props.userCredentials.token,
-                                                   setShowErrorMessage,
-                                                   props.setShowConnectionErrorMessage,
-                                                   setShowSuccessMessage,
-                                                   setShowUserExistsErrorMessage)}>
-                    Create User
-                </Button>
-            </form>
-            <Modal title="User Creation Failed" show={showErrorMessage} onClose={() => { setShowErrorMessage(false) }}>
-                <h5>Failed to create user</h5>
+            <Button
+                className="fieldLabel"
+                backgroundColor="white"
+                textColor="black"
+                borderWidth="1px"
+                onClick={(event) => createUser(event,
+                                                props.userCredentials.token,
+                                                setShowErrorMessage,
+                                                props.setShowConnectionErrorMessage,
+                                                setShowSuccessMessage,
+                                                setShowUserExistsErrorMessage)}>
+                Create User
+            </Button>
+        </form>
+        {showErrorMessage && (
+            <Modal title="User Creation Failed" onClose={() => { setShowErrorMessage(false) }}>
+                Failed to create user
             </Modal>
-            <Modal title="User Creation Success" show={showSuccessMessage} onClose={() => { setShowSuccessMessage(false) }}>
-                <h5>Succeeded in creating a new user</h5>
+        )}
+        {showSuccessMessage && (
+            <Modal title="User Creation Success" onClose={() => { setShowSuccessMessage(false) }}>
+                Succeeded in creating a new user
             </Modal>
-            <Modal title="User Already Exists" show={showUserExistsErrorMessage} onClose={() => { setShowUserExistsErrorMessage(false) }}>
-                <h5>User already exists</h5>
+        )}
+        {showUserExistsErrorMessage && (
+            <Modal title="User Already Exists" onClose={() => { setShowUserExistsErrorMessage(false) }}>
+                User already exists
             </Modal>
-        </>
-    )
+        )}
+    </>;
 }

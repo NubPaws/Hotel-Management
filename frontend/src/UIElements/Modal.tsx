@@ -5,17 +5,13 @@ import "./Modal.css";
 
 export interface ModalProps {
 	title: string;
-	show: boolean;
 	onClose: () => void;
 	onAccept?: () => void;
 	children: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({ title, show, onClose, onAccept, children }) => {
+export const Modal: React.FC<ModalProps> = ({ title, onClose, onAccept, children }) => {
 	useEffect(() => {
-		if (!show)
-			return;
-		
 		const closeOnEscapeKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
 				onClose();
@@ -26,10 +22,7 @@ export const Modal: React.FC<ModalProps> = ({ title, show, onClose, onAccept, ch
 		return () => {
 			document.body.removeEventListener("keydown", closeOnEscapeKeyDown);
 		};
-	}, [show, onClose]);
-	
-	if (!show)
-		return null;
+	}, [onClose]);
 	
 	return (
 		<div className="modal" onClick={onClose}>

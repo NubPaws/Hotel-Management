@@ -1,64 +1,93 @@
 import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react";
-import { Input } from "../UIElements/Input"
-import { Button } from "../UIElements/Button"
+import React, { useEffect, useState } from "react";
+import { Input, InputType } from "../UIElements/Input"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { changePassword } from "./PasswordChange"
 import { Modal } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
+import { FormContainer } from "../UIElements/FormContainer";
+import { ReactSetStateDispatch } from "../Utils/Types";
 
-export function ChangePasswordScreen(props: {
-    userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export interface ChangePasswordScreenProps {
+    userCredentials: UserCredentials;
+    setUserCredentials: ReactSetStateDispatch<UserCredentials>;
+    setShowConnectionErrorMessage: ReactSetStateDispatch<boolean>;
+}
+
+export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
+    userCredentials,
+    setUserCredentials,
+    setShowConnectionErrorMessage,
+}) => {
     const navigate = useNavigate();
+    
     const [showErrorMessage, setShowErrorMessage] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+    const [oldPass, setOldPass] = useState("");
+    const [newPass, setNewPass] = useState("");
+    const [confirmPass, setConfirmPass] = useState("");
+    
     useEffect(() => {
-        if (props.userCredentials.username === "") {
+        if (userCredentials.username === "") {
             navigate("/login");
         }
-    }, [props.userCredentials, props.setUserCredentials, navigate]);
-
-    return (
-        <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Password Change" />
-            <form id="changePasswordForm" className="fieldsContainer" action="http://localhost:8000/api/Users/change-password">
-                <Input id="oldPassword" className="field" type="password" name="oldPassword"
-                    placeholder="Old Password" errorMessageId="oldPasswordErrorMessage">
-                    Old Password
-                </Input>
-                <Input id="newPassword" className="field" type="password" name="password"
-                    placeholder="New Password" errorMessageId="passwordErrorMessage">
-                    New Password
-                </Input>
-                <Input id="confirmPassword" className="field" type="password" name="confirmPassword"
-                    placeholder="Confirm Password" errorMessageId="confirmPasswordErrorMessage">
-                    Confirm Password
-                </Input>
-                <Button
-                    className="fieldLabel"
-                    bgColor="white"
-                    textColor="black"
-                    borderWidth="1px"
-                    onClick={(event) => { changePassword(event,
-                                                         props.userCredentials,
-                                                         props.setUserCredentials,
-                                                         setShowErrorMessage,
-                                                         props.setShowConnectionErrorMessage,
-                                                         setShowSuccessMessage)}}>
-                    Change Password
-                </Button>
-            </form>
-            <Modal title="Password Change Failed" show={showErrorMessage} onClose={() => { setShowErrorMessage(false) }}>
-                <h5>Failed to change user's password</h5>
+    }, [userCredentials, navigate]);
+    
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        await changePassword(
+            userCredentials,
+            oldPass,
+            newPass,
+            confirmPass,
+            setShowErrorMessage,
+            setShowSuccessMessage,
+            setShowConnectionErrorMessage,
+            setUserCredentials,
+        );
+    }
+    
+    return <>
+        <NavigationBar />
+        <CenteredLabel>Change Password</CenteredLabel>
+        <FormContainer onSubmit={handleSubmit}>
+            <Input
+                id="old-password"
+                label="Old Password"
+                type={InputType.Password}
+                placeholder="Enter old password"
+                onChange={(e) => setOldPass(e.target.value)}
+            />
+            <Input
+                id="new-password"
+                label="New Password"
+                type={InputType.Password}
+                placeholder="Enter new password"
+                onChange={(e) => setNewPass(e.target.value)}
+            />
+            <Input
+                id="confirm-password"
+                label="Confirm Password"
+                type={InputType.Password}
+                placeholder="Enter new password again"
+                onChange={(e) => setConfirmPass(e.target.value)}
+            />
+            <Input
+                id="change-password-button"
+                type={InputType.Submit}
+                value="Update Password"
+            />
+        </FormContainer>
+        
+        {showErrorMessage && (
+            <Modal title="Password Change Failed" onClose={() => setShowErrorMessage(false)}>
+                Failed to change user's password
             </Modal>
-            <Modal title="Password Change Success" show={showSuccessMessage} onClose={() => { setShowSuccessMessage(false) }}>
-                <h5>Succeeded in changing user's password</h5>
+        )}
+        {showSuccessMessage && (
+            <Modal title="Password Change Success" onClose={() => setShowSuccessMessage(false)}>
+                Succeeded in changing user's password
             </Modal>
-        </>
-    )
+        )}
+    </>;
 }
