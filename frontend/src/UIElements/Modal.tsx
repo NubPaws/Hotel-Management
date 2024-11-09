@@ -1,42 +1,63 @@
 import { Button } from "./Button.js";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import "./Modal.css";
 
-export function Modal(props: any) {
+export interface ModalProps {
+	title: string;
+	show: boolean;
+	onClose: () => void;
+	onAccept?: () => void;
+	children: React.ReactNode;
+}
+
+export const Modal: React.FC<ModalProps> = ({ title, show, onClose, onAccept, children }) => {
 	useEffect(() => {
+		if (!show)
+			return;
+		
+		const closeOnEscapeKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				onClose();
+			}
+		};
+		
 		document.body.addEventListener("keydown", closeOnEscapeKeyDown);
-		return function cleanup() {
+		return () => {
 			document.body.removeEventListener("keydown", closeOnEscapeKeyDown);
-		}
-	});
+		};
+	}, [show, onClose]);
 	
-	if (!props.show)
+	if (!show)
 		return null;
 	
-	function closeOnEscapeKeyDown(e: any) {
-		if (e.key === "Escape") {
-			props.onClose();
-		}
-	}
-	
-	function acceptButton() {
-		if (props.onAccept === undefined)
-			return <></>;
-		
-		return <Button textColor="black" onClick={() => {props.onAccept(); props.onClose()}} bgColor="#28A745">Accept</Button>
-	}
-	
 	return (
-		<div className="modal" onClick={props.onClose}>
-			<div className="modalContent" onClick={e => e.stopPropagation()}>
-				<div className="modalHeader">
-					<h3 className="modalTitle">{props.title}</h3>
+		<div className="modal" onClick={onClose}>
+			<div className="modal-content" onClick={(e) => e.stopPropagation()}>
+				<div className="modal-header">
+					<span className="modal-title">{title}</span>
 				</div>
-				<div className="modalBody">{props.children}</div>
-				<div className="modalFooter">
-					{acceptButton()}
-					<Button textColor="black" onClick={props.onClose} bgColor="#5C95FF">Close</Button>
+				<div className="modal-body">{children}</div>
+				<div className="modal-footer">
+					{onAccept && (
+						<Button
+							textColor="black"
+							onClick={() => {
+								onAccept();
+								onClose();
+							}}
+							backgroundColor="#28A745"
+						>
+							Accept
+						</Button>
+					)}
+					<Button
+						textColor="black"
+						onClick={onClose}
+						backgroundColor="#5C95FF"
+					>
+						Close
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -45,5 +66,5 @@ export function Modal(props: any) {
 
 Modal.defaultProps = {
 	onAccept: undefined,
-	onClose: undefined,
+	onClose: () => {},
 }

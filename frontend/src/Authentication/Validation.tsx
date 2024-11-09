@@ -1,26 +1,12 @@
 const USERNAME_MIN_LENGTH = 4;
 const PASSWORD_MIN_LENGTH = 4;
 
-function validateUsername() {
-    let username = document.getElementById("username") as HTMLInputElement;
-    let errorMessageSpan = document.getElementById("usernameErrorMessage")!
-    if (username.value.length < USERNAME_MIN_LENGTH) {
-        errorMessageSpan.innerText = "Username needs to have at least 4 characters";
-        return false;
-    }
-    errorMessageSpan.innerText = "";
-    return true;
+function validateUsername(username: string) {
+    return username.length >= USERNAME_MIN_LENGTH;
 }
 
-function validatePassword(passwordId: string, passwordErrorMessageId: string) {
-    let password = document.getElementById(passwordId) as HTMLInputElement;
-    let errorMessageSpan = document.getElementById(passwordErrorMessageId)!
-    if (password.value.length < PASSWORD_MIN_LENGTH) {
-        errorMessageSpan.innerText = "Password needs have at least " + PASSWORD_MIN_LENGTH + " characters";
-        return false;
-    }
-    errorMessageSpan.innerText = "";
-    return true;
+function validatePassword(password: string) {
+    return password.length >= PASSWORD_MIN_LENGTH;
 }
 
 function confirmPassword(passwordId: string, confirmPasswordId: string, confirmPasswordErrorMessageId: string) {

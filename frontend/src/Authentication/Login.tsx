@@ -1,52 +1,62 @@
 import { getUserDetails } from "../APIRequests/APIRequests";
+import { ReactSetStateDispatch } from "../Utils/Types";
 import { validatePassword, validateUsername } from "./Validation";
 
-async function loginUser(event : any,
-                        setShowErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-                        setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-                        setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>) {
-    event.preventDefault();
-    if (validateUsername() && validatePassword("password", "passwordErrorMessage")) {
-        let enteredUsername = document.getElementById("username") as HTMLInputElement;
-        let enteredPassword = document.getElementById("password") as HTMLInputElement;
-        let userData = {
-            "username": enteredUsername.value,
-            "password": enteredPassword.value,
-        };
+class InvalidRequestError extends Error {}
+class UserCredentialsFetchError extends Error {}
 
-        let res = null;
-        try {
-            let loginForm = document.getElementById("loginForm") as HTMLFormElement;
-            res = await fetch(loginForm.action, {
-                'method': 'POST',
-                'headers': {
-                    'Content-Type': 'application/json',
-                },
-                'body': JSON.stringify(userData)
-            });
-        } catch (error) {
-            if (error instanceof TypeError) {
-                setShowConnectionErrorMessage(true);
-                return;
-            }
+async function fetchUserCredentials(username: string, password: string) {
+    const userData = { username, password };
+    
+    const res = await fetch("http://localhost:8000/api/Users/login", {
+        'method': 'POST',
+        'headers': {
+            'Content-Type': 'application/json',
+        },
+        'body': JSON.stringify(userData)
+    });
+
+    if (res?.status !== 200) {
+        throw new InvalidRequestError();
+    }
+    const token = await res.text();
+    const userDetails = await getUserDetails(username, "Bearer " + token);
+    if (!token && !userDetails) {
+        throw new UserCredentialsFetchError();
+    }
+    
+    return {
+        token: "Bearer " + token,
+        username: userDetails.user,
+        role: userDetails.role,
+        department: userDetails.department
+    } as UserCredentials;
+}
+
+export async function loginUser(
+    username: string,
+    password: string,
+    setShowErrorMessage: ReactSetStateDispatch<boolean>,
+    setShowConnectionErrorMessage: ReactSetStateDispatch<boolean>,
+    setUserCredentials: ReactSetStateDispatch<UserCredentials>
+) {
+    if (!validateUsername(username) && !validatePassword(password)) {
+        setShowErrorMessage(true);
+        return;
+    }
+    
+    try {
+        const credentials = await fetchUserCredentials(username, password);
+        setUserCredentials(credentials);
+    } catch (error: any) {
+        if (error instanceof TypeError) {
+            setShowConnectionErrorMessage(true);
         }
-
-        if (res!.status !== 200) {
+        if (error instanceof InvalidRequestError) {
             setShowErrorMessage(true);
         }
-        else {
-            const token = await res!.text();
-            const userDetails = await getUserDetails(enteredUsername.value, "Bearer " + token,);
-            if (token !== null && userDetails !== null) {
-                setUserCredentials({
-                    token: "Bearer " + token,
-                    username: userDetails.user,
-                    role: userDetails.role,
-                    department: userDetails.department
-                })
-            }
+        if (error instanceof UserCredentialsFetchError) {
+            setShowErrorMessage(true);
         }
     }
 }
-
-export { loginUser };
