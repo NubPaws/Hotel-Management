@@ -2,9 +2,8 @@
 	clear: both;
 	position: relative;
 	cursor: pointer;
-	font-size: 16pt;
+	font-family: var(--font-league-spartan-family);
 	padding: 0.25rem 0.5rem;
-	border-color: black;
 	border-style: solid;
 }
 
@@ -16,6 +15,6 @@
 	box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
-.iconBtn {
+.icon-btn {
 	background-color: rgba(0, 0, 0, 0);
 }
