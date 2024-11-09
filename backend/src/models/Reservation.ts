@@ -93,12 +93,13 @@ const ReservationSchema = new Schema<Reservation>({
 		required: true,
 	},
 	prices: [{
-		type: Number,
+		type: [Number],
 		required: true,
 		validate: {
 			validator: (value: number[]) => value.every((price) => price >= 0),
 			message: "Each price must be a non-negative number",
 		},
+		default: [],
 	}],
 	roomType: {
 		type: String,
