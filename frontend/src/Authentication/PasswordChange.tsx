@@ -1,4 +1,4 @@
-import { makeRequest, FetchError, RequestError } from "../Utils/Requester";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { validatePassword, validateUsername } from "./Validation";
 
