@@ -459,8 +459,8 @@ router.post("/remove-extra", verifyUser, async (req, res, next) => {
  *         description: Reservation not found
  */
 router.post("/cancel", verifyUser, async (req, res, next) => {
-	const { isAdmin } = req as AuthedRequest;
-	if (!isAdmin) {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
 		return next(new UnauthorizedUserError());
 	}
 	
