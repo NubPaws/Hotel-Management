@@ -36,7 +36,7 @@ interface InputProps {
     onChange?: ChangeEventHandler<HTMLInputElement>;
 }
 
-export const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, hint, onChange }) => (
+const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, hint, onChange }) => (
     <div className="input-field-wrapper">
         {label && (
             <label htmlFor={id} className="input-label">
@@ -57,3 +57,5 @@ export const Input: React.FC<InputProps> = ({ id, label, type, value, placeholde
         )}
     </div>
 );
+
+export default Input;

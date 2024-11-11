@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Input, InputType } from "../UIElements/Forms/Input";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";

@@ -3,7 +3,7 @@ import { AuthenticatedUserProps } from "../Utils/Props";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Forms/Input";
+import Input from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import Modal from "../UIElements/Modal";
 import { authorizedPostRequestWithoutBody } from "../APIRequests/APIRequests";
