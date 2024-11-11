@@ -57,7 +57,7 @@ const router = Router();
  */
 router.post("/update", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk, isFoodBeverage } = req as AuthedRequest;
-	if (!isAdmin || !isFrontDesk || !isFoodBeverage) {
+	if (!isAdmin && !isFrontDesk && !isFoodBeverage) {
 		return next(new UnauthorizedUserError());
 	}
 	
@@ -87,7 +87,7 @@ router.post("/update", verifyUser, async (req, res, next) => {
 		await Promise.all(updatePromises);
 		const extra = await ExtraModel.getById(extraId);
 		
-		return res.status(StatusCode.Ok).json(price);
+		return res.status(StatusCode.Ok).json(extra);
 	} catch (error) {
 		next(error);
 	}

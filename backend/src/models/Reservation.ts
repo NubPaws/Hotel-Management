@@ -379,7 +379,8 @@ async function setStartDate(reservationId: number, startDate: Date) {
 	if (startDate < today) {
 		throw new ReservationUpdateError("Invalid start date (must be today or later).");
 	}
-	
+	const reservation = await getById(reservationId);
+	await updateReservationField(reservationId, "endDate", addDaysToDate(startDate, reservation.nightCount));
 	return await updateReservationField(reservationId, "startDate", startDate);
 }
 
@@ -563,8 +564,8 @@ async function removeExtra(reservationId: number, extraId: number) {
 		throw new ReservationUpdateError(`Extra ${extraId} does not exists in reservaiton`);
 	}
 	
-	reservation.extras = reservation.extras.filter((val: number) => val === extraId);
-	await reservation.save();
+	reservation.extras = reservation.extras.filter((val: number) => val !== extraId);
+	await Promise.all([Extra.deleteById(extraId), reservation.save()])
 	return reservation as Reservation;
 }
 
@@ -580,7 +581,7 @@ async function isValidReservation(reservationId: number): Promise<boolean> {
 }
 
 async function query(
-	guestId?: number,
+	guestId?: string,
 	room?: number,
 	startDate?: string,
 	endDate?: string,
@@ -592,10 +593,16 @@ async function query(
 	
 	// Add filters based on query parameters provided
 	if (guestId) {
-		filters.guest = new RegExp(`${guestId}`, "i");
+		filters.guestIdentification = new RegExp(`${guestId}`, "i");
 	}
+
 	if (room) {
-		filters.room = new RegExp(`${room}`, "i");
+		filters.$expr = {
+			$regexMatch: {
+				input: { $toString: "$room" },
+				regex: new RegExp(`${room}`, "i"),
+			},
+		};
 	}
 	
 	if (startDate && endDate) {

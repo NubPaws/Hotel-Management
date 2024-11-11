@@ -126,7 +126,7 @@ function reservations(err: any, _req: Request, res: Response, next: NextFunction
 		message = "There was an error fetching the reservation";
 	} else if (err instanceof ReservationUpdateError) {
 		statusCode = StatusCode.BadRequest;
-		message = "There was an error updating the reservation";
+		message = err.message;
 	} else {
 		return next(err);
 	}

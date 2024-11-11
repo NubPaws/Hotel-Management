@@ -295,7 +295,7 @@ router.post("/add-nights", verifyUser, async (req, res, next) => {
  *       400:
  *         description: Invalid input
  */
-router.post("/add-nights", verifyUser, async (req, res, next) => {
+router.post("/remove-nights", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk } = req as AuthedRequest;
 	if (!isAdmin && !isFrontDesk) {
 		return next(new UnauthorizedUserError());
@@ -471,7 +471,8 @@ router.post("/cancel", verifyUser, async (req, res, next) => {
 	}
 	
 	try {
-		await ReservationModel.setState(reservationId, ReservationState.Cancelled);
+		const reservation = await ReservationModel.setState(reservationId, ReservationState.Cancelled);
+		res.status(StatusCode.Ok).json(reservation);
 	} catch (error) {
 		next(error);
 	}
@@ -537,11 +538,11 @@ router.post("/cancel", verifyUser, async (req, res, next) => {
  */
 router.get("/query", verifyUser, async (req, res, next) => {
 	const {
-		guestId, room, startDate, endDate, email, phone, guestName
+		guestIdentification, room, startDate, endDate, email, phone, guestName
 	} = req.query;
 	
 	const validate = dataValidate({
-		guestId, room, startDate, endDate, email, phone, guestName
+		guestIdentification, room, startDate, endDate, email, phone, guestName
 	});
 	if (validate.status) {
 		return validate.respond(res);
@@ -549,13 +550,13 @@ router.get("/query", verifyUser, async (req, res, next) => {
 	
 	try {
 		const reservations = await ReservationModel.query(
-			guestId   ? Number(guestId)   : undefined,
-			room      ? Number(room)      : undefined,
-			startDate ? String(startDate) : undefined,
-			endDate   ? String(endDate)   : undefined,
-			email     ? String(email)     : undefined,
-			phone     ? String(phone)     : undefined,
-			guestName ? String(guestName) : undefined
+			guestIdentification ? String(guestIdentification) : undefined,
+			room                ? Number(room)                : undefined,
+			startDate           ? String(startDate)           : undefined,
+			endDate             ? String(endDate)             : undefined,
+			email               ? String(email)               : undefined,
+			phone               ? String(phone)               : undefined,
+			guestName           ? String(guestName)           : undefined
 		);
 		
 		res.status(StatusCode.Ok).json(reservations);
