@@ -22,7 +22,7 @@ export function CancelReservationScreen(props: AuthenticatedUserProps) {
         if (props.userCredentials.role === "") {
             navigate("/login");
         }
-        if (props.userCredentials.department !== "FrontDesk" || props.userCredentials.department !== "FrontDesk") {
+        if (props.userCredentials.role !== "Admin" && props.userCredentials.department !== "FrontDesk") {
             navigate("/home");
         }
     }, [props.userCredentials, navigate]);
