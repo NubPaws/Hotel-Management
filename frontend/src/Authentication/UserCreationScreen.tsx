@@ -1,48 +1,48 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
 
-import { Input, InputType } from "../UIElements/Input"
+import { Input, InputType } from "../UIElements/Forms/Input"
 import { Button } from "../UIElements/Button"
 import { CenteredLabel } from "../UIElements/CenteredLabel"
 import { createUser } from "./UserCreation";
 import { Modal } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { UserDepartmentRadioButton } from "./UserRadioButtons";
+import { ScreenProps } from "../Utils/Props";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
 
-export function UserCreationScreen(props: {
-    userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export const UserCreationScreen: React.FC<ScreenProps> = ({
+    userCredentials, setUserCredentials, setShowConnectionErrorMessage
+}) => {
     const [showErrorMessage, setShowErrorMessage] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showUserExistsErrorMessage, setShowUserExistsErrorMessage] = useState(false);
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (props.userCredentials.role !== "Admin") {
+        if (userCredentials.role !== "Admin") {
             navigate("/login");
         }
-    }, [props.userCredentials, props.setUserCredentials, navigate]);
+    }, [userCredentials, navigate]);
 
     return <>
-        <NavigationBar></NavigationBar>
-        <CenteredLabel>Create User</CenteredLabel>
-        <form id="createUserForm" className="fieldsContainer" action="http://localhost:8000/api/Users/create">
+        <NavigationBar />
+        <CenteredLabel>Create New User</CenteredLabel>
+        <FormContainer onSubmit={() => {}}>
             <Input
                 id="username"
                 label="Username"
                 type={InputType.Text}
                 placeholder="Username"
+                hint="At least 4 characters long"
             />
-            <span className="note">At least 4 characters long</span>
             <Input
                 id="password"
                 label="Password"
                 type={InputType.Password}
                 placeholder="Password"
+                hint="At least 4 characters long"
             />
-            <span className="note">At least 4 characters long</span>
             <Input
                 id="confirmPassword"
                 label="Confirm Password"
@@ -66,14 +66,14 @@ export function UserCreationScreen(props: {
                 textColor="black"
                 borderWidth="1px"
                 onClick={(event) => createUser(event,
-                                                props.userCredentials.token,
+                                                userCredentials.token,
                                                 setShowErrorMessage,
-                                                props.setShowConnectionErrorMessage,
+                                                setShowConnectionErrorMessage,
                                                 setShowSuccessMessage,
                                                 setShowUserExistsErrorMessage)}>
                 Create User
             </Button>
-        </form>
+        </FormContainer>
         {showErrorMessage && (
             <Modal title="User Creation Failed" onClose={() => { setShowErrorMessage(false) }}>
                 Failed to create user

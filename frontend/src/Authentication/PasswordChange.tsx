@@ -1,4 +1,5 @@
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import { UserCredentials } from "../APIRequests/ServerData";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { validatePassword, validateUsername } from "./Validation";
 

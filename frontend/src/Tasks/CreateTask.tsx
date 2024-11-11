@@ -3,7 +3,7 @@ import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Input";
+import { Input } from "../UIElements/Forms/Input";
 import { UserDepartmentRadioButton } from "../Authentication/UserRadioButtons";
 import { Button } from "../UIElements/Button";
 import { validateRadioButton } from "../Authentication/Validation";

@@ -1,11 +1,11 @@
-interface UserCredentials {
+export interface UserCredentials {
     token: string
     username: string,
     role: string,
     department: string
 }
 
-interface Room {
+export interface Room {
     "roomId": number,
     "type": string,
     "state": string,
@@ -13,7 +13,7 @@ interface Room {
     "reservation": number,
 }
 
-interface Guest {
+export interface Guest {
     guestId: number,
     identification: string,
     fullName: string,
@@ -23,7 +23,7 @@ interface Guest {
     reservations: number[]
 }
 
-interface Task {
+export interface Task {
     taskId: number,
     timeCreated: string
     room: number,

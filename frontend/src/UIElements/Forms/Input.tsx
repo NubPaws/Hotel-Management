@@ -32,6 +32,7 @@ interface InputProps {
     type: InputType;
     value?: string;
     placeholder?: string;
+    hint?: string;
     onChange?: ChangeEventHandler<HTMLInputElement>;
 }
 
