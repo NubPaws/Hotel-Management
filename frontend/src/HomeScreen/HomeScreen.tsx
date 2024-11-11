@@ -58,6 +58,8 @@ export function HomeScreen(props: {
             <Link to="/remove-nights">Remove nights</Link>
             <br></br>
             <Link to="/add-extra">Add Extra</Link>
+            <br></br>
+            <Link to="/remove-extra">Remove Extra</Link>
         </>
     )
 }

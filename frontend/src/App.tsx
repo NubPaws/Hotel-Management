@@ -23,6 +23,7 @@ import { CancelReservationScreen } from './Reservations/CancelReservation';
 import { AddNightsScreen } from './Reservations/AddNights';
 import { RemoveNightScreen } from './Reservations/RemoveNights';
 import { AddExtraScreen } from './Reservations/AddExtra';
+import { RemoveExtraScreen } from './Reservations/RemoveExtra';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -163,6 +164,12 @@ function App() {
                     </Route>
                     <Route path='/add-extra'
                         element={<AddExtraScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                        />}>
+                    </Route>
+                    <Route path='/remove-extra'
+                        element={<RemoveExtraScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                         />}>
