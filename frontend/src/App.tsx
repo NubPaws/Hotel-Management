@@ -21,6 +21,7 @@ import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/Sear
 import { CreateReservationScreen } from './Reservations/CreateReservation';
 import { CancelReservationScreen } from './Reservations/CancelReservation';
 import { AddNightsScreen } from './Reservations/AddNights';
+import { RemoveNightScreen } from './Reservations/RemoveNights';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -149,6 +150,12 @@ function App() {
                     </Route>
                     <Route path='/add-nights'
                         element={<AddNightsScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                        />}>
+                    </Route>
+                    <Route path='/remove-nights'
+                        element={<RemoveNightScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                         />}>

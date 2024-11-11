@@ -54,6 +54,8 @@ export function HomeScreen(props: {
             <Link to="/cancel-reservation">Cancel reservation</Link>
             <br></br>
             <Link to="/add-nights">Add nights</Link>
+            <br></br>
+            <Link to="/remove-nights">Remove nights</Link>
         </>
     )
 }

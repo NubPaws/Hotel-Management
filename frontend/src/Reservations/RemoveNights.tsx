@@ -5,18 +5,17 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input, InputType } from "../UIElements/Input";
 import { FormContainer } from "../UIElements/FormContainer";
-import { DynamicList } from "../UIElements/DynamicList";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
 import { Modal } from "../UIElements/Modal";
 
+
 class InvalidRequestError extends Error { }
 
-const ADD_NIGHTS_URL = "http://localhost:8000/api/Reservations/add-nights";
+const REMOVE_NIGHTS_URL = "http://localhost:8000/api/Reservations/remove-nights";
 
-export function AddNightsScreen(props: AuthenticatedUserProps) {
+export function RemoveNightScreen(props: AuthenticatedUserProps) {
     const [reservationId, setReservationId] = useState(-1);
     const [nightCount, setNightCount] = useState(-1);
-    const [prices, setPrices] = useState<number[]>([]);
     const [showErrorMessage, setShowErrorMessage] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -33,13 +32,12 @@ export function AddNightsScreen(props: AuthenticatedUserProps) {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            await addNights(
+            await removeNights(
                 props.userCredentials.token,
                 reservationId,
                 nightCount,
-                prices,
                 props.setShowConnectionErrorMessage
-            );
+            )
             setShowSuccessMessage(true);
         }
         catch (error: any) {
@@ -52,7 +50,7 @@ export function AddNightsScreen(props: AuthenticatedUserProps) {
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel>Add nights</CenteredLabel>
+            <CenteredLabel>Remove nights</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input
                     id="reservationId"
@@ -68,58 +66,45 @@ export function AddNightsScreen(props: AuthenticatedUserProps) {
                     placeholder="Enter number of nights"
                     onChange={(e) => setNightCount(Number(e.target.value))}
                 />
-                <DynamicList
-                    list={prices}
-                    setList={setPrices}
-                    listId="priceInputs"
-                    itemId="price"
-                    itemLabel="Night price"
-                    itemPlaceHolder="Enter night price"
-                    removeItemId="removePriceButton"
-                    addItemId="addPriceButton"
-                    addItemButtonValue="Add Price"
-                />
                 <Input
-                    id="addNightsButton"
+                    id="removeNightsButton"
                     type={InputType.Submit}
-                    value="Add nights"
+                    value="Remove nights"
                 />
             </FormContainer>
             <Modal
-                title="Add night Failed"
+                title="Remove night Failed"
                 show={showErrorMessage}
                 onClose={() => setShowErrorMessage(false)}
             >
-                <h1>Failed to add nights</h1>
+                <h1>Failed to remove nights</h1>
             </Modal>
             <Modal
-                title="Add night success"
+                title="Remove night success"
                 show={showSuccessMessage}
                 onClose={() => setShowSuccessMessage(false)}
             >
-                <h1>Successfully added the specified nights</h1>
+                <h1>Successfully removed the specified nights</h1>
             </Modal>
         </>
     )
 }
 
-async function addNights(
+async function removeNights(
     token: string,
     reservationId: number,
     nightCount: number,
-    prices: number[],
     setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
 ) {
     let addNightsData = {
         "reservationId": reservationId,
         "nights": nightCount,
-        "prices": prices
     }
 
     let res = await authorizedPostRequestWithBody(
         token,
         JSON.stringify(addNightsData),
-        ADD_NIGHTS_URL,
+        REMOVE_NIGHTS_URL,
         setShowConnectionErrorMessage
     );
 
