@@ -1,24 +1,19 @@
+
 .input-fields-wrapper {
     background-color: var(--color-white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-league-spartan-family);
-}
-
-.form-container {
-    width: 100%;
-    max-width: 400px;
-    padding: 1rem;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
 }
 
 .input-field-wrapper {
     width: 100%;
     margin-bottom: 1rem;
+}
+
+.input-label {
+    font-size: 14pt;
+    font-weight: 400;
 }
 
 .input-field {
@@ -29,6 +24,7 @@
     background: white;
     transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
+    font-size: 12pt;
 	/* Remove default outline so we can add our own outline. */
     outline: none;
 }
@@ -47,4 +43,9 @@
 
 .input-field[type="submit"]:active {
     transform: scale(0.9);
+}
+
+.input-hint {
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 12pt;
 }

@@ -2,13 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { authorizedGetRequest } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
-import { getUserDepartment, UserDepartmentRadioButton } from "../Authentication/UserRadioButtons";
+import Modal from "../UIElements/Modal";
 import { validateRadioButton } from "../Authentication/Validation";
+import { Task } from "../APIRequests/ServerData";
 
 export function SearchTaskByIdScreen(props: AuthenticatedUserProps) {
     const [showTaskNotFound, setShowTaskNotFound] = useState(false);
@@ -21,46 +21,48 @@ export function SearchTaskByIdScreen(props: AuthenticatedUserProps) {
         }
     }, [props.userCredentials, navigate]);
 
-    return (
-        <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Search task by Id"></CenteredLabel>
-            <form id="taskSearchByIdForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/">
-                <Input id="taskId" className="field" type="number" name="taskId"
-                    placeholder="Enter task Id" errorMessageId="taskIdErrorMessage">
-                    Task Id
-                </Input>
-                <Button
-                    className="fieldLabel"
-                    bgColor="white"
-                    textColor="black"
-                    borderWidth="1px"
-                    onClick={(event) => searchTaskById(event,
-                        props.userCredentials.token,
-                        setTask,
-                        setShowTaskNotFound
-                    )}>
-                    Search task
-                </Button>
-            </form>
-            <Modal title="Task not found" show={showTaskNotFound} onClose={() => { setShowTaskNotFound(false) }}>
-                <h5>Failed to find the specified task.</h5>
+    return <>
+        <NavigationBar />
+        <CenteredLabel>Search task by Id</CenteredLabel>
+        <form id="taskSearchByIdForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/">
+            <Input
+                id="taskId"
+                label="Task Id"
+                type={InputType.Number}
+                placeholder="Enter task Id"
+            />
+            <Button
+                className="fieldLabel"
+                backgroundColor="white"
+                textColor="black"
+                borderWidth="1px"
+                onClick={(event) => searchTaskById(event,
+                    props.userCredentials.token,
+                    setTask,
+                    setShowTaskNotFound
+                )}>
+                Search task
+            </Button>
+        </form>
+        {showTaskNotFound && (
+            <Modal title="Task not found" onClose={() => { setShowTaskNotFound(false) }}>
+                Failed to find the specified task.
             </Modal>
-            {task !== undefined && (
-                <TaskEntry
-                    taskId={task.taskId}
-                    timeCreated={task.timeCreated}
-                    room={task.room}
-                    description={task.description}
-                    urgency={task.urgency}
-                    department={task.department}
-                    creator={task.creator}
-                    status={task.status}
-                    history={task.history}>
-                </TaskEntry>
-            )}
-        </>
-    )
+        )}
+        {task && (
+            <TaskEntry
+                taskId={task.taskId}
+                timeCreated={task.timeCreated}
+                room={task.room}
+                description={task.description}
+                urgency={task.urgency}
+                department={task.department}
+                creator={task.creator}
+                status={task.status}
+                history={task.history}>
+            </TaskEntry>
+        )}
+    </>;
 }
 
 async function searchTaskById(event: any,
@@ -111,13 +113,13 @@ export function SearchTaskByDepartmentScreen(props: AuthenticatedUserProps) {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Search task by department"></CenteredLabel>
+            <NavigationBar />
+            <CenteredLabel>Search task by department</CenteredLabel>
             <form id="taskSearchByDepartmentForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/department/">
-                <UserDepartmentRadioButton></UserDepartmentRadioButton>
+                {/* <UserDepartmentRadioButton></UserDepartmentRadioButton> */}
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => searchTaskByDepartment(event,
@@ -128,9 +130,11 @@ export function SearchTaskByDepartmentScreen(props: AuthenticatedUserProps) {
                     Search task
                 </Button>
             </form>
-            <Modal title="Tasks not found" show={showTasksNotFound} onClose={() => { setShowTasksNotFound(false) }}>
-                <h5>There are no tasks under the selected department.</h5>
-            </Modal>
+            {showTasksNotFound && (
+                <Modal title="Tasks not found" onClose={() => { setShowTasksNotFound(false) }}>
+                    There are no tasks under the selected department.
+                </Modal>
+            )}
             {tasks.length > 0 && (
                 <ul>
                     {tasks.map((task) => (
@@ -163,12 +167,12 @@ async function searchTaskByDepartment(event: any,
         return;
     }
 
-    let userDepartment = getUserDepartment();
+    let userDepartment = null // TODO: getUserDepartment();
     if (userDepartment === null) {
         return;
     }
     let taskSearchByDepartmentForm = document.getElementById("taskSearchByDepartmentForm") as HTMLFormElement;
-    let url = taskSearchByDepartmentForm.action + userDepartment.value;
+    let url = taskSearchByDepartmentForm.action // TODO: + userDepartment.value;
 
     let res = await authorizedGetRequest(url, token);
     if (res === null) {

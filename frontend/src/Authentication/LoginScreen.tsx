@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Input, InputType } from "../UIElements/Input";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
 import { loginUser } from "./Login";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { ReactSetStateDispatch } from "../Utils/Types";
-import { FormContainer } from "../UIElements/FormContainer";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
+import { UserCredentials } from "../APIRequests/ServerData";
 
 export interface LoginScreenProps {
     userCredentials: UserCredentials;
@@ -39,7 +40,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
     
     return  <>
         <CenteredLabel>Hotel Management System</CenteredLabel>
-        <FormContainer onSubmit={(e) => handleSubmit(e).then(() => console.log("Taters"))}>
+        <FormContainer onSubmit={(e) => handleSubmit(e)}>
             <Input
                 id="username"
                 label="Username"
@@ -60,12 +61,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
                 value="Login"
             />
         </FormContainer>
-        <Modal
-            title="Login Failed"
-            show={showErrorMessage}
-            onClose={() => setShowErrorMessage(false)}
-        >
-            <h1>Incorrect username/password</h1>
-        </Modal>
+        {showErrorMessage && (
+            <Modal title="Login Failed" onClose={() => setShowErrorMessage(false)}>
+                Incorrect username/password
+            </Modal>
+        )}
     </>;
 }

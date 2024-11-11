@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { addReservation } from "./AddReservation";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { AuthenticatedUserProps } from "../Utils/Props";
 
 export function AddReservationScreen(props: AuthenticatedUserProps) {
@@ -23,19 +23,23 @@ export function AddReservationScreen(props: AuthenticatedUserProps) {
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Add Reservation to guest"></CenteredLabel>
+            <CenteredLabel>Add Reservation to guest</CenteredLabel>
             <form id="addReservationForm" className="fieldsContainer" action="http://localhost:8000/api/Guests/add-reservation">
-                <Input id="guestId" className="field" type="text" name="guestId"
-                    placeholder="Enter guest Id" errorMessageId="guestIdErrorMessage">
-                    Guest Id
-                </Input>
-                <Input id="reservationId" className="field" type="number" name="reservationId"
-                    placeholder="Enter reservation Id" errorMessageId="reservationIdErrorMessage">
-                    Reservation Id
-                </Input>
+                <Input
+                    id="guestId"
+                    label="Guest Id"
+                    type={InputType.Text}
+                    placeholder="Enter guest Id"
+                />
+                <Input
+                    id="reservationId"
+                    label="Reservation Id"
+                    type={InputType.Number}
+                    placeholder="Enter reservation Id"
+                />    
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => addReservation(event,
@@ -48,15 +52,22 @@ export function AddReservationScreen(props: AuthenticatedUserProps) {
                     Add Reservation
                 </Button>
             </form>
-            <Modal title="Reservation Added successfully" show={showAddReservationSuccessMessage} onClose={() => { setShowAddReservationSuccessMessage(false) }}>
-                <h5>Successfully update guest</h5>
-            </Modal>
-            <Modal title="Invalid input" show={showInvalidInputMessage} onClose={() => { setShowInvalidInputMessage(false) }}>
-                <h5>Received invalid input when trying to add reservation </h5>
-            </Modal>
-            <Modal title="Guest not found" show={showGuestNotFoundMessage} onClose={() => { setShowGuestNotFoundMessage(false) }}>
-                <h5>Failed to find guest when trying to add reservation </h5>
-            </Modal>
+            {showAddReservationSuccessMessage && (
+                <Modal title="Reservation Added successfully" onClose={() => { setShowAddReservationSuccessMessage(false) }}>
+                    Successfully update guest
+                </Modal>
+            )}
+            {showInvalidInputMessage && (
+                <Modal title="Invalid input" onClose={() => { setShowInvalidInputMessage(false) }}>
+                    Received invalid input when trying to add reservation
+                </Modal>
+            )}
+            {showGuestNotFoundMessage && (
+                <Modal title="Guest not found" onClose={() => { setShowGuestNotFoundMessage(false) }}>
+                    Failed to find guest when trying to add reservation
+               </Modal>
+            )}
+            
         </>
     )
 }

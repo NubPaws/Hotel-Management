@@ -3,19 +3,20 @@ import React, { useEffect } from "react";
 
 import "./Modal.css";
 
-export interface ModalProps {
+export interface ModalController {
 	title: string;
-	show: boolean;
+	message: string;
+}
+
+interface ModalProps {
+	title: string;
 	onClose: () => void;
 	onAccept?: () => void;
 	children: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({ title, show, onClose, onAccept, children }) => {
+const Modal: React.FC<ModalProps> = ({ title, onClose, onAccept, children }) => {
 	useEffect(() => {
-		if (!show)
-			return;
-		
 		const closeOnEscapeKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
 				onClose();
@@ -26,10 +27,7 @@ export const Modal: React.FC<ModalProps> = ({ title, show, onClose, onAccept, ch
 		return () => {
 			document.body.removeEventListener("keydown", closeOnEscapeKeyDown);
 		};
-	}, [show, onClose]);
-	
-	if (!show)
-		return null;
+	}, [onClose]);
 	
 	return (
 		<div className="modal" onClick={onClose}>
@@ -68,3 +66,5 @@ Modal.defaultProps = {
 	onAccept: undefined,
 	onClose: () => {},
 }
+
+export default Modal;

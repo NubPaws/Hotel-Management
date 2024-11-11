@@ -4,6 +4,15 @@
 	--font-league-spartan-family: "League Spartan", sans-serif;
 }
 
+/* Reset the styles. */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	/* Default font family is the league spartan */
+	font-family: var(--font-league-spartan-family);
+}
+
 body {
 	background-color: var(--color-white);
 	padding: 0;
