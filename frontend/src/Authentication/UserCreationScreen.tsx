@@ -54,7 +54,7 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
                 });
             }
         }
-    }
+    };
     
     const validateInputs = () => {
         const ERROR_TITLE = "Failed to process form";

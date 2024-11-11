@@ -2,12 +2,13 @@ import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import CenteredLabel from "../UIElements/CenteredLabel";
-import { changePassword } from "./PasswordChange";
-import Modal from "../UIElements/Modal";
+import Modal, { ModalController } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { UserCredentials } from "../APIRequests/ServerData";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import { validatePassword } from "./Validation";
 
 export interface ChangePasswordScreenProps {
     userCredentials: UserCredentials;
@@ -20,12 +21,12 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
     setUserCredentials,
     setShowConnectionErrorMessage,
 }) => {
-    const navigate = useNavigate();
     
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [oldPass, setOldPass] = useState("");
-    const [newPass, setNewPass] = useState("");
+    const navigate = useNavigate();
+    const [passwordChangeMessage, setPasswordChangeMessage] = useState<ModalController | undefined>();
+    
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
     
     useEffect(() => {
@@ -36,17 +37,99 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
     
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        await changePassword(
-            userCredentials,
-            oldPass,
-            newPass,
-            confirmPass,
-            setShowErrorMessage,
-            setShowSuccessMessage,
-            setShowConnectionErrorMessage,
-            setUserCredentials,
-        );
+        
+        if (!validateInputs()) {
+            return;
+        }
+        
+        const data = {
+            username: userCredentials.username,
+            oldPassword: oldPassword,
+            newPassword: newPassword,
+        }
+        
+        try {
+            const res = await makeRequest("api/Users/change-password", "POST", "json", data, userCredentials.token);
+            
+            handleResponse(res);
+        } catch (error: any) {
+            if (error instanceof FetchError) {
+                setShowConnectionErrorMessage(true);
+            }
+            if (error instanceof RequestError) {
+                setPasswordChangeMessage({
+                    title: "General Error Occured",
+                    message: error.message,
+                });
+            }
+        }
+    };
+    
+    const validateInputs = () => {
+        if (oldPassword === newPassword) {
+            setPasswordChangeMessage({
+                title: "Reused passwords",
+                message: "Your new password cannot be the same as your old one."
+            });
+            return false;
+        }
+        if (!validatePassword(newPassword)) {
+            setPasswordChangeMessage({
+                title: "Invalid new password",
+                message: "Make sure that the password is appropriate.",
+            });
+            return false;
+        }
+        if (newPassword !== confirmPass) {
+            setPasswordChangeMessage({
+                title: "Passwords don't match",
+                message: "New password and confirmed password don't match.",
+            });
+            return false;
+        }
+        return true;
+    };
+    
+    const handleResponse = (res: Response) => {
+        if (res.status === 200) {
+            setPasswordChangeMessage({
+                title: "Success",
+                message: "Password changed successfully",
+            });
+            
+            // Get the text from the response and update the user's token.
+            res.text().then((value: string) => {
+                setUserCredentials({ ...userCredentials, token: `Bbearer ${value}`});
+            });
+            
+            clearInputs();
+            return;
+        }
+        if (res.status === 400) {
+            setPasswordChangeMessage({
+                title: "Request failed",
+                message: "One or more of the fields is wrong/invalid.",
+            });
+            
+            return;
+        }
+        if (res.status === 401) {
+            setPasswordChangeMessage({
+                title: "Unauthorized!",
+                message: "You are not authorized to make that request",
+            });
+            
+            return;
+        }
+        
+        setShowConnectionErrorMessage(true);
     }
+    
+    const clearInputs = () => {
+        setNewPassword("");
+        setOldPassword("");
+        setConfirmPass("");
+    };
     
     return <>
         <NavigationBar />
@@ -57,20 +140,23 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
                 label="Old Password"
                 type={InputType.Password}
                 placeholder="Enter old password"
-                onChange={(e) => setOldPass(e.target.value)}
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
             />
             <Input
                 id="new-password"
                 label="New Password"
                 type={InputType.Password}
                 placeholder="Enter new password"
-                onChange={(e) => setNewPass(e.target.value)}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
             />
             <Input
                 id="confirm-password"
                 label="Confirm Password"
                 type={InputType.Password}
                 placeholder="Enter new password again"
+                value={confirmPass}
                 onChange={(e) => setConfirmPass(e.target.value)}
             />
             <Input
@@ -80,14 +166,9 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
             />
         </FormContainer>
         
-        {showErrorMessage && (
-            <Modal title="Password Change Failed" onClose={() => setShowErrorMessage(false)}>
-                Failed to change user's password
-            </Modal>
-        )}
-        {showSuccessMessage && (
-            <Modal title="Password Change Success" onClose={() => setShowSuccessMessage(false)}>
-                Succeeded in changing user's password
+        {passwordChangeMessage && (
+            <Modal title={passwordChangeMessage.title} onClose={() => setPasswordChangeMessage(undefined)}>
+                {passwordChangeMessage.message}
             </Modal>
         )}
     </>;
