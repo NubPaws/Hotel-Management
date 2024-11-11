@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Input, InputType } from "../UIElements/Forms/Input";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { loginUser } from "./Login";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { UserCredentials } from "../APIRequests/ServerData";

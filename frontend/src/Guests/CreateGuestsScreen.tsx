@@ -5,7 +5,7 @@ import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input, InputType } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { createGuest } from "./CreateGuests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { AuthenticatedUserProps } from "../Utils/Props";
 
 export function CreateGuestScreen(props: AuthenticatedUserProps) {

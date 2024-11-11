@@ -6,7 +6,7 @@ import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input, InputType } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { authorizedGetRequest } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { validateRadioButton } from "../Authentication/Validation";
 import { Task } from "../APIRequests/ServerData";
 

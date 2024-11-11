@@ -6,7 +6,7 @@ import { Input, InputType } from "../UIElements/Forms/Input";
 import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
 import { Button } from "../UIElements/Button";
 import { searchRoom } from "./RoomInformation";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 export function RoomInformationScreen(props: {
     userCredentials: UserCredentials,

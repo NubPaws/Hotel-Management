@@ -7,7 +7,7 @@ import { Input } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { validateRadioButton } from "../Authentication/Validation";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 export function CreateTaskScreen(props: AuthenticatedUserProps) {
     const [showTaskCreateMessage, setShowTaskCreateMessage] = useState(false);

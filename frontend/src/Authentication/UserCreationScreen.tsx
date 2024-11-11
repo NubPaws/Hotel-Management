@@ -3,22 +3,27 @@ import { useNavigate } from "react-router-dom";
 
 import { Input, InputType } from "../UIElements/Forms/Input";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { createUser } from "./UserCreation";
-import { Modal } from "../UIElements/Modal";
+import Modal, { ModalController } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { ScreenProps } from "../Utils/Props";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
 import RadioButton from "../UIElements/Forms/Radio/RadioButton";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+
 
 const UserCreationScreen: React.FC<ScreenProps> = ({
     userCredentials, setShowConnectionErrorMessage
 }) => {
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [showUserExistsErrorMessage, setShowUserExistsErrorMessage] = useState(false);
-
+    const [userCreationMessage, setUserCreationMessage] = useState<ModalController | undefined>(undefined);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPasword, setConfirmPassword] = useState("");
+    const [role, setRole] = useState("");
+    const [department, setDepartment] = useState("");
+    
     const navigate = useNavigate();
+    
     useEffect(() => {
         if (userCredentials.role !== "Admin") {
             navigate("/login");
@@ -26,12 +31,83 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
     }, [userCredentials, navigate]);
     
     const handleSubmit = async (event: React.FormEvent) => {
-        createUser(event,
-            userCredentials.token,
-            setShowErrorMessage,
-            setShowConnectionErrorMessage,
-            setShowSuccessMessage,
-            setShowUserExistsErrorMessage)
+        event.preventDefault();
+        
+        if (!validateInputs()) {
+            return;
+        }
+        
+        const userData = { username, password, role, department: department.replace(" ", "") };
+        
+        try {
+            const res = await makeRequest("api/Users/create", "POST", "json", userData, userCredentials.token);
+            
+            handleResponse(res);
+        } catch (error: any) {
+            if (error instanceof FetchError) {
+                setShowConnectionErrorMessage(true);
+            }
+            if (error instanceof RequestError) {
+                setUserCreationMessage({
+                    title: "General Error Occurred",
+                    message: error.message,
+                });
+            }
+        }
+    }
+    
+    const validateInputs = () => {
+        const ERROR_TITLE = "Failed to process form";
+        if (password !== confirmPasword) {
+            setUserCreationMessage({
+                title: ERROR_TITLE,
+                message: "Password and confirm password must be the same."
+            });
+            return false;
+        }
+        if (!role || !department) {
+            setUserCreationMessage({
+                title: ERROR_TITLE,
+                message: "Role or department not chosen."
+            })
+            return false;
+        }
+        return true;
+    };
+    
+    const handleResponse = async (res: Response) => {
+        switch (res.status) {
+            case 200:
+                setUserCreationMessage({
+                    title: "Success!",
+                    message: "User created successfully!",
+                });
+                clearForm();
+                break;
+            case 400:
+                    setUserCreationMessage({
+                        title: "Failed!",
+                        message: await res.text(),
+                    });
+                    break;
+            case 409:
+                setUserCreationMessage({
+                    title: "User already exists!",
+                    message: "User with that username already exists. Choose another username and try again.",
+                });
+                break;
+            default:
+                setShowConnectionErrorMessage(true);
+                break;
+        }
+    };
+    
+    const clearForm = () => {
+        setUsername("");
+        setPassword("");
+        setConfirmPassword("");
+        setRole("");
+        setDepartment("");
     }
     
     return <>
@@ -43,28 +119,44 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
                 label="Username"
                 type={InputType.Text}
                 placeholder="Username"
+                value={username}
                 hint="At least 4 characters long"
+                onChange={(e) => setUsername(e.target.value)}
             />
             <Input
                 id="password"
                 label="Password"
                 type={InputType.Password}
                 placeholder="Password"
+                value={password}
                 hint="At least 4 characters long"
+                onChange={(e) => setPassword(e.target.value)}
             />
             <Input
                 id="confirmPassword"
                 label="Confirm Password"
                 type={InputType.Password}
                 placeholder="Confirm Password"
+                value={confirmPasword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
             />
             
-            <RadioButtonContainer title="Select User's Role:" name="role">
+            <RadioButtonContainer
+                title="Select User's Role:"
+                name="role"
+                value={role}
+                setValue={setRole}
+            >
                 <RadioButton>User</RadioButton>
                 <RadioButton>Admin</RadioButton>
             </RadioButtonContainer>
             
-            <RadioButtonContainer title="Select User's Department:" name="department">
+            <RadioButtonContainer
+                title="Select User's Department:"
+                name="department"
+                value={department}
+                setValue={setDepartment}
+            >
                 <RadioButton>General</RadioButton>
                 <RadioButton>Front Desk</RadioButton>
                 <RadioButton>Housekeeping</RadioButton>
@@ -80,19 +172,9 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
                 value="Create User" />
         </FormContainer>
         
-        {showErrorMessage && (
-            <Modal title="User Creation Failed" onClose={() => { setShowErrorMessage(false) }}>
-                Failed to create user
-            </Modal>
-        )}
-        {showSuccessMessage && (
-            <Modal title="User Creation Success" onClose={() => { setShowSuccessMessage(false) }}>
-                Succeeded in creating a new user
-            </Modal>
-        )}
-        {showUserExistsErrorMessage && (
-            <Modal title="User Already Exists" onClose={() => { setShowUserExistsErrorMessage(false) }}>
-                User already exists
+        {userCreationMessage && (
+            <Modal title={userCreationMessage.title} onClose={() => setUserCreationMessage(undefined) }>
+                {userCreationMessage.message}
             </Modal>
         )}
     </>;

@@ -41,7 +41,7 @@ export async function makeRequest(
 			headers: headers,
 			body: bodyStr,
 		});
-		
+        
 		return res;
 	} catch (error: any) {
 		if (error instanceof TypeError) {

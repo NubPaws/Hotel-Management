@@ -5,7 +5,7 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { authorizedPostRequestWithoutBody } from "../APIRequests/APIRequests";
 
 export function RemoveTaskScreen(props: AuthenticatedUserProps) {

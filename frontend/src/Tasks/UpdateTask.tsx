@@ -6,7 +6,7 @@ import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { Input } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 export function UpdateTaskScreen(props: AuthenticatedUserProps) {
     const [showTaskUpdatedMessage, setShowTaskUpdatedMessage] = useState(false);

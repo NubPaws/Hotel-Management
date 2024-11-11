@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Input, InputType } from "../UIElements/Forms/Input";
 import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { changePassword } from "./PasswordChange";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { ReactSetStateDispatch } from "../Utils/Types";
