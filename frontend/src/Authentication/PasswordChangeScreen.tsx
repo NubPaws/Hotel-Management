@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
+import CenteredLabel from "../UIElements/CenteredLabel";
 import { changePassword } from "./PasswordChange";
 import Modal from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
