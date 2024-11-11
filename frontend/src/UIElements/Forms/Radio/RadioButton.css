@@ -1,0 +1,52 @@
+
+/* Hide the default radio button. */
+.custom-radio input[type="radio"] {
+	display: none;
+}
+
+/* Style for custom radio button. */
+.radio-button {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #b3b3b3;
+	border-radius: 50%;
+	margin-right: 8px;
+	vertical-align: middle;
+	transition: border-color 0.3s, background-color 0.3s;
+}
+
+/* Style for when clicking on the button. */
+.custom-radio input[type="radio"]:checked + .radio-button {
+	background-color: #3a8af8;
+	border-color: #3a8af8;
+	position: relative;
+}
+
+/* Inner dot for the checked radio button. */
+.custom-radio input[type="radio"]:checked + .radio-button::after {
+	content: "";
+	display: block;
+	width: 50%;
+	height: 50%;
+	background-color: white;
+	border-radius: 50%;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+}
+
+/* Hover effect over the radio button. */
+.custom-radio:hover .radio-button {
+	border-color: #3a8af8;
+}
+
+/* Label style. */
+.custom-radio {
+	display: flex;
+	align-items: center;
+	font-size: 12pt;
+	cursor: pointer;
+	margin-bottom: 8px;
+	margin-left: 16px;
+}

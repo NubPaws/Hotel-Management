@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
-import { Input, InputType } from "../UIElements/Forms/Input"
-import { Button } from "../UIElements/Button"
-import { CenteredLabel } from "../UIElements/CenteredLabel"
+import { Input, InputType } from "../UIElements/Forms/Input";
+import { CenteredLabel } from "../UIElements/CenteredLabel";
 import { createUser } from "./UserCreation";
 import { Modal } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { UserDepartmentRadioButton } from "./UserRadioButtons";
 import { ScreenProps } from "../Utils/Props";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
+import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
+import RadioButton from "../UIElements/Forms/Radio/RadioButton";
 
-export const UserCreationScreen: React.FC<ScreenProps> = ({
-    userCredentials, setUserCredentials, setShowConnectionErrorMessage
+const UserCreationScreen: React.FC<ScreenProps> = ({
+    userCredentials, setShowConnectionErrorMessage
 }) => {
     const [showErrorMessage, setShowErrorMessage] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -24,11 +24,20 @@ export const UserCreationScreen: React.FC<ScreenProps> = ({
             navigate("/login");
         }
     }, [userCredentials, navigate]);
-
+    
+    const handleSubmit = async (event: React.FormEvent) => {
+        createUser(event,
+            userCredentials.token,
+            setShowErrorMessage,
+            setShowConnectionErrorMessage,
+            setShowSuccessMessage,
+            setShowUserExistsErrorMessage)
+    }
+    
     return <>
         <NavigationBar />
         <CenteredLabel>Create New User</CenteredLabel>
-        <FormContainer onSubmit={() => {}}>
+        <FormContainer onSubmit={handleSubmit}>
             <Input
                 id="username"
                 label="Username"
@@ -49,31 +58,28 @@ export const UserCreationScreen: React.FC<ScreenProps> = ({
                 type={InputType.Password}
                 placeholder="Confirm Password"
             />
-            <div className="userRoleContainer" >
-                <p>Select user role:</p>
-                <input type="radio" id="user" name="role" value="User"></input>
-                <label htmlFor="user">User</label>
-                <br />
-                <input type="radio" id="admin" name="role" value="Admin"></input>
-                <label htmlFor="admin">Admin</label>
-                <div id="userRoleErrorMessage"></div>
-            </div>
-            <UserDepartmentRadioButton />
-
-            <Button
-                className="fieldLabel"
-                backgroundColor="white"
-                textColor="black"
-                borderWidth="1px"
-                onClick={(event) => createUser(event,
-                                                userCredentials.token,
-                                                setShowErrorMessage,
-                                                setShowConnectionErrorMessage,
-                                                setShowSuccessMessage,
-                                                setShowUserExistsErrorMessage)}>
-                Create User
-            </Button>
+            
+            <RadioButtonContainer title="Select User's Role:" name="role">
+                <RadioButton>User</RadioButton>
+                <RadioButton>Admin</RadioButton>
+            </RadioButtonContainer>
+            
+            <RadioButtonContainer title="Select User's Department:" name="department">
+                <RadioButton>General</RadioButton>
+                <RadioButton>Front Desk</RadioButton>
+                <RadioButton>Housekeeping</RadioButton>
+                <RadioButton>Maintenance</RadioButton>
+                <RadioButton>Food and Beverage</RadioButton>
+                <RadioButton>Security</RadioButton>
+                <RadioButton>Concierge</RadioButton>
+            </RadioButtonContainer>
+            
+            <Input
+                id="create-user-button"
+                type={InputType.Submit}
+                value="Create User" />
         </FormContainer>
+        
         {showErrorMessage && (
             <Modal title="User Creation Failed" onClose={() => { setShowErrorMessage(false) }}>
                 Failed to create user
@@ -91,3 +97,5 @@ export const UserCreationScreen: React.FC<ScreenProps> = ({
         )}
     </>;
 }
+
+export default UserCreationScreen;

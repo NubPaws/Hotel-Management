@@ -14,6 +14,9 @@ const BASE_URL = "http://localhost:8000/"
  * @param authorization - Optional Bearer token for authorization. If provided, it will be included in the request headers.
  *
  * @returns The response object if the request succeeds; otherwise, `undefined` if an error occurs.
+ * 
+ * @throws FetchError - if the fetch request failed; connection issue.
+ * @throws RequestError - if the response is invalid; request issue.
  */
 export async function makeRequest(
 	endpoint: string,

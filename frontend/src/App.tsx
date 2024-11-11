@@ -1,8 +1,7 @@
-import './App.css'
+import './App.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { LoginScreen } from './Authentication/LoginScreen'
-import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen'
-import { UserCreationScreen } from './Authentication/UserCreationScreen'
+import { LoginScreen } from './Authentication/LoginScreen';
+import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
@@ -18,6 +17,8 @@ import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
+import UserCreationScreen from './Authentication/UserCreationScreen';
+import { UserCredentials } from './APIRequests/ServerData';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
