@@ -31,10 +31,10 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (props.userCredentials.role !== "Admin") {
+        if (props.userCredentials.role === "") {
             navigate("/login");
         }
-        if (props.userCredentials.department !== "FrontDesk") {
+        if (props.userCredentials.department !== "FrontDesk" || props.userCredentials.department !== "FrontDesk") {
             navigate("/home");
         }
     }, [props.userCredentials, navigate]);
