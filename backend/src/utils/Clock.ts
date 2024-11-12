@@ -73,9 +73,3 @@ export function arrayToDate(date: number[]): Date {
 	
 	return day;
 }
-
-export function duplicateDate(d: Date | string) {
-	const date = new Date(d);
-	date.setHours(0, 0, 0, 0);
-	return date;
-}
