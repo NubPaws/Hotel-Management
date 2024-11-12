@@ -172,7 +172,7 @@ router.post("/update", verifyUser, async (req, res, next) => {
 	};
 	
 	try {
-		const reservation = await ReservationModel.update(reservationId, updates);
+		await ReservationModel.update(reservationId, updates);
 		
 		// Update prices individually if provided.
 		if (prices && Array.isArray(prices)) {
