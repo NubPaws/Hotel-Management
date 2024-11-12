@@ -3,6 +3,7 @@ import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 import { UnauthorizedUserError } from "../models/User.js";
 import { StatusCode } from "../utils/StatusCode.js";
 import ReservationModel, { InvalidPricesArrayError, Reservation, ReservationState } from "../models/Reservation.js";
+import { duplicateDate } from "../utils/Clock.js";
 
 const router = Router();
 
@@ -26,7 +27,56 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Reservation'
+ *             type: object
+ *             properties:
+ *               guest:
+ *                 type: number
+ *                 description: ID of the guest making the reservation
+ *                 example: 123
+ *               comment:
+ *                 type: string
+ *                 description: Additional comments for the reservation
+ *                 example: "Late check-in requested"
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Start date of the reservation
+ *                 example: "2024-11-01"
+ *               startTime:
+ *                 type: string
+ *                 description: Start time of the reservation in HH:mm format (24-hour)
+ *                 example: "14:00"
+ *               nightCount:
+ *                 type: number
+ *                 description: Number of nights for the reservation
+ *                 example: 2
+ *               endTime:
+ *                 type: string
+ *                 description: End time of the reservation in HH:mm format (24-hour)
+ *                 example: "10:00"
+ *               prices:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                   description: Price per night or service, must be a non-negative number
+ *                 example: [100, 120]
+ *               roomType:
+ *                 type: string
+ *                 description: Type of room for the reservation
+ *                 example: "Deluxe Suite"
+ *               guestName:
+ *                 type: string
+ *                 description: Name of the guest
+ *                 example: "John Doe"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Guest's email address
+ *                 example: "johndoe@example.com"
+ *               phone:
+ *                 type: string
+ *                 description: Guest's contact phone number
+ *                 example: "+972 50 505 5005"
  *     responses:
  *       201:
  *         description: Reservation created successfully
@@ -34,8 +84,10 @@ const router = Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Validation error or invalid request data
  *       403:
- *         description: Unauthorized, requires front desk or admin
+ *         description: Unauthorized, requires front desk or admin privileges
  */
 router.post("/create", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk } = req as AuthedRequest;
@@ -64,7 +116,7 @@ router.post("/create", verifyUser, async (req, res, next) => {
 		const reservation = await ReservationModel.create(
 			guest,
 			comment,
-			new Date(startDate),
+			duplicateDate(startDate),
 			startTime,
 			nightCount,
 			endTime,
@@ -164,7 +216,7 @@ router.post("/update", verifyUser, async (req, res, next) => {
 		comment,
 		email,
 		phone,
-		startDate: startDate ? new Date(startDate) : undefined,
+		startDate: startDate ? duplicateDate(startDate) : undefined,
 		startTime,
 		endTime,
 		roomType,
@@ -174,12 +226,14 @@ router.post("/update", verifyUser, async (req, res, next) => {
 	try {
 		await ReservationModel.update(reservationId, updates);
 		
+		const priceUpdates: Promise<any>[] = [];
 		// Update prices individually if provided.
 		if (prices && Array.isArray(prices)) {
 			prices.forEach((price, night) => {
-				ReservationModel.setPrice(reservationId, night, price);
+				priceUpdates.push(ReservationModel.setPrice(reservationId, night, price));
 			});
 		}
+		await Promise.all(priceUpdates);
 		
 		const updatedReservation = await ReservationModel.getById(reservationId);
 		res.status(StatusCode.Ok).json(updatedReservation);

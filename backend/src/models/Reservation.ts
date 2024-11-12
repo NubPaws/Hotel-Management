@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { addDaysToDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/Clock.js";
+import { addDaysToDate, duplicateDate, getTodaysDate, isTime24String, numFromTime24, Time24 } from "../utils/Clock.js";
 import { Email, isEmailString } from "../utils/Email.js";
 import Logger from "../utils/Logger.js";
 import Counter from "./Counter.js";
@@ -92,14 +92,14 @@ const ReservationSchema = new Schema<Reservation>({
 		type: Date,
 		required: true,
 	},
-	prices: [{
-		type: Number,
+	prices: {
+		type: [Number],
 		required: true,
 		validate: {
 			validator: (value: number[]) => value.every((price) => price >= 0),
 			message: "Each price must be a non-negative number",
 		},
-	}],
+	},
 	roomType: {
 		type: String,
 		ref: "RoomTypeModel",
@@ -501,11 +501,11 @@ async function query(
 	}
 	
 	if (startDate && endDate) {
-		filters.startDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+		filters.startDate = { $gte: duplicateDate(startDate), $lte: duplicateDate(endDate) };
 	} else if (startDate) {
-		filters.startDate = { $gte: new Date(startDate) };
+		filters.startDate = { $gte: duplicateDate(startDate) };
 	} else if (endDate) {
-		filters.startDate = { $lte: new Date(endDate) };
+		filters.startDate = { $lte: duplicateDate(endDate) };
 	}
 	
 	if (email) {
