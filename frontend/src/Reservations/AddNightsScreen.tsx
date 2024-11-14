@@ -73,7 +73,7 @@ const AddNightsScreen: React.FC<AuthenticatedUserProps> = ({
             case 200:
                 setAddNightMessage({
                     title: "Success!",
-                    message: "Successfully added extra!",
+                    message: "Successfully added night!",
                 });
                 break;
             case 400:

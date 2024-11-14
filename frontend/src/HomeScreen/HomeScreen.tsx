@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 
 import CenteredLabel from "../UIElements/CenteredLabel"
 import { NavigationBar } from "../UIElements/NavigationBar"
+import { UserCredentials } from "../APIRequests/ServerData";
 
 export function HomeScreen(props: {
     userCredentials: UserCredentials,
@@ -59,7 +60,9 @@ export function HomeScreen(props: {
             <br></br>
             <Link to="/add-extra">Add Extra</Link>
             <br></br>
-            <Link to="/remove-extra">Remove Extra</Link>
+            <Link to="/remove-extra">Remove extra</Link>
+            <br></br>
+            <Link to="/update-extra">Update extra</Link>
         </>
     )
 }
