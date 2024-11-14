@@ -18,7 +18,7 @@ import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 import { CreateReservationScreen } from './Reservations/CreateReservation';
-import { CancelReservationScreen } from './Reservations/CancelReservation';
+import CancelReservationScreen from './Reservations/CancelReservationScreen';
 import AddNightsScreen from './Reservations/AddNightsScreen';
 import { RemoveNightScreen } from './Reservations/RemoveNights';
 import AddExtraScreen from './Reservations/AddExtraScreen';
