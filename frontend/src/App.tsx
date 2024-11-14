@@ -19,7 +19,7 @@ import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 import { CreateReservationScreen } from './Reservations/CreateReservation';
 import { CancelReservationScreen } from './Reservations/CancelReservation';
-import { AddNightsScreen } from './Reservations/AddNights';
+import AddNightsScreen from './Reservations/AddNightsScreen';
 import { RemoveNightScreen } from './Reservations/RemoveNights';
 import AddExtraScreen from './Reservations/AddExtraScreen';
 import { RemoveExtraScreen } from './Reservations/RemoveExtra';
