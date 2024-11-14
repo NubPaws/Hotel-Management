@@ -1,4 +1,4 @@
-import "./Input.css";
+import "./FormContainer.css";
 
 interface FormContainerProps {
     onSubmit: React.FormEventHandler<HTMLFormElement>;
@@ -6,8 +6,8 @@ interface FormContainerProps {
 }
 
 export const FormContainer: React.FC<FormContainerProps> = ({ onSubmit, children }) => (
-    <div className="input-fields-wrapper">
-        <form className="form-container" onSubmit={onSubmit}>
+    <div className="form-container">
+        <form onSubmit={onSubmit}>
             {children}
         </form>
     </div>

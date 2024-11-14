@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
 import { Button } from "../UIElements/Button";
 import { searchRoom } from "./RoomInformation";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 export function RoomInformationScreen(props: {
     userCredentials: UserCredentials,
@@ -24,23 +24,27 @@ export function RoomInformationScreen(props: {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Get Room information"></CenteredLabel>
+            <NavigationBar />
+            <CenteredLabel>Get Room information</CenteredLabel>
             <form id="roomInformationForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/room">
-                <Input id="roomType" className="field" type="text" name="roomType"
-                    placeholder="Enter room type" errorMessageId="roomTypeErrorMessage">
-                    Room type
-                </Input>
-                <RoomStateRadioButton></RoomStateRadioButton>
-                <RoomOccupationRadioButton></RoomOccupationRadioButton>
-                <Input id="reservationId" className="field" type="number" name="reservationId"
-                    placeholder="Enter reservation Id" errorMessageId="reservationIdErrorMessage">
-                    Reservation Id
-                </Input>
+                <Input
+                    id="roomType"
+                    label="Room type"
+                    type={InputType.Text}
+                    placeholder="Enter room type"
+                />
+                <RoomStateRadioButton />
+                <RoomOccupationRadioButton />
+                <Input
+                    id="reservationId"
+                    label="Reservation Id"
+                    type={InputType.Number}
+                    placeholder="Enter reservation Id"
+                />
 
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => searchRoom(event,
@@ -51,13 +55,16 @@ export function RoomInformationScreen(props: {
                     Search room
                 </Button>
             </form>
-            <Modal title="Failed to retrieve room" show={showRoomSearchErrorMessage} onClose={() => { setShowRoomSearchErrorMessage(false) }}>
-                <h5>Failed to retrieve room.</h5>
-            </Modal>
-            <Modal title="Room Not Found" show={showRoomNotFoundErrorMessage} onClose={() => { setRoomNotFoundErrorMessage(false) }}>
-                <h5>Failed to find room with the specified features.</h5>
-            </Modal>
-
+            {showRoomSearchErrorMessage && (
+                <Modal title="Failed to retrieve room" onClose={() => { setShowRoomSearchErrorMessage(false) }}>
+                    Failed to retrieve room.
+                </Modal>
+            )}
+            {showRoomNotFoundErrorMessage && (
+                <Modal title="Room Not Found" onClose={() => { setRoomNotFoundErrorMessage(false) }}>
+                    Failed to find room with the specified features.
+                </Modal>
+            )}
             {rooms.length > 0 && (
                 <ul>
                     {rooms.map((room) => (

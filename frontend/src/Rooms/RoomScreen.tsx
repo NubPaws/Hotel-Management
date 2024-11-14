@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input } from "../UIElements/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { Button } from "../UIElements/Button";
 import { createRoom, removeRoom } from "./Rooms";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 export function RoomScreen(props: {
     userCredentials: UserCredentials,
@@ -28,20 +28,24 @@ export function RoomScreen(props: {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Create Room"></CenteredLabel>
+            <NavigationBar />
+            <CenteredLabel>Create Room</CenteredLabel>
             <form id="roomCreateForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/create-room/">
-                <Input id="roomType" className="field" type="text" name="roomType"
-                    placeholder="Enter room type" errorMessageId="roomTypeErrorMessage">
-                    Room type
-                </Input>
-                <Input id="roomNumber" className="field" type="number" name="roomNumber"
-                    placeholder="Enter room number" errorMessageId="roomNumberErrorMessage">
-                    Room number
-                </Input>
+                <Input
+                    id="roomType"
+                    label="Room type"
+                    type={InputType.Text}
+                    placeholder="Enter room type"
+                />
+                <Input
+                    id="roomNumber"
+                    label="Room number"
+                    type={InputType.Number}
+                    placeholder="Enter room number"
+                />
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => createRoom(event,
@@ -52,22 +56,28 @@ export function RoomScreen(props: {
                     Create Room
                 </Button>
             </form>
-            <Modal title="Room Creation Succeeded" show={showRoomCreationSuccessMessage} onClose={() => { setShowRoomCreationSuccessMessage(false) }}>
-                <h5>Room was created successfully.</h5>
-            </Modal>
-            <Modal title="Room Creation Failed" show={showRoomCreationErrorMessage} onClose={() => { setShowRoomCreationErrorMessage(false) }}>
-                <h5>Failed to create room.</h5>
-            </Modal>
-
-            <CenteredLabel labelName="Remove Room"></CenteredLabel>
+            {showRoomCreationSuccessMessage && (
+                <Modal title="Room Creation Succeeded" onClose={() => { setShowRoomCreationSuccessMessage(false) }}>
+                    Room was created successfully.
+                </Modal>
+            )}
+            {showRoomCreationErrorMessage && (
+                <Modal title="Room Creation Failed" onClose={() => { setShowRoomCreationErrorMessage(false) }}>
+                    Failed to create room.
+                </Modal>
+            )}
+            
+            <CenteredLabel>Remove Room</CenteredLabel>
             <form id="roomRemovalForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/remove-room/">
-                <Input id="roomNumberToRemove" className="field" type="number" name="roomNumberToRemove"
-                    placeholder="Enter room number" errorMessageId="roomNumberToRemoveErrorMessage">
-                    Room number
-                </Input>
+                <Input
+                    id="roomNumberToRemove"
+                    label="Room number"
+                    type={InputType.Number}
+                    placeholder="Enter room number"
+                />
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => removeRoom(event,
@@ -78,12 +88,18 @@ export function RoomScreen(props: {
                     Remove Room
                 </Button>
             </form>
-            <Modal title="Room Removal Succeeded" show={showRoomRemovalSuccessMessage} onClose={() => { setShowRoomRemovalSuccessMessage(false) }}>
-                <h5>Room was removed successfully.</h5>
-            </Modal>
-            <Modal title="Room Removal Failed" show={showRoomRemovalErrorMessage} onClose={() => { setShowRoomRemovalErrorMessage(false) }}>
-                <h5>Failed to remove room.</h5>
-            </Modal>
+            {showRoomRemovalSuccessMessage && (
+                <Modal title="Room Removal Succeeded" onClose={() => { setShowRoomRemovalSuccessMessage(false) }}>
+                    Room was removed successfully.
+                </Modal>
+            )}
+            {showRoomRemovalErrorMessage && (
+                <Modal title="Room Removal Failed" onClose={() => { setShowRoomRemovalErrorMessage(false) }}>
+                    Failed to remove room.
+                </Modal>
+            )}
+            
+            
         </>
     )
 }

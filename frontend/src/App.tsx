@@ -1,14 +1,13 @@
-import './App.css'
+import './App.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { LoginScreen } from './Authentication/LoginScreen'
-import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen'
-import { UserCreationScreen } from './Authentication/UserCreationScreen'
+import { LoginScreen } from './Authentication/LoginScreen';
+import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
 import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
-import { Modal } from './UIElements/Modal';
+import Modal from './UIElements/Modal';
 import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
@@ -24,6 +23,8 @@ import { AddNightsScreen } from './Reservations/AddNights';
 import { RemoveNightScreen } from './Reservations/RemoveNights';
 import { AddExtraScreen } from './Reservations/AddExtra';
 import { RemoveExtraScreen } from './Reservations/RemoveExtra';
+import UserCreationScreen from './Authentication/UserCreationScreen';
+import { UserCredentials } from './APIRequests/ServerData';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -176,11 +177,13 @@ function App() {
                     </Route>
                 </Routes>
             </BrowserRouter>
-            <Modal title="Failed to connect to server" show={showConnectionErrorMessage} onClose={() => { setShowConnectionErrorMessage(false) }}>
-                <h5>Unfortunately, we failed to reach our server.</h5>
-            </Modal>
+            {showConnectionErrorMessage && (
+                <Modal title="Failed to connect to server" onClose={() => { setShowConnectionErrorMessage(false) }}>
+                    Unfortunately, we failed to reach our server.
+                </Modal>
+            )}
         </div>
     )
 }
 
-export default App
+export default App;
