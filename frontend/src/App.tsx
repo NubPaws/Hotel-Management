@@ -21,7 +21,7 @@ import { CreateReservationScreen } from './Reservations/CreateReservation';
 import { CancelReservationScreen } from './Reservations/CancelReservation';
 import { AddNightsScreen } from './Reservations/AddNights';
 import { RemoveNightScreen } from './Reservations/RemoveNights';
-import { AddExtraScreen } from './Reservations/AddExtra';
+import AddExtraScreen from './Reservations/AddExtraScreen';
 import { RemoveExtraScreen } from './Reservations/RemoveExtra';
 import UserCreationScreen from './Authentication/UserCreationScreen';
 import { UserCredentials } from './APIRequests/ServerData';

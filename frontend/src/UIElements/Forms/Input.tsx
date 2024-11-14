@@ -33,11 +33,12 @@ interface InputProps {
     value?: string;
     placeholder?: string;
     hint?: string;
+    isRequired?: boolean;
     onChange?: ChangeEventHandler<HTMLInputElement>;
     onClick?: MouseEventHandler<HTMLInputElement>;
 }
 
-const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, hint, onChange, onClick }) => (
+const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, hint, isRequired = true, onChange, onClick }) => (
     <div className="input-field-wrapper">
         {label && (
             <label htmlFor={id} className="input-label">
@@ -52,7 +53,7 @@ const Input: React.FC<InputProps> = ({ id, label, type, value, placeholder, hint
             placeholder={placeholder}
             onChange={onChange}
             onClick={onClick}
-            required
+            required={isRequired}
         />
         {hint && (
             <span className="input-hint">{hint}</span>

@@ -5,52 +5,71 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
-import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import Modal from "../UIElements/Modal";
+import Modal, { ModalController } from "../UIElements/Modal";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 
-class InvalidRequestError extends Error { }
-
-const ADD_EXTRA_URL = "http://localhost:8000/api/Reservations/add-extra";
-
-export function AddExtraScreen(props: AuthenticatedUserProps) {
+const AddExtraScreen: React.FC<AuthenticatedUserProps> = ({
+    userCredentials, setShowConnectionErrorMessage
+}) => {
     const [reservationId, setReservationId] = useState(-1);
     const [item, setItem] = useState("");
     const [price, setPrice] = useState(-1);
     const [description, setDescription] = useState("");
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [addExtraMessage, setAddExtraMessage] = useState<ModalController | undefined>(undefined);
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (props.userCredentials.role === "") {
+        if (userCredentials.role === "") {
             navigate("/login");
         }
-        if (props.userCredentials.role !== "Admin"
-            && props.userCredentials.department !== "FrontDesk"
-            && props.userCredentials.department !== "FoodAndBeverage") {
+        if (userCredentials.role !== "Admin"
+            && userCredentials.department !== "FrontDesk"
+            && userCredentials.department !== "FoodAndBeverage") {
             navigate("/home");
         }
-    }, [props.userCredentials, navigate]);
+    }, [userCredentials, navigate]);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        const addExtraData = { reservationId, item, price, description };
+
         try {
-            await addExtra(
-                props.userCredentials.token,
-                reservationId,
-                item,
-                price,
-                description,
-                props.setShowConnectionErrorMessage
-            );
-            setShowSuccessMessage(true);
-        }
-        catch (error: any) {
-            if (error instanceof InvalidRequestError) {
-                setShowErrorMessage(true);
+            const res = await makeRequest("api/Reservations/add-extra", "POST", "json", addExtraData, userCredentials.token);
+            handleResponse(res);
+        } catch (error: any) {
+            if (error instanceof FetchError) {
+                setShowConnectionErrorMessage(true);
+            }
+            if (error instanceof RequestError) {
+                setAddExtraMessage({
+                    title: "General Error Occurred",
+                    message: error.message,
+                });
             }
         }
     }
+
+    const handleResponse = async (res: Response) => {
+        switch (res.status) {
+            case 200:
+                setAddExtraMessage({
+                    title: "Success!",
+                    message: "Successfully added extra!",
+                });
+                break;
+            case 400:
+                setAddExtraMessage({
+                        title: "Failed!",
+                        message: await res.text(),
+                    });
+                    break;
+            default:
+                setShowConnectionErrorMessage(true);
+                break;
+        }
+    };
+
     return (
         <>
             <NavigationBar></NavigationBar>
@@ -90,49 +109,15 @@ export function AddExtraScreen(props: AuthenticatedUserProps) {
                     value="Add extra"
                 />
             </FormContainer>
-            {showErrorMessage && (
-                <Modal
-                    title="Add extra Failed"
-                    onClose={() => setShowErrorMessage(false)}
-                >
-                    <h1>Failed to add extra</h1>
-                </Modal>
-            )}
-            {showSuccessMessage && (
-                <Modal
-                    title="Add extra success"
-                    onClose={() => setShowSuccessMessage(false)}
-                >
-                    <h1>Successfully added extra</h1>
+
+            {addExtraMessage && (
+                <Modal title={addExtraMessage.title} onClose={() => setAddExtraMessage(undefined)}>
+                    {addExtraMessage.message}
                 </Modal>
             )}
         </>
     )
+
 }
 
-async function addExtra(
-    token: string,
-    reservationId: number,
-    item: string,
-    price: number,
-    description: string,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-) {
-    let addExtraData = {
-        "reservationId": reservationId,
-        "item": item,
-        "price": price,
-        "description": description
-    }
-
-    let res = await authorizedPostRequestWithBody(
-        token,
-        JSON.stringify(addExtraData),
-        ADD_EXTRA_URL,
-        setShowConnectionErrorMessage
-    );
-
-    if (res?.status !== 200) {
-        throw new InvalidRequestError();
-    }
-}
+export default AddExtraScreen;
