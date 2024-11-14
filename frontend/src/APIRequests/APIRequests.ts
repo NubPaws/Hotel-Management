@@ -22,7 +22,7 @@ export async function makeRequest(
 	endpoint: string,
 	method: "POST" | "GET",
 	contentType: "text" | "json",
-	body: object | string,
+	body?: object | string,
 	authorization?: string,
 ): Promise<Response> {
 	const bodyStr = (typeof body === "string") ? body : JSON.stringify(body);
@@ -34,13 +34,18 @@ export async function makeRequest(
 	if (authorization) {
 		headers["Authorization"] = authorization;
 	}
-	
+
+    const fetchOptions: RequestInit = {
+		method: method,
+		headers: headers,
+	};
+
+    if (method === "POST" && bodyStr) {
+		fetchOptions.body = bodyStr;
+	}
+
 	try {
-		const res = await fetch(`${BASE_URL}${endpoint}`, {
-			method: method,
-			headers: headers,
-			body: bodyStr,
-		});
+		const res = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);
         
 		return res;
 	} catch (error: any) {

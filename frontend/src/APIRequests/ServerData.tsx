@@ -34,3 +34,23 @@ export interface Task {
     status: string,
     history: string[]
 }
+
+export interface Reservation {
+    reservationId: number,
+    reservationMade: string,
+    comment: string,
+    startDate: string,
+    startTime: string,
+    nightCount: number,
+    endTime: string,
+    endDate: string,
+    prices: number[],
+    roomType: string,
+    room: number,
+    state: string,
+    extras: number[],
+    guest: number,
+    guestName: string,
+    email: string,
+    phone: string,
+}

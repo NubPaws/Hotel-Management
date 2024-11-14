@@ -26,6 +26,7 @@ import RemoveExtraScreen from './Reservations/RemoveExtraScreen';
 import UserCreationScreen from './Authentication/UserCreationScreen';
 import { UserCredentials } from './APIRequests/ServerData';
 import UpdateExtraScreen from './Extras/UpdateExtraScreen';
+import SearchReservationScreen from './Reservations/SearchReservationScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -178,6 +179,12 @@ function App() {
                     </Route>
                     <Route path='/update-extra'
                         element={<UpdateExtraScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                        />}>
+                    </Route>
+                    <Route path='/search-reservation'
+                        element={<SearchReservationScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                         />}>

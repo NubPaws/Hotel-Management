@@ -18,4 +18,10 @@ const checkAdminOrFrontDesk = (role: string, department: string, navigate: Navig
     }
 };
 
-export { checkExtraPermissions, checkAdminOrFrontDesk };
+const checkLoggedIn = (username: string, navigate: NavigateFunction) => {
+    if (username === "") {
+        navigate("/home");
+    }
+};
+
+export { checkExtraPermissions, checkAdminOrFrontDesk, checkLoggedIn };
