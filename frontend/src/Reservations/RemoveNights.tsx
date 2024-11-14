@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input, InputType } from "../UIElements/Input";
-import { FormContainer } from "../UIElements/FormContainer";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 
 class InvalidRequestError extends Error { }
@@ -72,20 +72,23 @@ export function RemoveNightScreen(props: AuthenticatedUserProps) {
                     value="Remove nights"
                 />
             </FormContainer>
-            <Modal
-                title="Remove night Failed"
-                show={showErrorMessage}
-                onClose={() => setShowErrorMessage(false)}
-            >
-                <h1>Failed to remove nights</h1>
-            </Modal>
-            <Modal
-                title="Remove night success"
-                show={showSuccessMessage}
-                onClose={() => setShowSuccessMessage(false)}
-            >
-                <h1>Successfully removed the specified nights</h1>
-            </Modal>
+            {showErrorMessage && (
+                <Modal
+                    title="Remove night Failed"
+                    onClose={() => setShowErrorMessage(false)}
+                >
+                    <h1>Failed to remove nights</h1>
+                </Modal>
+            )}
+            {showSuccessMessage && (
+                <Modal
+                    title="Remove night success"
+                    onClose={() => setShowSuccessMessage(false)}
+                >
+                    <h1>Successfully removed the specified nights</h1>
+                </Modal>
+            )}
+
         </>
     )
 }

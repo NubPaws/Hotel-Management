@@ -2,13 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { FormContainer } from "../UIElements/FormContainer";
-import { Input, InputType } from "../UIElements/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
-class InvalidRequestError extends Error {}
+class InvalidRequestError extends Error { }
 
 const CANCEL_RESERVATION_URL = "http://localhost:8000/api/Reservations/cancel";
 
@@ -62,20 +62,22 @@ export function CancelReservationScreen(props: AuthenticatedUserProps) {
                     value="Cancel reservation"
                 />
             </FormContainer>
-            <Modal
-                title="Cancelation Failed"
-                show={showErrorMessage}
-                onClose={() => setShowErrorMessage(false)}
-            >
-                <h1>Failed to cancel reservation</h1>
-            </Modal>
-            <Modal
-                title="Cancelation Success"
-                show={showSuccessMessage}
-                onClose={() => setShowSuccessMessage(false)}
-            >
-                <h1>Successfully canceled reservation</h1>
-            </Modal>
+            {showErrorMessage && (
+                <Modal
+                    title="Cancelation Failed"
+                    onClose={() => setShowErrorMessage(false)}
+                >
+                    <h1>Failed to cancel reservation</h1>
+                </Modal>
+            )}
+            {showSuccessMessage && (
+                <Modal
+                    title="Cancelation Success"
+                    onClose={() => setShowSuccessMessage(false)}
+                >
+                    <h1>Successfully canceled reservation</h1>
+                </Modal>
+            )}
         </>
     )
 }

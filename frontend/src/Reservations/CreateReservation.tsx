@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { FormContainer } from "../UIElements/FormContainer";
-import { Input, InputType } from "../UIElements/Input";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
+import Input, { InputType } from "../UIElements/Forms/Input";
 import { DynamicList } from "../UIElements/DynamicList";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
 
@@ -160,20 +160,22 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
                     value="Create reservation"
                 />
             </FormContainer>
-            <Modal
-                title="Reservation creation failed"
-                show={showErrorMessage}
-                onClose={() => setShowErrorMessage(false)}
-            >
-                <h1>Invalid reservation values</h1>
-            </Modal>
-            <Modal
-                title="Reservation creation success"
-                show={showSuccessMessage}
-                onClose={() => setShowSuccessMessage(false)}
-            >
-                <h1>Successfully created new reservation</h1>
-            </Modal>
+            {showErrorMessage && (
+                <Modal
+                    title="Reservation creation failed"
+                    onClose={() => setShowErrorMessage(false)}
+                >
+                    <h1>Invalid reservation values</h1>
+                </Modal>
+            )}
+            {showSuccessMessage && (
+                <Modal
+                    title="Reservation creation success"
+                    onClose={() => setShowSuccessMessage(false)}
+                >
+                    <h1>Successfully created new reservation</h1>
+                </Modal>
+            )}
         </>
     )
 }

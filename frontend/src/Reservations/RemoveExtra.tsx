@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { CenteredLabel } from "../UIElements/CenteredLabel";
-import { Input, InputType } from "../UIElements/Input";
-import { FormContainer } from "../UIElements/FormContainer";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import Input, { InputType } from "../UIElements/Forms/Input";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { Modal } from "../UIElements/Modal";
+import Modal from "../UIElements/Modal";
 
 class InvalidRequestError extends Error { }
 
@@ -73,20 +73,21 @@ export function RemoveExtraScreen(props: AuthenticatedUserProps) {
                     value="Remove extra"
                 />
             </FormContainer>
-            <Modal
-                title="Remove extra Failed"
-                show={showErrorMessage}
-                onClose={() => setShowErrorMessage(false)}
-            >
-                <h1>Failed to remove extra</h1>
-            </Modal>
-            <Modal
-                title="Remove extra success"
-                show={showSuccessMessage}
-                onClose={() => setShowSuccessMessage(false)}
-            >
-                <h1>Successfully removed extra</h1>
-            </Modal>
+            {showErrorMessage && (
+                <Modal
+                    title="Remove extra Failed"
+                    onClose={() => setShowErrorMessage(false)}
+                >
+                    <h1>Failed to remove extra</h1>
+                </Modal>
+            )}
+            {showSuccessMessage &&
+                <Modal
+                    title="Remove extra success"
+                    onClose={() => setShowSuccessMessage(false)}
+                >
+                    <h1>Successfully removed extra</h1>
+                </Modal>}
         </>
     )
 }
