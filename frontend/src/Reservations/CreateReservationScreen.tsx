@@ -6,17 +6,17 @@ import CenteredLabel from "../UIElements/CenteredLabel";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { DynamicList } from "../UIElements/DynamicList";
-import Modal from "../UIElements/Modal";
-import { ReactSetStateDispatch } from "../Utils/Types";
-import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
+import Modal, { ModalController } from "../UIElements/Modal";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
 
-const CREATE_RESERVATION_URL = "http://localhost:8000/api/Reservations/create";
-
-export function CreateReservationScreen(props: AuthenticatedUserProps) {
-    const [guestId, setGuestId] = useState(-1);
+const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
+    userCredentials, setShowConnectionErrorMessage
+}) => {
+    const [guest, setGuest] = useState(-1);
     const [guestName, setGuestName] = useState("");
-    const [guestEmail, setGuestEmail] = useState("");
-    const [guestPhone, setGuestPhone] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [roomNumber, setRoomNumber] = useState(-1);
     const [roomType, setRoomType] = useState("");
     const [startDate, setStartDate] = useState(new Date());
@@ -26,28 +26,24 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
     const [prices, setPrices] = useState<number[]>([]);
     const [comment, setComment] = useState("");
 
-    const [showErrorMessage, setShowErrorMessage] = useState(false);
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+    const [createReservationMessage, setCreateReservationMessage] = useState<ModalController | undefined>(undefined);
     const navigate = useNavigate();
     useEffect(() => {
-        if (props.userCredentials.role === "") {
-            navigate("/login");
-        }
-        if (props.userCredentials.role !== "Admin" && props.userCredentials.department !== "FrontDesk") {
-            navigate("/home");
-        }
-    }, [props.userCredentials, navigate]);
+        checkAdminOrFrontDesk(userCredentials.role, userCredentials.department, navigate);
+    }, [userCredentials, navigate]);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        await createReservation(
-            props.userCredentials.token,
-            props.setShowConnectionErrorMessage,
-            guestId,
+
+        if (!validateInputs()) {
+            return;
+        }
+
+        const createReservationData = {
+            guest,
             guestName,
-            guestEmail,
-            guestPhone,
+            email,
+            phone,
             roomNumber,
             roomType,
             startDate,
@@ -55,11 +51,63 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
             endTime,
             nightCount,
             prices,
-            comment,
-            setShowErrorMessage,
-            setShowSuccessMessage,
-        )
+            comment
+        };
+
+        try {
+            const res = await makeRequest("api/Reservations/create", "POST", "json", createReservationData, userCredentials.token);
+            handleResponse(res);
+        } catch (error: any) {
+            if (error instanceof FetchError) {
+                setShowConnectionErrorMessage(true);
+            }
+            if (error instanceof RequestError) {
+                setCreateReservationMessage({
+                    title: "General Error Occurred",
+                    message: error.message,
+                });
+            }
+        }
     }
+
+    const validateInputs = () => {
+        const ERROR_TITLE = "Failed to process form";
+        if (nightCount !== prices.length) {
+            setCreateReservationMessage({
+                title: ERROR_TITLE,
+                message: "Nights and prices needs to match"
+            });
+            return false;
+        }
+        if (nightCount <= 0) {
+            setCreateReservationMessage({
+                title: ERROR_TITLE,
+                message: "Nights must be positive"
+            });
+            return false;
+        }
+        return true;
+    };
+
+    const handleResponse = async (res: Response) => {
+        switch (res.status) {
+            case 201:
+                setCreateReservationMessage({
+                    title: "Success!",
+                    message: "Successfully created reservation!",
+                });
+                break;
+            case 400:
+                setCreateReservationMessage({
+                    title: "Failed!",
+                    message: await res.text(),
+                });
+                break;
+            default:
+                setShowConnectionErrorMessage(true);
+                break;
+        }
+    };
 
     return (
         <>
@@ -71,7 +119,7 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
                     label="Guest Id"
                     type={InputType.Number}
                     placeholder="Enter guest Id"
-                    onChange={(e) => setGuestId(Number(e.target.value))}
+                    onChange={(e) => setGuest(Number(e.target.value))}
                 />
                 <Input
                     id="guestName"
@@ -85,14 +133,14 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
                     label="Guest email"
                     type={InputType.Email}
                     placeholder="Enter guest email"
-                    onChange={(e) => setGuestEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
                     id="guestPhone"
                     label="Guest phone"
                     type={InputType.Text}
                     placeholder="Enter guest phone"
-                    onChange={(e) => setGuestPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value)}
                 />
                 <Input
                     id="roomNumber"
@@ -160,90 +208,13 @@ export function CreateReservationScreen(props: AuthenticatedUserProps) {
                     value="Create reservation"
                 />
             </FormContainer>
-            {showErrorMessage && (
-                <Modal
-                    title="Reservation creation failed"
-                    onClose={() => setShowErrorMessage(false)}
-                >
-                    <h1>Invalid reservation values</h1>
-                </Modal>
-            )}
-            {showSuccessMessage && (
-                <Modal
-                    title="Reservation creation success"
-                    onClose={() => setShowSuccessMessage(false)}
-                >
-                    <h1>Successfully created new reservation</h1>
+            {createReservationMessage && (
+                <Modal title={createReservationMessage.title} onClose={() => setCreateReservationMessage(undefined)}>
+                    {createReservationMessage.message}
                 </Modal>
             )}
         </>
     )
 }
 
-
-async function createReservation(
-    token: string,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>,
-    guestId: number,
-    guestName: string,
-    guestEmail: string,
-    guestPhone: string,
-    roomNumber: number,
-    roomType: string,
-    startDate: Date,
-    startTime: string,
-    endTime: string,
-    nightCount: number,
-    prices: number[],
-    comment: string,
-    setShowErrorMessage: ReactSetStateDispatch<boolean>,
-    setShowSuccessMessage: ReactSetStateDispatch<boolean>,
-) {
-    if (!validateReservation(nightCount, prices)) {
-        setShowErrorMessage(true);
-        return;
-    }
-
-    let createReservationData = {
-        "guest": guestId,
-        "guestName": guestName,
-        "room": roomNumber,
-        "roomType": roomType,
-        "startDate": startDate,
-        "startTime": startTime,
-        "endTime": endTime,
-        "email": guestEmail,
-        "phone": guestPhone,
-        "nightCount": nightCount,
-        "prices": prices,
-        "comment": comment
-    }
-
-    let res = await authorizedPostRequestWithBody(
-        token,
-        JSON.stringify(createReservationData),
-        CREATE_RESERVATION_URL,
-        setShowConnectionErrorMessage
-    );
-
-    if (res === null) {
-        return;
-    }
-    let status = res.status;
-    if (status === 201) {
-        setShowSuccessMessage(true);
-    }
-}
-
-function validateReservation(
-    nightCount: number,
-    prices: number[],
-) {
-    if (nightCount === 0) {
-        return false;
-    }
-    if (prices.length !== nightCount) {
-        return false;
-    }
-    return true;
-}
+export default CreateReservationScreen;

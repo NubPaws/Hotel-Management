@@ -1,19 +1,20 @@
-import { useNavigate } from "react-router-dom";
-import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
+import { AuthenticatedUserProps } from "../Utils/Props";
+import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
-import { FormContainer } from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
 
-const CancelReservationScreen: React.FC<AuthenticatedUserProps> = ({
+const RemoveNightScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials, setShowConnectionErrorMessage
 }) => {
     const [reservationId, setReservationId] = useState(-1);
-    const [cancelReservationMessage, setCancelReservationMessage] = useState<ModalController | undefined>(undefined);
+    const [nights, setNights] = useState(-1);
+    const [removeNightMessage, setRemoveNightMessage] = useState<ModalController | undefined>(undefined);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -23,17 +24,17 @@ const CancelReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const cancelReservationData = { reservationId };
+        const removeNightsData = { reservationId, nights };
 
         try {
-            const res = await makeRequest("api/Reservations/cancel", "POST", "json", cancelReservationData, userCredentials.token);
+            const res = await makeRequest("api/Reservations/remove-nights", "POST", "json", removeNightsData, userCredentials.token);
             handleResponse(res);
         } catch (error: any) {
             if (error instanceof FetchError) {
                 setShowConnectionErrorMessage(true);
             }
             if (error instanceof RequestError) {
-                setCancelReservationMessage({
+                setRemoveNightMessage({
                     title: "General Error Occurred",
                     message: error.message,
                 });
@@ -44,13 +45,13 @@ const CancelReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const handleResponse = async (res: Response) => {
         switch (res.status) {
             case 200:
-                setCancelReservationMessage({
+                setRemoveNightMessage({
                     title: "Success!",
-                    message: "Successfully canceled reservation!",
+                    message: "Successfully removed nights from reservation!",
                 });
                 break;
             case 400:
-                setCancelReservationMessage({
+                setRemoveNightMessage({
                         title: "Failed!",
                         message: await res.text(),
                     });
@@ -64,7 +65,7 @@ const CancelReservationScreen: React.FC<AuthenticatedUserProps> = ({
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel>Cancel Reservation</CenteredLabel>
+            <CenteredLabel>Remove nights</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input
                     id="reservationId"
@@ -74,19 +75,26 @@ const CancelReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     onChange={(e) => setReservationId(Number(e.target.value))}
                 />
                 <Input
-                    id="cancelReservationButton"
+                    id="nightCount"
+                    label="Number of nights"
+                    type={InputType.Number}
+                    placeholder="Enter number of nights"
+                    onChange={(e) => setNights(Number(e.target.value))}
+                />
+                <Input
+                    id="removeNightsButton"
                     type={InputType.Submit}
-                    value="Cancel reservation"
+                    value="Remove nights"
                 />
             </FormContainer>
-            {cancelReservationMessage && (
-                <Modal title={cancelReservationMessage.title} onClose={() => setCancelReservationMessage(undefined)}>
-                    {cancelReservationMessage.message}
+            {removeNightMessage && (
+                <Modal title={removeNightMessage.title} onClose={() => setRemoveNightMessage(undefined)}>
+                    {removeNightMessage.message}
                 </Modal>
             )}
+
         </>
     )
-
 }
 
-export default CancelReservationScreen;
+export default RemoveNightScreen;

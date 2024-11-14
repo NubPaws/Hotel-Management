@@ -7,6 +7,7 @@ import Input, { InputType } from "../UIElements/Forms/Input";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import { checkExtraPermissions } from "../Navigation/Navigation";
 
 const AddExtraScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials, setShowConnectionErrorMessage
@@ -19,14 +20,7 @@ const AddExtraScreen: React.FC<AuthenticatedUserProps> = ({
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (userCredentials.role === "") {
-            navigate("/login");
-        }
-        if (userCredentials.role !== "Admin"
-            && userCredentials.department !== "FrontDesk"
-            && userCredentials.department !== "FoodAndBeverage") {
-            navigate("/home");
-        }
+        checkExtraPermissions(userCredentials.role, userCredentials.department, navigate);
     }, [userCredentials, navigate]);
 
     const handleSubmit = async (event: React.FormEvent) => {

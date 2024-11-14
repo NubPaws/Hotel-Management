@@ -8,6 +8,7 @@ import { FormContainer } from "../UIElements/Forms/FormContainer";
 import { DynamicList } from "../UIElements/DynamicList";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import Modal, { ModalController } from "../UIElements/Modal";
+import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
 
 
 const AddNightsScreen: React.FC<AuthenticatedUserProps> = ({
@@ -20,12 +21,7 @@ const AddNightsScreen: React.FC<AuthenticatedUserProps> = ({
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (userCredentials.role === "") {
-            navigate("/login");
-        }
-        if (userCredentials.role !== "Admin" && userCredentials.department !== "FrontDesk") {
-            navigate("/home");
-        }
+        checkAdminOrFrontDesk(userCredentials.role, userCredentials.department, navigate);
     }, [userCredentials, navigate]);
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -59,6 +55,13 @@ const AddNightsScreen: React.FC<AuthenticatedUserProps> = ({
             setAddNightMessage({
                 title: ERROR_TITLE,
                 message: "Nights and prices needs to match"
+            });
+            return false;
+        }
+        if (nights <= 0) {
+            setAddNightMessage({
+                title: ERROR_TITLE,
+                message: "Nights must be positive"
             });
             return false;
         }

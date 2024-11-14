@@ -17,12 +17,12 @@ import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
-import { CreateReservationScreen } from './Reservations/CreateReservation';
+import CreateReservationScreen from './Reservations/CreateReservationScreen';
 import CancelReservationScreen from './Reservations/CancelReservationScreen';
 import AddNightsScreen from './Reservations/AddNightsScreen';
-import { RemoveNightScreen } from './Reservations/RemoveNights';
+import RemoveNightScreen from './Reservations/RemoveNightsScreen';
 import AddExtraScreen from './Reservations/AddExtraScreen';
-import { RemoveExtraScreen } from './Reservations/RemoveExtra';
+import RemoveExtraScreen from './Reservations/RemoveExtraScreen';
 import UserCreationScreen from './Authentication/UserCreationScreen';
 import { UserCredentials } from './APIRequests/ServerData';
 
