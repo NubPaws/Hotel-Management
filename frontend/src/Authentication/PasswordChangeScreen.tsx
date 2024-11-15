@@ -99,7 +99,7 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
             
             // Get the text from the response and update the user's token.
             res.text().then((value: string) => {
-                setUserCredentials({ ...userCredentials, token: `Bbearer ${value}`});
+                setUserCredentials({ ...userCredentials, token: `Bearer ${value}`});
             });
             
             clearInputs();
