@@ -110,7 +110,7 @@ function guests(err: any, _req: Request, res: Response, next: NextFunction) {
 
 function reservations(err: any, _req: Request, res: Response, next: NextFunction) {
 	let statusCode = StatusCode.Ok;
-	let message = "";
+	let message = err.message;
 	
 	if (err instanceof ReservationDoesNotExistError) {
 		statusCode = StatusCode.NotFound;
@@ -126,7 +126,7 @@ function reservations(err: any, _req: Request, res: Response, next: NextFunction
 		message = "There was an error fetching the reservation";
 	} else if (err instanceof ReservationUpdateError) {
 		statusCode = StatusCode.BadRequest;
-		message = err.message;
+		message = err.message || "Failed to update reservation";
 	} else {
 		return next(err);
 	}

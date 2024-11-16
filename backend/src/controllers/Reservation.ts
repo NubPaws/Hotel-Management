@@ -2,7 +2,8 @@ import { Router } from "express";
 import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 import { UnauthorizedUserError } from "../models/User.js";
 import { StatusCode } from "../utils/StatusCode.js";
-import ReservationModel, { InvalidPricesArrayError, ReservationState } from "../models/Reservation.js";
+import ReservationModel, { InvalidPricesArrayError, Reservation, ReservationState } from "../models/Reservation.js";
+import Logger from "../utils/Logger.js";
 
 const router = Router();
 
@@ -160,43 +161,26 @@ router.post("/update", verifyUser, async (req, res, next) => {
 		reservationId, comment, email, phone, startDate, startTime, endTime, roomType, prices, room
 	} = req.body;
 	
+	const updates: Partial<Reservation> = {
+		comment,
+		email,
+		phone,
+		startDate: startDate ? new Date(startDate) : undefined,
+		startTime,
+		endTime,
+		roomType,
+		room,
+	};
+	
 	try {
-		// Validate the reservation exists.
-		await ReservationModel.getById(reservationId)
+		await ReservationModel.update(reservationId, updates);
 		
-		const updatePromises = [];
-		
-		if (comment) {
-			updatePromises.push(ReservationModel.setComment(reservationId, comment));
-		}
-		if (email) {
-			updatePromises.push(ReservationModel.setEmail(reservationId, email));
-		}
-		if (phone) {
-			updatePromises.push(ReservationModel.setPhone(reservationId, phone));
-		}
-		if (startDate) {
-			updatePromises.push(ReservationModel.setStartDate(reservationId, new Date(startDate)));
-		}
-		if (startTime) {
-			updatePromises.push(ReservationModel.setStartTime(reservationId, startTime));
-		}
-		if (endTime) {
-			updatePromises.push(ReservationModel.setEndTime(reservationId, endTime));
-		}
-		if (roomType) {
-			updatePromises.push(ReservationModel.setRoomType(reservationId, roomType));
-		}
+		// Update prices individually if provided.
 		if (prices && Array.isArray(prices)) {
 			prices.forEach((price, night) => {
-				updatePromises.push(ReservationModel.setPrice(reservationId, night, price));
+				ReservationModel.setPrice(reservationId, night, price);
 			});
 		}
-		if (room) {
-			updatePromises.push(ReservationModel.setRoom(reservationId, room));
-		}
-		
-		await Promise.all(updatePromises);
 		
 		const updatedReservation = await ReservationModel.getById(reservationId);
 		res.status(StatusCode.Ok).json(updatedReservation);
