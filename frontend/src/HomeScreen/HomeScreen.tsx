@@ -67,6 +67,8 @@ export function HomeScreen(props: {
             <Link to="/search-reservation">Search reservation</Link>
             <br></br>
             <Link to="/update-reservation">Update reservation</Link>
+            <br></br>
+            <Link to="/end-of-day">End of day</Link>
         </>
     )
 }

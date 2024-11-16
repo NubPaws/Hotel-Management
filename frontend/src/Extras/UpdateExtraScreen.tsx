@@ -72,7 +72,7 @@ const UpdateExtraScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
+            <NavigationBar />
             <CenteredLabel>Update Extra</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input

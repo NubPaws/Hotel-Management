@@ -28,6 +28,7 @@ import { UserCredentials } from './APIRequests/ServerData';
 import UpdateExtraScreen from './Extras/UpdateExtraScreen';
 import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
+import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -192,6 +193,12 @@ function App() {
                     </Route>
                     <Route path='/update-reservation'
                         element={<UpdateReservationScreen
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                        />}>
+                    </Route>
+                    <Route path='/end-of-day'
+                        element={<EndOfDayScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                         />}>
