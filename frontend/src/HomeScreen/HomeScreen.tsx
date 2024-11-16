@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 
 import CenteredLabel from "../UIElements/CenteredLabel"
 import { NavigationBar } from "../UIElements/NavigationBar"
+import { UserCredentials } from "../APIRequests/ServerData";
 
 export function HomeScreen(props: {
     userCredentials: UserCredentials,
@@ -18,7 +19,7 @@ export function HomeScreen(props: {
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Home" />
+            <CenteredLabel>Home</CenteredLabel>
             <Link to="/change-password">Change password</Link>
             <br></br>
             <Link to="/user-creation">Create new user</Link>
@@ -48,6 +49,22 @@ export function HomeScreen(props: {
             <Link to="/search-task-by-id">Search task by Id</Link>
             <br></br>
             <Link to="/search-task-by-department">Search task by department</Link>
+            <br></br>
+            <Link to="/create-reservation">Create reservation</Link>
+            <br></br>
+            <Link to="/cancel-reservation">Cancel reservation</Link>
+            <br></br>
+            <Link to="/add-nights">Add nights</Link>
+            <br></br>
+            <Link to="/remove-nights">Remove nights</Link>
+            <br></br>
+            <Link to="/add-extra">Add Extra</Link>
+            <br></br>
+            <Link to="/remove-extra">Remove extra</Link>
+            <br></br>
+            <Link to="/update-extra">Update extra</Link>
+            <br></br>
+            <Link to="/search-reservation">Search reservation</Link>
         </>
     )
 }

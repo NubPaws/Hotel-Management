@@ -120,7 +120,7 @@ function reservations(err: any, _req: Request, res: Response, next: NextFunction
 		message = "The room is already occupied at that time";
 	} else if (err instanceof ReservationCreationError) {
 		statusCode = StatusCode.BadRequest;
-		message = "Failed to create the reservation, a general error has occured";
+		message = err.message;
 	} else if (err instanceof ReservationFetchingError) {
 		statusCode = StatusCode.BadRequest;
 		message = "There was an error fetching the reservation";

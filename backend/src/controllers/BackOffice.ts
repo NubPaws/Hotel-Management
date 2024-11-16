@@ -3,6 +3,7 @@ import { AuthedRequest, verifyUser } from "./Validator.js";
 import { UnauthorizedUserError } from "../models/User.js";
 import BackOffice from "../models/BackOffice.js";
 import { StatusCode } from "../utils/StatusCode.js";
+import Logger from "../utils/Logger.js";
 
 const router = Router();
 
@@ -25,7 +26,7 @@ const router = Router();
  *     tags:
  *       - BackOffice
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: End of day procedure succeeded
@@ -36,16 +37,8 @@ const router = Router();
  *               example: "End of day procedure succeeded"
  *       401:
  *         description: Unauthorized. User does not have permission to run the End of Day procedure.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UnauthorizedUserError'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InternalError'
  */
 router.post("/end-of-day", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk } = req as AuthedRequest;
