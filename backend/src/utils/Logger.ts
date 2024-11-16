@@ -16,7 +16,7 @@ function clearOutputFile() {
 
 function display(from: string, ...args: any[]) {
 	
-	console.log(from, ...args);
+	console.log(`[${from}]:`, ...args);
 	if (fileOut !== "") {
 		fs.appendFile(fileOut, `[${from}]: ${args.join(" ")}`)
 			.catch((reason: any) => {

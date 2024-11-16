@@ -3,6 +3,7 @@ import { AuthedRequest, dataValidate, verifyUser } from "./Validator.js";
 import { UnauthorizedUserError } from "../models/User.js";
 import { StatusCode } from "../utils/StatusCode.js";
 import ReservationModel, { InvalidPricesArrayError, Reservation, ReservationState } from "../models/Reservation.js";
+import Logger from "../utils/Logger.js";
 
 const router = Router();
 

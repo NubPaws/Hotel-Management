@@ -39,7 +39,7 @@ export interface Reservation extends Document {
 	extras: number[],				// References to Extra's ID. Anything added to the reservation.
 	guest: number | null,			// The guest who booked the reservation.
 	guestName: string,				// The name the guest used for the reservation.
-	email: string,					// Email of the reservation.
+	email: Email,					// Email of the reservation.
 	phone: string,					// Phone number of the reservation.
 }
 
@@ -92,14 +92,14 @@ const ReservationSchema = new Schema<Reservation>({
 		type: Date,
 		required: true,
 	},
-	prices: [{
-		type: Number,
+	prices: {
+		type: [Number],
 		required: true,
 		validate: {
 			validator: (value: number[]) => value.every((price) => price >= 0),
 			message: "Each price must be a non-negative number",
 		},
-	}],
+	},
 	roomType: {
 		type: String,
 		ref: "RoomTypeModel",
@@ -144,45 +144,62 @@ const ReservationSchema = new Schema<Reservation>({
 	},
 });
 
-const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
-
-ReservationSchema.pre("save", async function (next) {
-	const reservation = this as Reservation;
+async function preSaveHook(reservation: Partial<Reservation>) {
+	const { startDate, startTime, endTime, nightCount } = reservation;
 	
-	// Ensure `startDate` and `endDate` are not null before applying validations.
-	if (!reservation.startDate || !reservation.endDate) {
-		return next(new ReservationUpdateError("Start date and end date must be provided."));
+	if (startDate && nightCount != null) {
+		reservation.endDate = addDaysToDate(startDate, nightCount);
 	}
 	
 	// Validation for start and end time.
-	const startNum = numFromTime24(reservation.startTime);
-	const endNum = numFromTime24(reservation.endTime);
-	
-	reservation.endDate = addDaysToDate(reservation.startDate, reservation.nightCount);
-	
-	const isSameDayReservation = reservation.nightCount === 0;
-	
-	// Same-day reservation (start and end time must be in sequence).
-	// Requires start and end time validation.
-	if (isSameDayReservation) {
-		if (startNum >= endNum) {
-			return next(new ReservationUpdateError("For same-day reservations, start time must be before end time"));
+	if (startTime && endTime) {
+		const startNum = numFromTime24(startTime);
+		const endNum = numFromTime24(endTime);
+		
+		const isSameDayReservation = nightCount === 0;
+		
+		// Same-day reservation (start and end time must be in sequence).
+		// Requires start and end time validation.
+		if (isSameDayReservation) {
+			if (startNum >= endNum) {
+				throw new ReservationUpdateError("For same-day reservations, start time must be before end time");
+			}
 		}
 	}
 	
 	// Make sure the room is valid.
-	if (!reservation.room) {
+	if (reservation.room !== undefined) {
 		reservation.room = reservation.room as number;
 		if (!(await Room.isValidRoom(reservation.room))) {
-			return next(new ReservationUpdateError(`Room #${reservation.room} does not exist.`));
+			throw new ReservationUpdateError(`Room #${reservation.room} does not exist.`);
 		}
 		if (!(await Room.isRoomOccupied(reservation.room))) {
-			throw next(new ReservationUpdateError(`Occupied room #${reservation.room}.`));
+			throw new ReservationUpdateError(`Occupied room #${reservation.room}.`);
 		}
 	}
-	
-	next();
+}
+
+ReservationSchema.pre("save", async function (next) {
+	const reservation = this as Reservation;
+	try {
+		await preSaveHook(reservation);
+		next();
+	} catch (error: any) {
+		next(error);
+	}
 });
+
+ReservationSchema.pre("findOneAndUpdate", async function (next) {
+	const reservation = this.getUpdate() as Partial<Reservation>;
+	try {
+		await preSaveHook(reservation);
+		next();
+	} catch (error: any) {
+		next(error);
+	}
+});
+
+const ReservationModel = mongoose.model<Reservation>("ReservationModel", ReservationSchema);
 
 /**
  * Create a new reservation in the reservation system. This function also
@@ -538,12 +555,17 @@ async function update(reservationId: number, updates: Partial<Reservation>) {
 	}
 	
 	try {
+		// for (const [key, value] of Object.entries(updates)) {
+		// 	if (key && value) {
+		// 		(reservation as any)[key] = value;
+		// 	}
+		// }
 		const updatedReservation = await ReservationModel.findOneAndUpdate(
 			{ reservationId },
 			{ $set: updates },
 			{ new: true }
 		);
-		
+		// return await reservation.save();
 		return updatedReservation;
 	} catch (err: any) {
 		throw new ReservationUpdateError(`Failed to update reservation: ${err.message}`);
