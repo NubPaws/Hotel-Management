@@ -64,7 +64,7 @@ const RemoveNightScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
+            <NavigationBar />
             <CenteredLabel>Remove nights</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input

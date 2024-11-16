@@ -17,7 +17,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const [guestName, setGuestName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [roomNumber, setRoomNumber] = useState(-1);
+    const [room, setRoom] = useState(-1);
     const [roomType, setRoomType] = useState("");
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState("");
@@ -44,7 +44,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
             guestName,
             email,
             phone,
-            roomNumber,
+            room,
             roomType,
             startDate,
             startTime,
@@ -111,7 +111,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
+            <NavigationBar />
             <CenteredLabel>Create Reservation</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input
@@ -143,11 +143,12 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     onChange={(e) => setPhone(e.target.value)}
                 />
                 <Input
-                    id="roomNumber"
+                    id="room"
                     label="Room number"
                     type={InputType.Number}
                     placeholder="Enter room number"
-                    onChange={(e) => setRoomNumber(Number(e.target.value))}
+                    onChange={(e) => setRoom(Number(e.target.value))}
+                    isRequired={false}
                 />
                 <Input
                     id="roomType"

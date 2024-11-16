@@ -66,7 +66,7 @@ const AddExtraScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
+           <NavigationBar />
             <CenteredLabel>Add extra</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input

@@ -64,7 +64,7 @@ const RemoveExtraScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
+            <NavigationBar />
             <CenteredLabel>Remove Extra</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input

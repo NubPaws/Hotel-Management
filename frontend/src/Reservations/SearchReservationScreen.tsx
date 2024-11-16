@@ -116,7 +116,7 @@ const SearchReservationScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
+            <NavigationBar />
             <CenteredLabel>Search Reservation</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input
