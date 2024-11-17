@@ -1,23 +1,18 @@
-import { useNavigate } from "react-router-dom";
 import IconButton from "../UIElements/Buttons/IconButton";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { ScreenProps } from '../Utils/Props';
 import myImage from "../assets/react.svg";
-import { useEffect } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
+import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
+import { useNavigate } from "react-router-dom";
 
 const RoomsManagementScreen: React.FC<ScreenProps> = ({
 	userCredentials,
 }) => {
-	const navigate = useNavigate();
+	useAuthenticationRedirect(userCredentials.username);
 	
-	useEffect(() => {
-		if (userCredentials.username === "") {
-			navigate("/login");
-		}
-		
-	}, [userCredentials, navigate]);
+	const navigate = useNavigate();
 	
 	const buttons = [
 		{image: myImage, navUrl: "add", text: "Add room"},
