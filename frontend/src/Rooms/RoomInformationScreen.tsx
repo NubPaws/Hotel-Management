@@ -10,7 +10,7 @@ import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 
-export function RoomInformationScreen(props: {
+function RoomInformationScreen(props: {
     userCredentials: UserCredentials,
 }) {
     const [roomState, setRoomState] = useState("");
@@ -71,14 +71,13 @@ export function RoomInformationScreen(props: {
             {rooms.length > 0 && (
                 <ul>
                     {rooms.map((room) => (
-                        <RoomEntry
-                            key={room.roomId}
-                            roomId={room.roomId}
-                            type={room.type}
-                            state={room.state}
-                            occupied={room.occupied}
-                            reservation={room.reservation}>
-                        </RoomEntry>
+                        <div className="fieldsContainer">
+                            <p>Room Id: {room.roomId}</p>
+                            <p>Room Type: {room.type}</p>
+                            <p>Room State: {room.state}</p>
+                            <p>Room Occupation: {room.occupied ? "Occupied" : "Free"}</p>
+                            <p>Room Reservation Id: {room.reservation ? room.reservation : "No Reservation"}</p>
+                        </div>
                     ))}
                 </ul>
             )}
@@ -87,16 +86,4 @@ export function RoomInformationScreen(props: {
     )
 }
 
-
-function RoomEntry(room: Room) {
-    return (
-        <div className="fieldsContainer">
-            <p>Room Id: {room.roomId}</p>
-            <p>Room Type: {room.type}</p>
-            <p>Room State: {room.state}</p>
-            <p>Room Occupation: {room.occupied ? "Occupied" : "Free"}</p>
-            <p>Room Reservation Id: {room.reservation ? room.reservation : "No Reservation"}</p>
-        </div>
-    )
-}
-
+export default RoomInformationScreen;

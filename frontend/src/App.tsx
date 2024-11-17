@@ -7,7 +7,7 @@ import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import Modal from './UIElements/Modal';
-import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
+import RoomInformationScreen from './Rooms/RoomInformationScreen';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
