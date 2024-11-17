@@ -94,7 +94,6 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
                 message: "No rooms match your search criteria."
             });
         }
-        
     }
     
     return <>
@@ -132,7 +131,7 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
         </FormContainer>
         
         {rooms.length > 0 && (
-            <ul>
+            <ul style={{ marginTop: "8px"}}>
                 {rooms.map((room) => (
                     <RoomEntry
                         roomId={room.roomId}
