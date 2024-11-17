@@ -11,7 +11,16 @@ const RoomEntry: React.FC<RoomEntryProps> = ({
 	reservation
 }) => {
 	return <div className="room-entry">
-		{roomId}
+		<div>{roomId}</div>
+		<div>{type}</div>
+		<div>{state}</div>
+		<div>
+			{occupied ? (
+				"Link to reservation" + reservation
+			) : (
+				""
+			)}
+		</div>
 	</div>;
 }
 

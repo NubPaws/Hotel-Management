@@ -11,6 +11,7 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import RoomEntry from "./Elements/RoomEntry";
 
 const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials,
@@ -133,13 +134,13 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
         {rooms.length > 0 && (
             <ul>
                 {rooms.map((room) => (
-                    <div className="fieldsContainer">
-                        <p>Room Id: {room.roomId}</p>
-                        <p>Room Type: {room.type}</p>
-                        <p>Room State: {room.state}</p>
-                        <p>Room Occupation: {room.occupied ? "Occupied" : "Free"}</p>
-                        <p>Room Reservation Id: {room.reservation ? room.reservation : "No Reservation"}</p>
-                    </div>
+                    <RoomEntry
+                        roomId={room.roomId}
+                        type={room.type}
+                        state={room.state}
+                        occupied={room.occupied}
+                        reservation={room.reservation}
+                    />
                 ))}
             </ul>
         )}

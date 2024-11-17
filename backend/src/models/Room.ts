@@ -215,7 +215,10 @@ async function isRoomOccupied(num: number): Promise<boolean> {
  * @throws RoomDoesNotExistError
  * @throws MissingReservationIdError
  */
-async function setRoomOccupation(num: number, occupied: boolean, reservationId?: number) {
+async function setRoomOccupation(num: number | null, occupied: boolean, reservationId?: number) {
+	if (num === null) {
+		return;
+	}
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(

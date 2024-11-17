@@ -561,17 +561,19 @@ async function update(reservationId: number, updates: Partial<Reservation>) {
 	}
 	
 	try {
-		// for (const [key, value] of Object.entries(updates)) {
-		// 	if (key && value) {
-		// 		(reservation as any)[key] = value;
-		// 	}
-		// }
 		const updatedReservation = await ReservationModel.findOneAndUpdate(
 			{ reservationId },
 			{ $set: updates },
 			{ new: true }
 		);
-		// return await reservation.save();
+		
+		if (updates.room) {
+			await Room.setRoomOccupation(reservation.room, false);
+			await Room.setRoomOccupation(updates.room, true, reservationId);
+		} else if (updates.room === null) {
+			await Room.setRoomOccupation(reservation.room, false);
+		}
+		
 		return updatedReservation;
 	} catch (err: any) {
 		throw new ReservationUpdateError(`Failed to update reservation: ${err.message}`);
