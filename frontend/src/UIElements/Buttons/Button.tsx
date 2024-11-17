@@ -17,21 +17,23 @@ export interface ButtonProps {
 	children: React.ReactNode;
 }
 
-export function Button(props: ButtonProps) {
-	const { backgroundColor, textColor, textSize, borderWidth, borderRadius } = props;
+const Button: React.FC<ButtonProps> = (
+	{ className, backgroundColor, textColor, textSize, borderWidth, borderRadius, onClick, children }
+) => {
+	const buttonStyles = {
+		backgroundColor,
+		color: textColor,
+		fontSize: textSize,
+		borderWidth,
+		borderRadius: borderRadius ? "5px" : 0,
+	}
 	
 	return (
 		<button
-			className={`btn ${props.className}`}
-			style={{
-				backgroundColor,
-				color: textColor,
-				fontSize: textSize,
-				borderWidth,
-				borderRadius: borderRadius ? "5px" : 0,
-			}}
-			onClick={props.onClick}
-		>{props.children}</button>
+			className={`btn ${className}`}
+			style={buttonStyles}
+			onClick={onClick}
+		>{children}</button>
 	);
 }
 
@@ -50,10 +52,4 @@ Button.defaultProps = {
 	children: "",
 } as ButtonProps;
 
-export interface IconButtonProps extends ButtonProps {
-	
-}
-
-export function IconButton(_props: IconButtonProps) {
-	return <button>Empty for now</button>;
-}
+export default Button;

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input from "../UIElements/Forms/Input";
-import { Button } from "../UIElements/Buttons/Button";
+import Button from "../UIElements/Buttons/Button";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
 import Modal from "../UIElements/Modal";
 
