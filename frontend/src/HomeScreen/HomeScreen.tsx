@@ -1,70 +1,68 @@
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-import CenteredLabel from "../UIElements/CenteredLabel"
-import { NavigationBar } from "../UIElements/NavigationBar"
-import { UserCredentials } from "../APIRequests/ServerData";
+import CenteredLabel from "../UIElements/CenteredLabel";
+import { NavigationBar } from "../UIElements/NavigationBar";
 
-export function HomeScreen(props: {
-    userCredentials: UserCredentials,
-    setUserCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>
-}) {
+import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
+import { ScreenProps } from "../Utils/Props";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
+
+import icon from "../assets/react.svg";
+import IconButton from "../UIElements/Buttons/IconButton";
+
+export const HomeScreen: React.FC<ScreenProps> = ({
+    userCredentials
+}) => {
+    useAuthenticationRedirect(userCredentials.username);
+    
     const navigate = useNavigate();
-    useEffect(() => {
-        if (props.userCredentials.username === "") {
-            navigate("/login");
-        }
-    }, [props.userCredentials, props.setUserCredentials, navigate]);
-
-    return (
-        <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel>Home</CenteredLabel>
-            <Link to="/change-password">Change password</Link>
-            <br></br>
-            <Link to="/user-creation">Create new user</Link>
-            <br></br>
-            <Link to="/rooms-management">Rooms Management</Link>
-            <br></br>
-            <Link to="/create-guest">Create guests</Link>
-            <br></br>
-            <Link to="/update-guest">Update guests</Link>
-            <br></br>
-            <Link to="/add-reservation">Add reservation to guest</Link>
-            <br></br>
-            <Link to="/search-guest">Search guest</Link>
-            <br></br>
-            <Link to="/create-task">Create tasks</Link>
-            <br></br>
-            <Link to="/update-task">Update tasks</Link>
-            <br></br>
-            <Link to="/remove-task">Remove tasks</Link>
-            <br></br>
-            <Link to="/search-task-by-id">Search task by Id</Link>
-            <br></br>
-            <Link to="/search-task-by-department">Search task by department</Link>
-            <br></br>
-            <Link to="/create-reservation">Create reservation</Link>
-            <br></br>
-            <Link to="/cancel-reservation">Cancel reservation</Link>
-            <br></br>
-            <Link to="/add-nights">Add nights</Link>
-            <br></br>
-            <Link to="/remove-nights">Remove nights</Link>
-            <br></br>
-            <Link to="/add-extra">Add Extra</Link>
-            <br></br>
-            <Link to="/remove-extra">Remove extra</Link>
-            <br></br>
-            <Link to="/update-extra">Update extra</Link>
-            <br></br>
-            <Link to="/search-reservation">Search reservation</Link>
-            <br></br>
-            <Link to="/update-reservation">Update reservation</Link>
-            <br></br>
-            <Link to="/end-of-day">End of day</Link>
-        </>
-    )
+    
+    const elements = [
+        {image: icon, navUrl: "/change-password",           text: "Change password"},
+        {image: icon, navUrl: "/user-creation",             text: "Create new user"},
+        {image: icon, navUrl: "/rooms-management",          text: "Rooms Management"},
+        {image: icon, navUrl: "/create-guest",              text: "Create guests"},
+        {image: icon, navUrl: "/update-guest",              text: "Update guests"},
+        {image: icon, navUrl: "/add-reservation",           text: "Add reservation to guest"},
+        {image: icon, navUrl: "/search-guest",              text: "Search guest"},
+        {image: icon, navUrl: "/create-task",               text: "Create tasks"},
+        {image: icon, navUrl: "/update-task",               text: "Update tasks"},
+        {image: icon, navUrl: "/remove-task",               text: "Remove tasks"},
+        {image: icon, navUrl: "/search-task-by-id",         text: "Search task by Id"},
+        {image: icon, navUrl: "/search-task-by-department", text: "Search task by department"},
+        {image: icon, navUrl: "/create-reservation",        text: "Create reservation"},
+        {image: icon, navUrl: "/cancel-reservation",        text: "Cancel reservation"},
+        {image: icon, navUrl: "/add-nights",                text: "Add nights"},
+        {image: icon, navUrl: "/remove-nights",             text: "Remove nights"},
+        {image: icon, navUrl: "/add-extra",                 text: "Add Extra"},
+        {image: icon, navUrl: "/remove-extra",              text: "Remove extra"},
+        {image: icon, navUrl: "/update-extra",              text: "Update extra"},
+        {image: icon, navUrl: "/search-reservation",        text: "Search reservation"},
+        {image: icon, navUrl: "/update-reservation",        text: "Update reservation"},
+        {image: icon, navUrl: "/end-of-day",                text: "End of day"},
+    ];
+    
+    const buttons = [];
+    for (const btn of elements) {
+        buttons.push(
+        <IconButton
+            key={btn.navUrl}
+            iconUrl={btn.image}
+            borderWidth="2px"
+            borderRadius="5px"
+            fontSize="18pt"
+            onClick={() => navigate(btn.navUrl)}
+        >
+            {btn.text}
+        </IconButton>);
+    }
+    
+    return <>
+        <NavigationBar />
+        <CenteredLabel>Home</CenteredLabel>
+        <MenuGridLayout shadow>
+            {buttons}
+        </MenuGridLayout>
+    </>;
 }
-
-
