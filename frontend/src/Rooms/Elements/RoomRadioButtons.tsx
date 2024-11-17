@@ -1,9 +1,9 @@
 import React from "react"
 import RadioButtonContainer from "../../UIElements/Forms/Radio/RadioButtonContainer"
 import RadioButton from "../../UIElements/Forms/Radio/RadioButton";
-import { RoomStateRadioButtonProps } from "./RoomRadioButtonsProps";
+import { RoomRadioButtonElementProps } from "./RoomRadioButtonsProps";
 
-const RoomStateRadioButton: React.FC<RoomStateRadioButtonProps> = ({
+const RoomStateRadioButton: React.FC<RoomRadioButtonElementProps> = ({
     value, setValue
 }) => (
     <RadioButtonContainer

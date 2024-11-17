@@ -43,7 +43,7 @@ const RoomsManagementScreen: React.FC<ScreenProps> = ({
 	return <>
 		<NavigationBar />
 		<CenteredLabel>Rooms Management</CenteredLabel>
-		<MenuGridLayout>
+		<MenuGridLayout shadow>
 			{elements}
 		</MenuGridLayout>
 	</>;

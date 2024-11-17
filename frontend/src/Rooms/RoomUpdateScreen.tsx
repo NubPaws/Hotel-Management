@@ -6,7 +6,9 @@ import Input from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
 import Modal from "../UIElements/Modal";
 import { updateRoom } from "./RoomUpdate";
-import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
+import { UserCredentials } from "../APIRequests/ServerData";
+import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
+import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 
 export function RoomUpdateScreen(props: {
     userCredentials: UserCredentials,
@@ -35,8 +37,8 @@ export function RoomUpdateScreen(props: {
                     placeholder="Enter room number" errorMessageId="roomNumberErrorMessage">
                     Room number
                 </Input>
-                <RoomStateRadioButton></RoomStateRadioButton>
-                <RoomOccupationRadioButton></RoomOccupationRadioButton>
+                <RoomStateRadioButton />
+                <RoomOccupationRadioButton />
 
                 <Input id="reservationId" className="field" type="number" name="reservationId"
                     placeholder="Enter reservation Id" errorMessageId="reservationIdErrorMessage">

@@ -8,6 +8,7 @@ import { Room, UserCredentials } from "../APIRequests/ServerData";
 import { FormContainer } from "../UIElements/Forms/FormContainer";
 import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
 
 export function RoomInformationScreen(props: {
     userCredentials: UserCredentials,
@@ -17,8 +18,6 @@ export function RoomInformationScreen(props: {
     
     const [queryMessage, setQueryMessage] = useState<ModalController | undefined>(undefined);
     
-    const [showRoomSearchErrorMessage, setShowRoomSearchErrorMessage] = useState(false);
-    const [showRoomNotFoundErrorMessage, setRoomNotFoundErrorMessage] = useState(false);
     const [rooms, setRooms] = useState<Room[]>([]);
     
     const navigate = useNavigate();
@@ -44,9 +43,10 @@ export function RoomInformationScreen(props: {
                     placeholder="Enter room type"
                 />
                 
-                <RoomStateRadioButton value={roomState} setValue={setRoomState} />
-                
-                <RoomOccupationRadioButton value={occupancy} setValue={setOccupancy} />
+                <MenuGridLayout>
+                    <RoomStateRadioButton value={roomState} setValue={setRoomState} />
+                    <RoomOccupationRadioButton value={occupancy} setValue={setOccupancy} />
+                </MenuGridLayout>
                 
                 <Input
                     id="reservation-id"
@@ -62,14 +62,9 @@ export function RoomInformationScreen(props: {
                 />
             </FormContainer>
             
-            {showRoomSearchErrorMessage && (
-                <Modal title="Failed to retrieve room" onClose={() => { setShowRoomSearchErrorMessage(false) }}>
-                    Failed to retrieve room.
-                </Modal>
-            )}
-            {showRoomNotFoundErrorMessage && (
-                <Modal title="Room Not Found" onClose={() => { setRoomNotFoundErrorMessage(false) }}>
-                    Failed to find room with the specified features.
+            {queryMessage && (
+                <Modal title={queryMessage.title} onClose={() => { setQueryMessage(undefined) }}>
+                    {queryMessage.message}
                 </Modal>
             )}
             {rooms.length > 0 && (
