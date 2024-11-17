@@ -4,9 +4,10 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
-import { Button } from "../UIElements/Button";
+import { Button } from "../UIElements/Buttons/Button";
 import { searchRoom } from "./RoomInformation";
 import Modal from "../UIElements/Modal";
+import { Room, UserCredentials } from "../APIRequests/ServerData";
 
 export function RoomInformationScreen(props: {
     userCredentials: UserCredentials,

@@ -1,4 +1,4 @@
-import { Button } from "./Button.js";
+import { Button } from "./Buttons/Button.js";
 import React, { useEffect } from "react";
 
 import "./Modal.css";

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import { Button } from "../UIElements/Button";
+import { Button } from "../UIElements/Buttons/Button";
 import { createGuest } from "./CreateGuests";
 import Modal from "../UIElements/Modal";
 import { AuthenticatedUserProps } from "../Utils/Props";
