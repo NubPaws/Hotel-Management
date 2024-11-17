@@ -109,7 +109,8 @@ function App() {
                     </Route>
                     <Route path='/rooms-management/information'
                         element={<RoomInformationScreen
-                            userCredentials={userCredentials} />}>
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
                     
                     <Route path='/create-guest'
