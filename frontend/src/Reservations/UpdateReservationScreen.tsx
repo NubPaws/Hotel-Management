@@ -66,46 +66,23 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
         }
     }
 
-    const buildUpdateData = () => {
-        let updateData: Partial<UpdateData> = { reservationId }
-        // In order to dynamically create the UpdateData object, we need variables with the key names
-        const emailKey = "email";
-        const phoneKey = "phone";
-        const roomKey = "room";
-        const roomTypeKey = "roomType";
-        const startDateKey = "startDate";
-        const startTimeKey = "startTime";
-        const endTimeKey = "endTime";
-        const pricesKey = "prices";
-        const commentKey = "comment";
-        if (email) {
-            updateData[emailKey] = email;
-        }
-        if (phone) {
-            updateData[phoneKey] = phone;
-        }
-        if (room > 0) {
-            updateData[roomKey] = room;
-        }
-        if (roomType) {
-            updateData[roomTypeKey] = roomType;
-        }
-        if (startDate.getTime() !== (new Date(0)).getTime()) {
-            updateData[startDateKey] = startDate;
-        }
-        if (startTime) {
-            updateData[startTimeKey] = startTime;
-        }
-        if (endTime) {
-            updateData[endTimeKey] = endTime;
-        }
-        if (prices.length > 0) {
-            updateData[pricesKey] = prices;
-        }
-        if (comment) {
-            updateData[commentKey] = comment;
-        }
-        return updateData;
+    const buildUpdateData = (): Partial<UpdateData> => {
+        const updateData: Partial<UpdateData> = {
+            email: email || undefined,
+            phone: phone || undefined,
+            room: room > 0 ? room : undefined,
+            roomType: roomType || undefined,
+            startDate: startDate.getTime() !== new Date(0).getTime() ? startDate : undefined,
+            startTime: startTime || undefined,
+            endTime: endTime || undefined,
+            prices: prices.length > 0 ? prices : undefined,
+            comment: comment || undefined,
+        };
+        
+        // Remove undefined properties.
+        return Object.fromEntries(
+            Object.entries(updateData).filter(([__reactRouterVersion, value]) => value !== undefined)
+        ) as Partial<UpdateData>;
     };
 
     const handleResponse = async (res: Response) => {
