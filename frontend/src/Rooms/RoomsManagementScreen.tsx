@@ -29,6 +29,7 @@ const RoomsManagementScreen: React.FC<ScreenProps> = ({
 	for (const btn of buttons) {
 		elements.push(
 			<IconButton
+				key={btn.navUrl}
 				iconUrl={btn.image}
 				borderWidth="2px"
 				borderRadius="5px"
