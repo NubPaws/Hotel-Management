@@ -69,7 +69,8 @@ function App() {
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
                     <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    <Route path='/room-type'
+                    
+                    <Route path='/rooms-management/type'
                         element={<RoomTypeScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
@@ -83,15 +84,34 @@ function App() {
                             />
                         }
                     />
-                    <Route path='/room-update'
+                    <Route path="/rooms-management/add"
+                        element={
+                            <RoomsManagementScreen
+                                userCredentials={userCredentials}
+                                setUserCredentials={setUserCredentials}
+                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />
+                        }
+                    />
+                    <Route path="/rooms-management/remove"
+                        element={
+                            <RoomsManagementScreen
+                                userCredentials={userCredentials}
+                                setUserCredentials={setUserCredentials}
+                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />
+                        }
+                    />
+                    <Route path='/rooms-management/update'
                         element={<RoomUpdateScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/room-information'
+                    <Route path='/rooms-management/information'
                         element={<RoomInformationScreen
                             userCredentials={userCredentials} />}>
                     </Route>
+                    
                     <Route path='/create-guest'
                         element={<CreateGuestScreen
                             userCredentials={userCredentials}

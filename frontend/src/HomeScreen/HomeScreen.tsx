@@ -24,13 +24,7 @@ export function HomeScreen(props: {
             <br></br>
             <Link to="/user-creation">Create new user</Link>
             <br></br>
-            <Link to="/room-type">Create or delete room types</Link>
-            <br></br>
-            <Link to="/rooms">Create or delete rooms</Link>
-            <br></br>
-            <Link to="/room-update">Update room state</Link>
-            <br></br>
-            <Link to="/room-information">Search rooms</Link>
+            <Link to="/rooms-management">Rooms Management</Link>
             <br></br>
             <Link to="/create-guest">Create guests</Link>
             <br></br>
