@@ -5,7 +5,7 @@ import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { Room, UserCredentials } from "../APIRequests/ServerData";
-import { FormContainer } from "../UIElements/Forms/FormContainer";
+import FormContainer from "../UIElements/Forms/FormContainer";
 import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
@@ -28,7 +28,8 @@ export function RoomInformationScreen(props: {
     }, [props.userCredentials, navigate]);
     
     const handleSubmit = async (event: React.FormEvent) => {
-        // searchRoom(props.userCredentials.token, setShowRoomSearchErrorMessage, setRoomNotFoundErrorMessage, setRooms);
+        event.preventDefault();
+        
     }
     
     return (

@@ -6,7 +6,7 @@ import CenteredLabel from "../UIElements/CenteredLabel";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import { ScreenProps } from "../Utils/Props";
-import { FormContainer } from "../UIElements/Forms/FormContainer";
+import FormContainer from "../UIElements/Forms/FormContainer";
 import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
 import RadioButton from "../UIElements/Forms/Radio/RadioButton";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
