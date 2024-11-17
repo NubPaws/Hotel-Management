@@ -5,7 +5,6 @@ import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
-import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import Modal from './UIElements/Modal';
 import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
@@ -29,6 +28,7 @@ import UpdateExtraScreen from './Extras/UpdateExtraScreen';
 import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
+import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -74,12 +74,15 @@ function App() {
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/rooms'
-                        element={<RoomScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-
-                    </Route>
+                    <Route path="/rooms-management"
+                        element={
+                            <RoomsManagementScreen
+                                userCredentials={userCredentials}
+                                setUserCredentials={setUserCredentials}
+                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />
+                        }
+                    />
                     <Route path='/room-update'
                         element={<RoomUpdateScreen
                             userCredentials={userCredentials}

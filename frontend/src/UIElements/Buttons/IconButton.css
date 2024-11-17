@@ -1,0 +1,24 @@
+
+.icon-btn {
+	display: flex;
+	align-items: center;
+	
+	border-style: solid;
+	border-color: black;
+	
+	padding: 8px 12px;
+	cursor: pointer;
+	outline: none;
+}
+
+.icon-btn:hover {
+	box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn:active {
+	box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
+}
+
+.icon-btn-image {
+	margin-right: 8px;
+}

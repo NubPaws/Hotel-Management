@@ -6,6 +6,7 @@ import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
 import { createRoom, removeRoom } from "./Rooms";
 import Modal from "../UIElements/Modal";
+import { UserCredentials } from "../APIRequests/ServerData";
 
 export function RoomScreen(props: {
     userCredentials: UserCredentials,
