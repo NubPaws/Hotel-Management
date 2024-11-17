@@ -3,6 +3,7 @@ import { Department, UnauthorizedUserError, UserRole } from "../models/User.js";
 import RoomModel, { InvalidRoomNumberError, RoomState, RoomTypeIsNotEmptyError } from "../models/Room.js";
 import { AuthedRequest, verifyUser } from "./Validator.js";
 import { StatusCode } from "../utils/StatusCode.js";
+import Logger from "../utils/Logger.js";
 
 const router = Router();
 
@@ -242,9 +243,13 @@ router.get("/room", verifyUser, async (req: Request, res: Response, next: NextFu
 		reservationId: reservationId ? Number(reservationId) : undefined
 	};
 	
-	const rooms = await RoomModel.getFilteredRooms(filters);
-	
-	res.status(StatusCode.Ok).json(rooms);
+	try {
+		const rooms = await RoomModel.getFilteredRooms(filters);
+		
+		res.status(StatusCode.Ok).json(rooms);
+	} catch (err) {
+		next(err)
+	}
 });
 
 /**

@@ -5,10 +5,9 @@ import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
-import { RoomScreen } from './Rooms/RoomScreen';
 import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import Modal from './UIElements/Modal';
-import { RoomInformationScreen } from './Rooms/RoomInformationScreen';
+import RoomInformationScreen from './Rooms/RoomInformationScreen';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
@@ -29,6 +28,7 @@ import UpdateExtraScreen from './Extras/UpdateExtraScreen';
 import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
+import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -69,26 +69,50 @@ function App() {
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
                     <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    <Route path='/room-type'
+                    
+                    <Route path='/rooms-management/type'
                         element={<RoomTypeScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/rooms'
-                        element={<RoomScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-
-                    </Route>
-                    <Route path='/room-update'
+                    <Route path="/rooms-management"
+                        element={
+                            <RoomsManagementScreen
+                                userCredentials={userCredentials}
+                                setUserCredentials={setUserCredentials}
+                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />
+                        }
+                    />
+                    <Route path="/rooms-management/add"
+                        element={
+                            <RoomsManagementScreen
+                                userCredentials={userCredentials}
+                                setUserCredentials={setUserCredentials}
+                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />
+                        }
+                    />
+                    <Route path="/rooms-management/remove"
+                        element={
+                            <RoomsManagementScreen
+                                userCredentials={userCredentials}
+                                setUserCredentials={setUserCredentials}
+                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                            />
+                        }
+                    />
+                    <Route path='/rooms-management/update'
                         element={<RoomUpdateScreen
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/room-information'
+                    <Route path='/rooms-management/information'
                         element={<RoomInformationScreen
-                            userCredentials={userCredentials} />}>
+                            userCredentials={userCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
+                    
                     <Route path='/create-guest'
                         element={<CreateGuestScreen
                             userCredentials={userCredentials}

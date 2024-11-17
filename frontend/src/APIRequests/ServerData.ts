@@ -1,3 +1,4 @@
+
 export interface UserCredentials {
     token: string
     username: string,
@@ -6,11 +7,11 @@ export interface UserCredentials {
 }
 
 export interface Room {
-    "roomId": number,
-    "type": string,
-    "state": string,
-    "occupied": boolean,
-    "reservation": number,
+    roomId: number,
+    type: string,
+    state: string,
+    occupied: boolean,
+    reservation: number,
 }
 
 export interface Guest {

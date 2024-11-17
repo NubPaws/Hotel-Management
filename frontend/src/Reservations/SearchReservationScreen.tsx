@@ -3,7 +3,7 @@ import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
-import { FormContainer } from "../UIElements/Forms/FormContainer";
+import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";

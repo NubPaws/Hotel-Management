@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input from "../UIElements/Forms/Input";
-import { Button } from "../UIElements/Button";
+import Button from "../UIElements/Buttons/Button";
 import Modal from "../UIElements/Modal";
 import { updateRoom } from "./RoomUpdate";
-import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
+import { UserCredentials } from "../APIRequests/ServerData";
+import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
+import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 
 export function RoomUpdateScreen(props: {
     userCredentials: UserCredentials,
@@ -35,8 +37,8 @@ export function RoomUpdateScreen(props: {
                     placeholder="Enter room number" errorMessageId="roomNumberErrorMessage">
                     Room number
                 </Input>
-                <RoomStateRadioButton></RoomStateRadioButton>
-                <RoomOccupationRadioButton></RoomOccupationRadioButton>
+                {/* <RoomStateRadioButton /> */}
+                {/* <RoomOccupationRadioButton /> */}
 
                 <Input id="reservationId" className="field" type="number" name="reservationId"
                     placeholder="Enter reservation Id" errorMessageId="reservationIdErrorMessage">
@@ -45,7 +47,7 @@ export function RoomUpdateScreen(props: {
 
                 <Button
                     className="fieldLabel"
-                    bgColor="white"
+                    backgroundColor="white"
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => updateRoom(event,
@@ -57,13 +59,13 @@ export function RoomUpdateScreen(props: {
                     Update Room
                 </Button>
             </form>
-            <Modal title="Room Update Succeeded" show={showRoomUpdateSuccessMessage} onClose={() => { setShowRoomUpdateSuccessMessage(false) }}>
+            <Modal title="Room Update Succeeded" onClose={() => { setShowRoomUpdateSuccessMessage(false) }}>
                 <h5>Room was updated successfully.</h5>
             </Modal>
-            <Modal title="Room Update Failed" show={showRoomUpdateErrorMessage} onClose={() => { setShowRoomUpdateErrorMessage(false) }}>
+            <Modal title="Room Update Failed" onClose={() => { setShowRoomUpdateErrorMessage(false) }}>
                 <h5>Failed to update room.</h5>
             </Modal>
-            <Modal title="Room Not Found" show={showRoomNotFoundErrorMessage} onClose={() => { setShowRoomNotFoundErrorMessage(false) }}>
+            <Modal title="Room Not Found" onClose={() => { setShowRoomNotFoundErrorMessage(false) }}>
                 <h5>Failed to find room number.</h5>
             </Modal>
         </>

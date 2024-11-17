@@ -1,4 +1,5 @@
 import { authorizedGetRequest } from "../APIRequests/APIRequests";
+import { Room } from "../APIRequests/ServerData";
 
 async function searchRoom(
     event: any,

@@ -5,10 +5,12 @@ interface FormContainerProps {
     children: React.ReactNode;
 }
 
-export const FormContainer: React.FC<FormContainerProps> = ({ onSubmit, children }) => (
+const FormContainer: React.FC<FormContainerProps> = ({ onSubmit, children }) => (
     <div className="form-container">
         <form onSubmit={onSubmit}>
             {children}
         </form>
     </div>
 );
+
+export default FormContainer;

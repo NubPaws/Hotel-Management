@@ -4,7 +4,7 @@ import Input, { InputType } from "../UIElements/Forms/Input";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { NavigationBar } from "../UIElements/NavigationBar";
-import { FormContainer } from "../UIElements/Forms/FormContainer";
+import FormContainer from "../UIElements/Forms/FormContainer";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { UserCredentials } from "../APIRequests/ServerData";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
