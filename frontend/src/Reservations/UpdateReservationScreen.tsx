@@ -10,23 +10,36 @@ import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
 
-const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
+interface UpdateData {
+    reservationId: number,
+    comment: string,
+    email: string,
+    phone: string,
+    startDate: Date,
+    startTime: string,
+    endTime: string,
+    roomType: string,
+    prices: number[],
+    room: number
+}
+
+
+const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials, setShowConnectionErrorMessage
 }) => {
-    const [guest, setGuest] = useState(-1);
-    const [guestName, setGuestName] = useState("");
+    const [reservationId, setReservationId] = useState(-1);
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [room, setRoom] = useState(-1);
     const [roomType, setRoomType] = useState("");
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(new Date(0));
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [nightCount, setNightCount] = useState(-1);
     const [prices, setPrices] = useState<number[]>([]);
     const [comment, setComment] = useState("");
 
-    const [createReservationMessage, setCreateReservationMessage] = useState<ModalController | undefined>(undefined);
+    const [updateReservationMessage, setUpdateReservationMessage] = useState<ModalController | undefined>(undefined);
+
     const navigate = useNavigate();
     useEffect(() => {
         checkAdminOrFrontDesk(userCredentials.role, userCredentials.department, navigate);
@@ -35,34 +48,17 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        if (!validateInputs()) {
-            return;
-        }
-
-        const createReservationData = {
-            guest,
-            guestName,
-            email,
-            phone,
-            room,
-            roomType,
-            startDate,
-            startTime,
-            endTime,
-            nightCount,
-            prices,
-            comment
-        };
+        const updateReservationData = buildUpdateData();
 
         try {
-            const res = await makeRequest("api/Reservations/create", "POST", "json", createReservationData, userCredentials.token);
+            const res = await makeRequest("api/Reservations/update", "POST", "json", updateReservationData, userCredentials.token);
             handleResponse(res);
         } catch (error: any) {
             if (error instanceof FetchError) {
                 setShowConnectionErrorMessage(true);
             }
             if (error instanceof RequestError) {
-                setCreateReservationMessage({
+                setUpdateReservationMessage({
                     title: "General Error Occurred",
                     message: error.message,
                 });
@@ -70,35 +66,58 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
         }
     }
 
-    const validateInputs = () => {
-        const ERROR_TITLE = "Failed to process form";
-        if (nightCount !== prices.length) {
-            setCreateReservationMessage({
-                title: ERROR_TITLE,
-                message: "Nights and prices needs to match"
-            });
-            return false;
+    const buildUpdateData = () => {
+        let updateData: Partial<UpdateData> = { reservationId }
+        // In order to dynamically create the UpdateData object, we need variables with the key names
+        const emailKey = "email";
+        const phoneKey = "phone";
+        const roomKey = "room";
+        const roomTypeKey = "roomType";
+        const startDateKey = "startDate";
+        const startTimeKey = "startTime";
+        const endTimeKey = "endTime";
+        const pricesKey = "prices";
+        const commentKey = "comment";
+        if (email) {
+            updateData[emailKey] = email;
         }
-        if (nightCount <= 0) {
-            setCreateReservationMessage({
-                title: ERROR_TITLE,
-                message: "Nights must be positive"
-            });
-            return false;
+        if (phone) {
+            updateData[phoneKey] = phone;
         }
-        return true;
+        if (room > 0) {
+            updateData[roomKey] = room;
+        }
+        if (roomType) {
+            updateData[roomTypeKey] = roomType;
+        }
+        if (startDate.getTime() !== (new Date(0)).getTime()) {
+            updateData[startDateKey] = startDate;
+        }
+        if (startTime) {
+            updateData[startTimeKey] = startTime;
+        }
+        if (endTime) {
+            updateData[endTimeKey] = endTime;
+        }
+        if (prices.length > 0) {
+            updateData[pricesKey] = prices;
+        }
+        if (comment) {
+            updateData[commentKey] = comment;
+        }
+        return updateData;
     };
 
     const handleResponse = async (res: Response) => {
         switch (res.status) {
-            case 201:
-                setCreateReservationMessage({
+            case 200:
+                setUpdateReservationMessage({
                     title: "Success!",
-                    message: "Successfully created reservation!",
+                    message: "Successfully updated reservation!",
                 });
                 break;
             case 400:
-                setCreateReservationMessage({
+                setUpdateReservationMessage({
                     title: "Failed!",
                     message: await res.text(),
                 });
@@ -112,21 +131,14 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     return (
         <>
             <NavigationBar />
-            <CenteredLabel>Create Reservation</CenteredLabel>
+            <CenteredLabel>Update Reservation</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input
-                    id="guestId"
-                    label="Guest Id"
+                    id="reservationId"
+                    label="Reservation Id"
                     type={InputType.Number}
-                    placeholder="Enter guest Id"
-                    onChange={(e) => setGuest(Number(e.target.value))}
-                />
-                <Input
-                    id="guestName"
-                    label="Guest Name"
-                    type={InputType.Text}
-                    placeholder="Enter guest name"
-                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Enter reservationId Id"
+                    onChange={(e) => setReservationId(Number(e.target.value))}
                 />
                 <Input
                     id="guestEmail"
@@ -134,6 +146,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Email}
                     placeholder="Enter guest email"
                     onChange={(e) => setEmail(e.target.value)}
+                    isRequired={false}
                 />
                 <Input
                     id="guestPhone"
@@ -141,6 +154,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter guest phone"
                     onChange={(e) => setPhone(e.target.value)}
+                    isRequired={false}
                 />
                 <Input
                     id="room"
@@ -156,6 +170,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter room type"
                     onChange={(e) => setRoomType(e.target.value)}
+                    isRequired={false}
                 />
                 <Input
                     id="startDate"
@@ -163,6 +178,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Date}
                     placeholder="Enter start date"
                     onChange={(e) => setStartDate(new Date(e.target.value))}
+                    isRequired={false}
                 />
                 <Input
                     id="startTime"
@@ -170,6 +186,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Time}
                     placeholder="Enter start time"
                     onChange={(e) => setStartTime(e.target.value)}
+                    isRequired={false}
                 />
                 <Input
                     id="endTime"
@@ -177,13 +194,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Time}
                     placeholder="Enter end time"
                     onChange={(e) => setEndTime(e.target.value)}
-                />
-                <Input
-                    id="nightCount"
-                    label="Number of nights"
-                    type={InputType.Number}
-                    placeholder="Enter number of nights"
-                    onChange={(e) => setNightCount(Number(e.target.value))}
+                    isRequired={false}
                 />
                 <DynamicList
                     list={prices}
@@ -202,20 +213,22 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter comment"
                     onChange={(e) => setComment(e.target.value)}
+                    isRequired={false}
                 />
                 <Input
-                    id="createReservationButton"
+                    id="updateReservationButton"
                     type={InputType.Submit}
-                    value="Create reservation"
+                    value="Update reservation"
                 />
             </FormContainer>
-            {createReservationMessage && (
-                <Modal title={createReservationMessage.title} onClose={() => setCreateReservationMessage(undefined)}>
-                    {createReservationMessage.message}
+
+            {updateReservationMessage && (
+                <Modal title={updateReservationMessage.title} onClose={() => setUpdateReservationMessage(undefined)}>
+                    {updateReservationMessage.message}
                 </Modal>
             )}
         </>
     )
 }
 
-export default CreateReservationScreen;
+export default UpdateReservationScreen;

@@ -40,7 +40,7 @@ export async function makeRequest(
 		headers: headers,
 	};
 
-    if (method === "POST" && bodyStr) {
+    if (method === "POST" && body) {
 		fetchOptions.body = bodyStr;
 	}
 

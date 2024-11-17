@@ -166,9 +166,9 @@ async function preSaveHook(reservation: Partial<Reservation>) {
 			}
 		}
 	}
-	
+
 	// Make sure the room is valid.
-	if (reservation.room !== undefined) {
+	if (reservation.room) {
 		reservation.room = reservation.room as number;
 		if (!(await Room.isValidRoom(reservation.room))) {
 			throw new ReservationUpdateError(`Room #${reservation.room} does not exist.`);
