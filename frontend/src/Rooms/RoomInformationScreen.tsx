@@ -1,61 +1,67 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import { RoomOccupationRadioButton, RoomStateRadioButton } from "./RoomRadioButtons";
-import Button from "../UIElements/Buttons/Button";
-import { searchRoom } from "./RoomInformation";
-import Modal from "../UIElements/Modal";
+import Modal, { ModalController } from "../UIElements/Modal";
 import { Room, UserCredentials } from "../APIRequests/ServerData";
+import { FormContainer } from "../UIElements/Forms/FormContainer";
+import RoomStateRadioButton from "./Elements/RoomRadioButtons";
+import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
 
 export function RoomInformationScreen(props: {
     userCredentials: UserCredentials,
 }) {
+    const [roomState, setRoomState] = useState("");
+    const [occupancy, setOccupancy] = useState("");
+    
+    const [queryMessage, setQueryMessage] = useState<ModalController | undefined>(undefined);
+    
     const [showRoomSearchErrorMessage, setShowRoomSearchErrorMessage] = useState(false);
     const [showRoomNotFoundErrorMessage, setRoomNotFoundErrorMessage] = useState(false);
     const [rooms, setRooms] = useState<Room[]>([]);
-
+    
     const navigate = useNavigate();
     useEffect(() => {
         if (props.userCredentials.username === "") {
             navigate("/home");
         }
     }, [props.userCredentials, navigate]);
-
+    
+    const handleSubmit = async (event: React.FormEvent) => {
+        // searchRoom(props.userCredentials.token, setShowRoomSearchErrorMessage, setRoomNotFoundErrorMessage, setRooms);
+    }
+    
     return (
         <>
             <NavigationBar />
-            <CenteredLabel>Get Room information</CenteredLabel>
-            <form id="roomInformationForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/room">
+            <CenteredLabel>Room Search</CenteredLabel>
+            <FormContainer onSubmit={handleSubmit}>
                 <Input
-                    id="roomType"
+                    id="room-type"
                     label="Room type"
                     type={InputType.Text}
                     placeholder="Enter room type"
                 />
-                <RoomStateRadioButton />
-                <RoomOccupationRadioButton />
+                
+                <RoomStateRadioButton value={roomState} setValue={setRoomState} />
+                
+                <RoomOccupationRadioButton value={occupancy} setValue={setOccupancy} />
+                
                 <Input
-                    id="reservationId"
+                    id="reservation-id"
                     label="Reservation Id"
                     type={InputType.Number}
                     placeholder="Enter reservation Id"
                 />
-
-                <Button
-                    className="fieldLabel"
-                    backgroundColor="white"
-                    textColor="black"
-                    borderWidth="1px"
-                    onClick={(event) => searchRoom(event,
-                        props.userCredentials.token,
-                        setShowRoomSearchErrorMessage,
-                        setRoomNotFoundErrorMessage,
-                        setRooms,)}>
-                    Search room
-                </Button>
-            </form>
+                
+                <Input
+                    id="query-rooms"
+                    type={InputType.Submit}
+                    value="Search"
+                />
+            </FormContainer>
+            
             {showRoomSearchErrorMessage && (
                 <Modal title="Failed to retrieve room" onClose={() => { setShowRoomSearchErrorMessage(false) }}>
                     Failed to retrieve room.

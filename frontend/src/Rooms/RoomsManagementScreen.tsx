@@ -23,8 +23,6 @@ const RoomsManagementScreen: React.FC<ScreenProps> = ({
 		{image: myImage, navUrl: "add", text: "Add room"},
 		{image: myImage, navUrl: "remove", text: "Remove room"},
 		{image: myImage, navUrl: "information", text: "Query"},
-		{image: myImage, navUrl: "add", text: "Add room"},
-		{image: myImage, navUrl: "add", text: "Add room"},
 	];
 	
 	const elements = [];
@@ -35,7 +33,7 @@ const RoomsManagementScreen: React.FC<ScreenProps> = ({
 				borderWidth="2px"
 				borderRadius="5px"
 				fontSize="18pt"
-				onClick={() => navigate(`/rooms-mamangement/${btn.navUrl}`)}
+				onClick={() => navigate(`/rooms-management/${btn.navUrl}`)}
 			>
 				{btn.text}
 			</IconButton>
