@@ -47,9 +47,17 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-
+        
+        if (reservationId === -1) {
+            setUpdateReservationMessage({
+                title: "Reservation ID required!",
+                message: "Form missing a valid reservation ID.",
+            });
+            return;
+        }
+        
         const updateReservationData = buildUpdateData();
-
+        
         try {
             const res = await makeRequest("api/Reservations/update", "POST", "json", updateReservationData, userCredentials.token);
             handleResponse(res);
@@ -68,6 +76,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
 
     const buildUpdateData = (): Partial<UpdateData> => {
         const updateData: Partial<UpdateData> = {
+            reservationId: reservationId,
             email: email || undefined,
             phone: phone || undefined,
             room: room > 0 ? room : undefined,
