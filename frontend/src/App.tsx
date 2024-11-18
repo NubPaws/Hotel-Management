@@ -29,6 +29,7 @@ import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
+import { NavigationBar } from './UIElements/NavigationBar';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -43,6 +44,9 @@ function App() {
     return (
         <div className="appContainer">
             <BrowserRouter>
+                {userCredentials.username !== "" && (
+                    <NavigationBar setUserCredentials={setUserCredentials} />
+                )}
                 <Routes>
                     <Route path='/'
                         element={<LoginScreen
@@ -68,8 +72,7 @@ function App() {
                             setUserCredentials={setUserCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
-                    
+                    <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}></Route>
                     <Route path='/rooms-management/type'
                         element={<RoomTypeScreen
                             userCredentials={userCredentials}
@@ -112,7 +115,7 @@ function App() {
                             userCredentials={userCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    
+
                     <Route path='/create-guest'
                         element={<CreateGuestScreen
                             userCredentials={userCredentials}

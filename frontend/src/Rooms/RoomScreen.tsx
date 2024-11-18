@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -29,7 +28,6 @@ export function RoomScreen(props: {
 
     return (
         <>
-            <NavigationBar />
             <CenteredLabel>Create Room</CenteredLabel>
             <form id="roomCreateForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/create-room/">
                 <Input

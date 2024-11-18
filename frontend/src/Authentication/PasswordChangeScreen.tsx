@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Modal, { ModalController } from "../UIElements/Modal";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { UserCredentials } from "../APIRequests/ServerData";
@@ -132,7 +131,6 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
     };
     
     return <>
-        <NavigationBar />
         <CenteredLabel>Change Password</CenteredLabel>
         <FormContainer onSubmit={handleSubmit}>
             <Input

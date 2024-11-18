@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Modal, { ModalController } from "../UIElements/Modal";
@@ -97,7 +96,6 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     }
     
     return <>
-        <NavigationBar />
         <CenteredLabel>Room Search</CenteredLabel>
         <FormContainer onSubmit={handleSubmit}>
             <Input

@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -21,7 +20,6 @@ export function CreateTaskScreen(props: AuthenticatedUserProps) {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Create new task"></CenteredLabel>
             <form id="taskCreateForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks">
                 <Input id="roomNumber" className="field" type="number" name="roomNumber"

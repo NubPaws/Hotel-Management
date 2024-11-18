@@ -1,6 +1,5 @@
 import IconButton from "../UIElements/Buttons/IconButton";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import { ScreenProps } from '../Utils/Props';
 import myImage from "../assets/react.svg";
 import CenteredLabel from "../UIElements/CenteredLabel";
@@ -37,7 +36,6 @@ const RoomsManagementScreen: React.FC<ScreenProps> = ({
 	}
 	
 	return <>
-		<NavigationBar />
 		<CenteredLabel>Rooms Management</CenteredLabel>
 		<MenuGridLayout shadow>
 			{elements}

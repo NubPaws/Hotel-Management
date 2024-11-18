@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Modal, { ModalController } from "../UIElements/Modal";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import { ScreenProps } from "../Utils/Props";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
@@ -111,7 +110,6 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
     }
     
     return <>
-        <NavigationBar />
         <CenteredLabel>Create New User</CenteredLabel>
         <FormContainer onSubmit={handleSubmit}>
             <Input

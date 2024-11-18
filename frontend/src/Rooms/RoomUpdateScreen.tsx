@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -30,7 +29,6 @@ export function RoomUpdateScreen(props: {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Update Room State"></CenteredLabel>
             <form id="roomUpdateForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/update">
                 <Input id="roomNumber" className="field" type="number" name="roomNumber"

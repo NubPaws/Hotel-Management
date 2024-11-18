@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import CenteredLabel from "../UIElements/CenteredLabel";
-import { NavigationBar } from "../UIElements/NavigationBar";
 
 import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
 import { ScreenProps } from "../Utils/Props";
@@ -59,7 +58,6 @@ export const HomeScreen: React.FC<ScreenProps> = ({
     }
     
     return <>
-        <NavigationBar />
         <CenteredLabel>Home</CenteredLabel>
         <MenuGridLayout shadow>
             {buttons}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -22,7 +21,6 @@ export function AddReservationScreen(props: AuthenticatedUserProps) {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
             <CenteredLabel>Add Reservation to guest</CenteredLabel>
             <form id="addReservationForm" className="fieldsContainer" action="http://localhost:8000/api/Guests/add-reservation">
                 <Input
