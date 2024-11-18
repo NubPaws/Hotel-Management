@@ -1,0 +1,64 @@
+
+.dropdown-container {
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.searchable-dropdown-label {
+	font-size: 14pt;
+	font-weight: 400;
+}
+
+.dropdown-input {
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid #B3B3B3;
+	border-radius: 3px;
+	background: white;
+	transition: border-color 0.3s, box-shadow 0.3s;
+	box-sizing: border-box;
+	border-radius: 4px;
+	margin: 0;
+	padding: 0.75rem;
+	font-size: 12pt;
+	outline: none;
+}
+
+.dropdown-input:focus {
+	/* Give the fields an outline when they are clicked. */
+    border-color: #3a8af8;
+    box-shadow: 0 0 0 3px rgba(58, 138, 248, 0.2);
+}
+
+.dropdown-list {
+	position: absolute;
+	top: 100%;
+	z-index: 100;
+	
+	background: white;
+	overflow-y: auto;
+	list-style: none;
+	
+	border: 1px solid black;
+	border-radius: 4px;
+	
+	max-height: 150px;
+	width: 100%;
+	
+	margin: 0;
+	padding: 0;
+}
+
+.dropdown-item {
+	padding: 10px;
+	cursor: pointer;
+	font-size: 12pt;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-item.active {
+	background-color: #f0f0f0;
+}

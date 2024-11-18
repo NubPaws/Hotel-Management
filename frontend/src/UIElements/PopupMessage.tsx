@@ -1,6 +1,8 @@
 import React from "react";
 import "./PopupMessage.css";
 
+export type MessageType = "Error" | "Info";
+
 interface PopupMessageProps {
 	children: React.ReactNode;
 	type: "Error" | "Info"

@@ -46,6 +46,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
                 label="Username"
                 type={InputType.Text}
                 placeholder="Enter your username"
+                value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
             <Input
@@ -53,6 +54,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({userCredentials, setUse
                 label="Password"
                 type={InputType.Password}
                 placeholder="Enter your password"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
             <Input
