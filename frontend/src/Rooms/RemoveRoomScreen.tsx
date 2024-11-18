@@ -5,8 +5,8 @@ import { NavigationBar } from "../UIElements/NavigationBar";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { ScreenProps } from "../Utils/Props";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import Modal, { ModalController } from "../UIElements/Modal";
 import { makeRequest, RequestError } from "../APIRequests/APIRequests";
+import useModal from "../Utils/Hooks/useModal";
 
 const RemoveRoomScreen: React.FC<ScreenProps> = ({
 	userCredentials,
@@ -14,7 +14,7 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 }) => {
 	const [roomNumber, setRoomNumber] = useState(0);
 	
-	const [removeRoomMessage, setRemoveRoomMessage] = useState<ModalController | undefined>(undefined);
+	const [modal, showModal] = useModal();
 	
 	useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
 	
@@ -22,10 +22,7 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 		event.preventDefault();
 		
 		if (roomNumber <= 0) {
-			setRemoveRoomMessage({
-				title: "Invalid room number",
-				message: "Room must be positive."
-			});
+			showModal("Invalid room number", "Room must be positive.");
 		}
 		
 		try {
@@ -37,25 +34,16 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 				setShowConnectionErrorMessage(true);
 			}
 			if (error instanceof RequestError) {
-				setRemoveRoomMessage({
-					title: "Request failed",
-					message: "Revalidate your fields."
-				});
+				showModal("Request failed", "Revalidate your fields.");
 			}
 		}
 	}
 	
 	const handleResponse = (res: Response) => {
 		if (res.ok) {
-			setRemoveRoomMessage({
-				title: "Success",
-				message: "Successfully removed the room.",
-			});
+			showModal("Success", "Successfully removed the room.");
 		} else {
-			setRemoveRoomMessage({
-				title: "Failed",
-				message: "Failed to remove room.",
-			})
+			showModal("Failed", "Failed to remove room.");
 		}
 	}
 	
@@ -78,11 +66,7 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 			/>
 		</FormContainer>
 		
-		{removeRoomMessage &&
-            <Modal title={removeRoomMessage.title} onClose={() => setRemoveRoomMessage(undefined)}>
-                {removeRoomMessage.message}
-            </Modal>
-        }
+		{modal}
 	</>;
 };
 

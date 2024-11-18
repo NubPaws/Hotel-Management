@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import Modal, { ModalController } from "../UIElements/Modal";
 import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
@@ -10,6 +9,7 @@ import { RoomType } from "../APIRequests/ServerData";
 import PopupMessage from "../UIElements/PopupMessage";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
+import useModal from "../Utils/Hooks/useModal";
 
 const CreateRoomScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -22,7 +22,7 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     const [roomType, setRoomType] = useState("");
     const [roomNumber, setRoomNumber] = useState(0);
     
-    const [createRoomMessage, setCreateRoomMessage] = useState<ModalController | undefined>(undefined);
+    const [modal, showModal] = useModal();
     const [fetchFailedMessage, setFetchFailedMessage] = useState(false);
     
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
@@ -44,10 +44,7 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
                     setFetchFailedMessage(true);
                 }
                 if (error instanceof RequestError) {
-                    setCreateRoomMessage({
-                        title: "Failed to fetch room types.",
-                        message: "Invalid error occurred, contact makers.",
-                    });
+                    showModal("Failed to fetch room types.", "Invalid error occurred, contact makers.");
                 }
             } finally {
                 setLoading(false);
@@ -61,10 +58,7 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
         event.preventDefault();
         
         if (roomNumber === 0 || roomTypes.includes(roomType)) {
-            setCreateRoomMessage({
-                title: "Invalid input",
-                message: "Room number must be non-negative, room type must exist."
-            });
+            showModal("Invalid input", "Room number must be non-negative, room type must exist.");
         }
         
         try {
@@ -79,25 +73,16 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
                 setShowConnectionErrorMessage(true);
             }
             if (error instanceof RequestError) {
-                setCreateRoomMessage({
-                    title: "Invalid request",
-                    message: "Request was invalid, re-validate fields."
-                });
+                showModal("Invalid request", "Request was invalid, re-validate fields.");
             }
         }
     }
     
     const handleResponse = (res: Response) => {
         if (res.ok) {
-            setCreateRoomMessage({
-                title: "Success",
-                message: "Room created successfully",
-            });
+            showModal("Success", "Room created successfully");
         } else {
-            setCreateRoomMessage({
-                title: "Failed",
-                message: "Failed to create room"
-            })
+            showModal("Failed", "Failed to create room");
         }
     }
     
@@ -132,11 +117,7 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
         </FormContainer>
             
         {fetchFailedMessage && <PopupMessage type="Error">Failed to fetch room types from server.</PopupMessage>}
-        {createRoomMessage &&
-            <Modal title={createRoomMessage.title} onClose={() => setCreateRoomMessage(undefined)}>
-                {createRoomMessage.message}
-            </Modal>
-        }
+        {modal}
     </>;
 };
 
