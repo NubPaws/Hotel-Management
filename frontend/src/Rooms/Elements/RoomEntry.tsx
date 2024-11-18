@@ -15,11 +15,7 @@ const RoomEntry: React.FC<RoomEntryProps> = ({
 		<div>{type}</div>
 		<div>{state}</div>
 		<div>
-			{occupied ? (
-				"Link to reservation" + reservation
-			) : (
-				""
-			)}
+			{occupied ? `Reservation ${reservation}` : ""}
 		</div>
 	</div>;
 }

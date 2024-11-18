@@ -1,5 +1,4 @@
-import { ReactSetStateDispatch } from "../Utils/Types";
-import Input, {InputType} from "./Forms/Input";
+import Input, { InputType } from "./Forms/Input";
 
 const createHandleAddItem = (
     list: number[],

@@ -41,7 +41,7 @@ function App() {
 
 
     return (
-        <div className="appContainer">
+        <div className="app-container">
             <BrowserRouter>
                 <Routes>
                     <Route path='/'
@@ -77,8 +77,8 @@ function App() {
                     <Route path='/rooms-management/type'
                         element={<RoomTypeScreen
                             userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />} />
-                    
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
+                    </Route>
                     <Route path="/rooms-management"
                         element={
                             <RoomsManagementScreen
