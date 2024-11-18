@@ -29,6 +29,7 @@ import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
+import CreateRoomScreen from './Rooms/CreateRoomScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -90,7 +91,7 @@ function App() {
                     />
                     <Route path="/rooms-management/add"
                         element={
-                            <RoomsManagementScreen
+                            <CreateRoomScreen
                                 userCredentials={userCredentials}
                                 setUserCredentials={setUserCredentials}
                                 setShowConnectionErrorMessage={setShowConnectionErrorMessage}

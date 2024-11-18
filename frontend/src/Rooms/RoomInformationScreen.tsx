@@ -9,15 +9,15 @@ import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { AuthenticatedUserProps } from "../Utils/Props";
-import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import RoomEntry from "./Elements/RoomEntry";
+import useUserRedirect from "../Utils/useUserRedirect";
 
 const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials,
     setShowConnectionErrorMessage,
 }) => {
-    useAuthenticationRedirect(userCredentials.username);
+    useUserRedirect(userCredentials);
     
     const [roomType, setRoomType] = useState("");
     const [roomState, setRoomState] = useState("");

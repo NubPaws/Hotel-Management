@@ -1,7 +1,7 @@
 
-export type UserRole = "Admin" | "User";
+export type UserRole = "Admin" | "User" | "";
 export type Department = "General" | "FrontDesk" | "HouseKeeping"
-    | "Maintenance" | "FoodAndBeverage" | "Security" | "Concierge";
+    | "Maintenance" | "FoodAndBeverage" | "Security" | "Concierge" | "";
 
 export interface UserCredentials {
     token: string

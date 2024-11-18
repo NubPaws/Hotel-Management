@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
-import { createRoom, removeRoom } from "./Rooms";
 import Modal from "../UIElements/Modal";
-import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
-import useAdminRedirect from "../Utils/useAdminRedirect";
+import { createRoom, removeRoom } from "./Rooms";
 import { ScreenProps } from "../Utils/Props";
-import useDepartmentRedirect from "../Utils/useDepartmentRedirect";
+import useUserRedirect from "../Utils/useUserRedirect";
 
-export const RoomScreen: React.FC<ScreenProps> = ({
+const CreateRoomScreen: React.FC<ScreenProps> = ({
     userCredentials,
     setShowConnectionErrorMessage
 }) => {
@@ -20,9 +17,7 @@ export const RoomScreen: React.FC<ScreenProps> = ({
     const [showRoomRemovalSuccessMessage, setShowRoomRemovalSuccessMessage] = useState(false);
     const [showRoomRemovalErrorMessage, setShowRoomRemovalErrorMessage] = useState(false);
     
-    useAuthenticationRedirect(userCredentials.username);
-    useAdminRedirect(userCredentials.role);
-    useDepartmentRedirect(userCredentials.department, "FrontDesk");
+    useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
     
     return (
         <>
@@ -100,4 +95,6 @@ export const RoomScreen: React.FC<ScreenProps> = ({
             
         </>
     )
-}
+};
+
+export default CreateRoomScreen;
