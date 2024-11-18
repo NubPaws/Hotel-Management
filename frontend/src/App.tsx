@@ -30,6 +30,10 @@ import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
 import { NavigationBar } from './UIElements/NavigationBar';
+import ReservationsManagementsScreen from './Reservations/ReservationsManagementScreen';
+import BackOfficeScreen from './BackOffice/BackOfficeScreen';
+import GuestsManagementScreen from './Guests/GuestsManagementScreen';
+import AdministrationScreen from './Administration/AdministrationScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -45,6 +49,7 @@ function App() {
         { path: "/login", element: LoginScreen },
         { path: "/user-creation", element: UserCreationScreen },
         { path: "/change-password", element: ChangePasswordScreen },
+        { path: "/administration", element: AdministrationScreen },
 
         { path: "/home", element: HomeScreen },
 
@@ -55,6 +60,7 @@ function App() {
         { path: "/rooms-management/update", element: RoomUpdateScreen },
         { path: "/rooms-management/information", element: RoomInformationScreen },
 
+        { path: "/guests-management/", element: GuestsManagementScreen },
         { path: "/create-guest", element: CreateGuestScreen },
         { path: "/update-guest", element: UpdateGuestScreen },
         { path: "/add-reservation", element: AddReservationScreen },
@@ -75,14 +81,17 @@ function App() {
         { path: "/update-extra", element: UpdateExtraScreen },
         { path: "/search-reservation", element: SearchReservationScreen },
         { path: "/update-reservation", element: UpdateReservationScreen },
+        { path: "/reservations", element: ReservationsManagementsScreen },
 
-        { path: "/end-of-day", element: EndOfDayScreen },
+        { path: "/back-office/end-of-day", element: EndOfDayScreen },
+        { path: "/back-office", element: BackOfficeScreen}
     ];
 
     const routeComponents = [];
     for (const route of userRoutes) {
         routeComponents.push(
             <Route path={route.path}
+                key={route.path}
                 element={<route.element
                     userCredentials={userCredentials}
                     setUserCredentials={setUserCredentials}
