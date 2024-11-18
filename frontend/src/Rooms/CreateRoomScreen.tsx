@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
@@ -6,27 +6,24 @@ import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
 import { createRoom, removeRoom } from "./Rooms";
 import Modal from "../UIElements/Modal";
-import { UserCredentials } from "../APIRequests/ServerData";
+import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
+import useAdminRedirect from "../Utils/useAdminRedirect";
+import { ScreenProps } from "../Utils/Props";
+import useDepartmentRedirect from "../Utils/useDepartmentRedirect";
 
-export function RoomScreen(props: {
-    userCredentials: UserCredentials,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export const RoomScreen: React.FC<ScreenProps> = ({
+    userCredentials,
+    setShowConnectionErrorMessage
+}) => {
     const [showRoomCreationSuccessMessage, setShowRoomCreationSuccessMessage] = useState(false);
     const [showRoomCreationErrorMessage, setShowRoomCreationErrorMessage] = useState(false);
     const [showRoomRemovalSuccessMessage, setShowRoomRemovalSuccessMessage] = useState(false);
     const [showRoomRemovalErrorMessage, setShowRoomRemovalErrorMessage] = useState(false);
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (props.userCredentials.role !== "Admin") {
-            navigate("/login");
-        }
-        if (props.userCredentials.department !== "FrontDesk") {
-            navigate("/home");
-        }
-    }, [props.userCredentials, navigate]);
-
+    
+    useAuthenticationRedirect(userCredentials.username);
+    useAdminRedirect(userCredentials.role);
+    useDepartmentRedirect(userCredentials.department, "FrontDesk");
+    
     return (
         <>
             <NavigationBar />
@@ -50,8 +47,8 @@ export function RoomScreen(props: {
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => createRoom(event,
-                        props.userCredentials.token,
-                        props.setShowConnectionErrorMessage,
+                        userCredentials.token,
+                        setShowConnectionErrorMessage,
                         setShowRoomCreationSuccessMessage,
                         setShowRoomCreationErrorMessage)}>
                     Create Room
@@ -82,8 +79,8 @@ export function RoomScreen(props: {
                     textColor="black"
                     borderWidth="1px"
                     onClick={(event) => removeRoom(event,
-                        props.userCredentials.token,
-                        props.setShowConnectionErrorMessage,
+                        userCredentials.token,
+                        setShowConnectionErrorMessage,
                         setShowRoomRemovalSuccessMessage,
                         setShowRoomRemovalErrorMessage)}>
                     Remove Room

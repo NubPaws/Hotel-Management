@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserRole } from "../../../backend/src/models/User";
+import { UserRole } from "../APIRequests/ServerData";
 
 const useAdminRedirect = (role: UserRole) => {
 	const navigate = useNavigate();
 	
 	useEffect(() => {
-		if (role !== UserRole.Admin) {
+		if (role !== "Admin") {
 			navigate("/home");
 		}
 	}, [role, navigate]);

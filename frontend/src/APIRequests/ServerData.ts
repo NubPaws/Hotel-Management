@@ -1,9 +1,13 @@
 
+export type UserRole = "Admin" | "User";
+export type Department = "General" | "FrontDesk" | "HouseKeeping"
+    | "Maintenance" | "FoodAndBeverage" | "Security" | "Concierge";
+
 export interface UserCredentials {
     token: string
     username: string,
-    role: string,
-    department: string
+    role: UserRole,
+    department: Department
 }
 
 export interface Room {
