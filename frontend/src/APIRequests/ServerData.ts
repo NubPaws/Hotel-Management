@@ -4,10 +4,10 @@ export type Department = "General" | "FrontDesk" | "HouseKeeping"
     | "Maintenance" | "FoodAndBeverage" | "Security" | "Concierge" | "";
 
 export interface UserCredentials {
-    token: string
-    username: string,
-    role: UserRole,
-    department: Department
+    token: string;
+    username: string;
+    role: UserRole;
+    department: Department;
 }
 
 export interface Room {
@@ -16,6 +16,11 @@ export interface Room {
     state: string,
     occupied: boolean,
     reservation: number,
+}
+
+export interface RoomType {
+    code: string;
+	description: string;
 }
 
 export interface Guest {

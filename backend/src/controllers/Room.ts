@@ -343,4 +343,37 @@ router.post("/update", verifyUser, async (req: Request, res: Response, next: Nex
 	}
 });
 
+/**
+ * @swagger
+ * /api/Rooms/types:
+ *   get:
+ *     summary: Retrieve all room types
+ *     description: Fetches a list of all room types available in the system.
+ *     tags: [Rooms]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the list of room types.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/RoomType'
+ *       401:
+ *         description: Unauthorized access.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get("/types", verifyUser, async (req, res, next) => {
+	try {
+		const roomTypes = await RoomModel.getAllRoomTypes();
+		
+		res.status(StatusCode.Ok).json(roomTypes);
+	} catch (error) {
+		next(error);
+	}
+});
+
 export const RoomsRouter = router;

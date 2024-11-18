@@ -288,6 +288,10 @@ async function getRoomByReservation(reservationId: number) {
     return await RoomModel.findOne({ reservation: reservationId });
 }
 
+async function getAllRoomTypes() {
+	return await RoomTypeModel.find({}) as RoomType[];
+}
+
 /**
  * Get rooms based on multiple filters: type, state, occupied, reservationId.
  * All filters are optional, and multiple filters can be combined.
@@ -349,6 +353,8 @@ export default {
 	getRoomsByOccupation,
 	getRoomByReservation,
 	getFilteredRooms,
+	
+	getAllRoomTypes,
 	
 	find,
 	count,

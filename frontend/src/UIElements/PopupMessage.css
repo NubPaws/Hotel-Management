@@ -1,0 +1,40 @@
+
+.popup-message-box {
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	
+	padding: 10px 20px;
+	border-radius: 5px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+	font-size: 16px;
+}
+
+.error-popup {
+	background-color: #ff0000;
+	color: white;
+}
+
+.info-popup {
+	background-color: #399918;
+	color: white;
+}
+
+@keyframes fadeInOut {
+	0% {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	10% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	90% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+}
