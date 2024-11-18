@@ -40,6 +40,56 @@ function App() {
     });
     const [showConnectionErrorMessage, setShowConnectionErrorMessage] = useState(false);
 
+    const userRoutes = [
+        { path: "/", element: LoginScreen },
+        { path: "/login", element: LoginScreen },
+        { path: "/user-creation", element: UserCreationScreen },
+        { path: "/change-password", element: ChangePasswordScreen },
+
+        { path: "/home", element: HomeScreen },
+
+        { path: "/rooms-management/type", element: RoomTypeScreen },
+        { path: "/rooms-management", element: RoomsManagementScreen },
+        { path: "/rooms-management/add", element: RoomsManagementScreen },
+        { path: "/rooms-management/remove", element: RoomsManagementScreen },
+        { path: "/rooms-management/update", element: RoomUpdateScreen },
+        { path: "/rooms-management/information", element: RoomInformationScreen },
+
+        { path: "/create-guest", element: CreateGuestScreen },
+        { path: "/update-guest", element: UpdateGuestScreen },
+        { path: "/add-reservation", element: AddReservationScreen },
+        { path: "/search-guest", element: SearchGuestScreen },
+
+        { path: "/create-task", element: CreateTaskScreen },
+        { path: "/update-task", element: UpdateTaskScreen },
+        { path: "/remove-task", element: RemoveTaskScreen },
+        { path: "/search-task-by-id", element: SearchTaskByIdScreen },
+        { path: "/search-task-by-department", element: SearchTaskByDepartmentScreen },
+
+        { path: "/create-reservation", element: CreateReservationScreen },
+        { path: "/cancel-reservation", element: CancelReservationScreen },
+        { path: "/add-nights", element: AddNightsScreen },
+        { path: "/remove-nights", element: RemoveNightScreen },
+        { path: "/add-extra", element: AddExtraScreen },
+        { path: "/remove-extra", element: RemoveExtraScreen },
+        { path: "/update-extra", element: UpdateExtraScreen },
+        { path: "/search-reservation", element: SearchReservationScreen },
+        { path: "/update-reservation", element: UpdateReservationScreen },
+
+        { path: "/end-of-day", element: EndOfDayScreen },
+    ];
+
+    const routeComponents = [];
+    for (const route of userRoutes) {
+        routeComponents.push(
+            <Route path={route.path}
+                element={<route.element
+                    userCredentials={userCredentials}
+                    setUserCredentials={setUserCredentials}
+                    setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
+            </Route>
+        )
+    }
 
     return (
         <div className="appContainer">
@@ -48,188 +98,7 @@ function App() {
                     <NavigationBar setUserCredentials={setUserCredentials} />
                 )}
                 <Routes>
-                    <Route path='/'
-                        element={<LoginScreen
-                            userCredentials={userCredentials}
-                            setUserCredentials={setUserCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path='/login'
-                        element={<LoginScreen
-                            userCredentials={userCredentials}
-                            setUserCredentials={setUserCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path='/user-creation'
-                        element={<UserCreationScreen
-                            userCredentials={userCredentials}
-                            setUserCredentials={setUserCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path='/change-password'
-                        element={<ChangePasswordScreen
-                            userCredentials={userCredentials}
-                            setUserCredentials={setUserCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}></Route>
-                    <Route path='/rooms-management/type'
-                        element={<RoomTypeScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path="/rooms-management"
-                        element={
-                            <RoomsManagementScreen
-                                userCredentials={userCredentials}
-                                setUserCredentials={setUserCredentials}
-                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                            />
-                        }
-                    />
-                    <Route path="/rooms-management/add"
-                        element={
-                            <RoomsManagementScreen
-                                userCredentials={userCredentials}
-                                setUserCredentials={setUserCredentials}
-                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                            />
-                        }
-                    />
-                    <Route path="/rooms-management/remove"
-                        element={
-                            <RoomsManagementScreen
-                                userCredentials={userCredentials}
-                                setUserCredentials={setUserCredentials}
-                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                            />
-                        }
-                    />
-                    <Route path='/rooms-management/update'
-                        element={<RoomUpdateScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path='/rooms-management/information'
-                        element={<RoomInformationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-
-                    <Route path='/create-guest'
-                        element={<CreateGuestScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/update-guest'
-                        element={<UpdateGuestScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/add-reservation'
-                        element={<AddReservationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/search-guest'
-                        element={<SearchGuestScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/create-task'
-                        element={<CreateTaskScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/update-task'
-                        element={<UpdateTaskScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/remove-task'
-                        element={<RemoveTaskScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/search-task-by-id'
-                        element={<SearchTaskByIdScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/search-task-by-department'
-                        element={<SearchTaskByDepartmentScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/create-reservation'
-                        element={<CreateReservationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/cancel-reservation'
-                        element={<CancelReservationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/add-nights'
-                        element={<AddNightsScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/remove-nights'
-                        element={<RemoveNightScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/add-extra'
-                        element={<AddExtraScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/remove-extra'
-                        element={<RemoveExtraScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/update-extra'
-                        element={<UpdateExtraScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/search-reservation'
-                        element={<SearchReservationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/update-reservation'
-                        element={<UpdateReservationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
-                    <Route path='/end-of-day'
-                        element={<EndOfDayScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                        />}>
-                    </Route>
+                    {routeComponents}
                 </Routes>
             </BrowserRouter>
             {showConnectionErrorMessage && (
