@@ -68,13 +68,17 @@ function App() {
                             setUserCredentials={setUserCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
+                    <Route path='/home'
+                        element={<HomeScreen
+                            userCredentials={userCredentials}
+                            setUserCredentials={setUserCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>} />
                     
                     <Route path='/rooms-management/type'
                         element={<RoomTypeScreen
                             userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />} />
+                    
                     <Route path="/rooms-management"
                         element={
                             <RoomsManagementScreen
