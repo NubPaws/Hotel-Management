@@ -5,7 +5,7 @@ import { ScreenProps } from '../Utils/Props';
 import myImage from "../assets/react.svg";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import { useNavigate } from "react-router-dom";
-import useUserRedirect from "../Utils/useUserRedirect";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 const RoomsManagementScreen: React.FC<ScreenProps> = ({
 	userCredentials,

@@ -11,7 +11,7 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import RoomEntry from "./Elements/RoomEntry";
-import useUserRedirect from "../Utils/useUserRedirect";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials,

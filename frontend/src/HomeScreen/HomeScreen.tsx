@@ -9,7 +9,7 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 
 import icon from "../assets/react.svg";
 import IconButton from "../UIElements/Buttons/IconButton";
-import useUserRedirect from "../Utils/useUserRedirect";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 export const HomeScreen: React.FC<ScreenProps> = ({
     userCredentials

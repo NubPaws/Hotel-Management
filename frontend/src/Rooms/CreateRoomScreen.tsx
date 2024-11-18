@@ -5,7 +5,7 @@ import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { ScreenProps } from "../Utils/Props";
-import useUserRedirect from "../Utils/useUserRedirect";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { RoomType } from "../APIRequests/ServerData";
 import PopupMessage from "../UIElements/PopupMessage";
@@ -21,7 +21,8 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     // Room types holders.
     const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
     
-    const [roomType, setRoomType] = useState<string>();
+    const [roomType, setRoomType] = useState("");
+    const [roomNumber, setRoomNumber] = useState(0);
     
     const [createRoomMessage, setCreateRoomMessage] = useState<ModalController | undefined>(undefined);
     const [fetchFailedMessage, setFetchFailedMessage] = useState(false);
