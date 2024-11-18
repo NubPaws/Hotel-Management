@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import Button from "../UIElements/Buttons/Button";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
@@ -14,12 +13,11 @@ import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 
 const CreateRoomScreen: React.FC<ScreenProps> = ({
     userCredentials,
-    // setShowConnectionErrorMessage
+    setShowConnectionErrorMessage
 }) => {
-    // Loading for the room types.
+    // Handlers for room types loading
     const [loading, setLoading] = useState(true);
-    // Room types holders.
-    const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+    const [roomTypes, setRoomTypes] = useState<string[]>([]);
     
     const [roomType, setRoomType] = useState("");
     const [roomNumber, setRoomNumber] = useState(0);
@@ -31,12 +29,16 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     
     // Fetch room types.
     useEffect(() => {
+        if (!userCredentials.token) {
+            return;
+        }
+        
         const fetchRoomTypes = async () => {
             try {
                 const res = await makeRequest("api/Rooms/types", "GET", "text", "", userCredentials.token);
                 
                 const data: RoomType[] = await res.json();
-                setRoomTypes(data);
+                setRoomTypes(data.map(val => val.code));
             } catch (error) {
                 if (error instanceof FetchError) {
                     setFetchFailedMessage(true);
@@ -55,8 +57,48 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
         fetchRoomTypes();
     }, [userCredentials.token]);
     
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        
+        if (roomNumber === 0 || roomTypes.includes(roomType)) {
+            setCreateRoomMessage({
+                title: "Invalid input",
+                message: "Room number must be non-negative, room type must exist."
+            });
+        }
+        
+        try {
+            const res = await makeRequest("api/Rooms/create-room", "POST", "json", {
+                type: roomType,
+                room: roomNumber,
+            }, userCredentials.token);
+            
+            handleResponse(res);
+        } catch (error) {
+            if (error instanceof FetchError) {
+                setShowConnectionErrorMessage(true);
+            }
+            if (error instanceof RequestError) {
+                setCreateRoomMessage({
+                    title: "Invalid request",
+                    message: "Request was invalid, re-validate fields."
+                });
+            }
+        }
+    }
+    
+    const handleResponse = (res: Response) => {
+        if (res.ok) {
+            setCreateRoomMessage({
+                title: "Success",
+                message: "Room created successfully",
+            });
+        } else {
+            setCreateRoomMessage({
+                title: "Failed",
+                message: "Failed to create room"
+            })
+        }
     }
     
     if (loading) {
@@ -69,7 +111,7 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
         <FormContainer onSubmit={handleSubmit}>
             <SearchableDropdown
                 id="asd"
-                options={roomTypes.map((value) => value.code)}
+                options={roomTypes}
                 placeholder="Enter room type"
                 label="Room Type"
                 setValue={(value) => setRoomType(value)}
@@ -77,39 +119,18 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
             <Input
                 id="room-number-input"
                 label="Room number"
+                value={`${roomNumber}`}
                 type={InputType.Number}
                 placeholder="Enter room number"
+                onChange={(e) => setRoomNumber(e.target.value ? parseInt(e.target.value) : 0)}
             />
             <Input
                 id="new-room-btn"
                 type={InputType.Submit}
-                value="Submit"
+                value="Create"
             />
         </FormContainer>
             
-        <CenteredLabel>Remove Room</CenteredLabel>
-        <form id="roomRemovalForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/remove-room/">
-            <Input
-                id="roomNumberToRemove"
-                label="Room number"
-                type={InputType.Number}
-                placeholder="Enter room number"
-            />
-            <Button
-                className="fieldLabel"
-                backgroundColor="white"
-                textColor="black"
-                borderWidth="1px"
-                // onClick={(event) => removeRoom(event,
-                //     userCredentials.token,
-                //     setShowConnectionErrorMessage,
-                //     setShowRoomRemovalSuccessMessage,
-                //     setShowRoomRemovalErrorMessage)}
-                    >
-                Remove Room
-            </Button>
-        </form>
-        
         {fetchFailedMessage && <PopupMessage type="Error">Failed to fetch room types from server.</PopupMessage>}
         {createRoomMessage &&
             <Modal title={createRoomMessage.title} onClose={() => setCreateRoomMessage(undefined)}>

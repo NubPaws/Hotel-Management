@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Department, UserCredentials, UserRole } from "../APIRequests/ServerData";
+import { Department, UserCredentials, UserRole } from "../../APIRequests/ServerData";
 
 // TODO: Use React context to make a global item that we can display as an error.
 
