@@ -99,7 +99,7 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     return <>
         <NavigationBar />
         <CenteredLabel>Room Search</CenteredLabel>
-        <FormContainer onSubmit={handleSubmit}>
+        <FormContainer onSubmit={handleSubmit} maxWidth="500px">
             <Input
                 id="room-type"
                 label="Room type"
