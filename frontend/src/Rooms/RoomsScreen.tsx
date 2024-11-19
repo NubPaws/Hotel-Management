@@ -13,20 +13,24 @@ import { usePopupError } from "../Utils/Contexts/PopupErrorContext";
 import { Room } from "../APIRequests/ServerData";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
-import IconButton from "../UIElements/Buttons/IconButton";
-
-import "./RoomsScreen.css";
-import plusIcon from "../assets/plus-icon.svg";
 import { useNavigate } from "react-router-dom";
 import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 import Button from "../UIElements/Buttons/Button";
+import useFetchRoomTypes from "./Hooks/useFetchRoomTypes";
+import IconButton from "../UIElements/Buttons/IconButton";
+
+
+import plusIcon from "../assets/plus-icon.svg";
+import "./RoomsScreen.css";
+import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 
 const RoomsScreen: FC<ScreenProps> = ({
 	userCredentials,
 }) => {
 	useUserRedirect(userCredentials);
-    
     const navigate = useNavigate();
+    
+    const { roomTypes, loading } = useFetchRoomTypes(userCredentials.token);
     
     const [roomType, setRoomType] = useState("");
     const [roomState, setRoomState] = useState("");
@@ -42,7 +46,8 @@ const RoomsScreen: FC<ScreenProps> = ({
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         
-        const url = buildQueryUrl(roomType, roomState, occupancy, reservationId);
+        const realRoomState = roomState ? roomState.split(" ").join("") : "";
+        const url = buildQueryUrl(roomType, realRoomState, occupancy, reservationId);
         
         try {
             const res = await makeRequest(url, "GET", "text", "", userCredentials.token);
@@ -129,6 +134,10 @@ const RoomsScreen: FC<ScreenProps> = ({
         }
     }
     
+    if (loading) {
+        return <p>Loading room types.</p>;
+    }
+    
     return <>
         <NavigationBar />
         <CenteredLabel>Rooms Management</CenteredLabel>
@@ -148,13 +157,11 @@ const RoomsScreen: FC<ScreenProps> = ({
             </Button>
         </div>
         <FormContainer onSubmit={handleSubmit} maxWidth="500px">
-            <Input
-                id="room-type"
+            <SearchableDropdown
+                id="rooms-screen-room-types"
                 label="Room type"
-                value={roomType}
-                type={InputType.Text}
-                placeholder="Enter room type"
-                onChange={(e) => setRoomType(e.target.value)}
+                options={roomTypes}
+                setValue={setRoomType}
             />
             
             <MenuGridLayout>

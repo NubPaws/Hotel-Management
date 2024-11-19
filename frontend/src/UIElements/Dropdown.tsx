@@ -23,11 +23,11 @@ const Dropdown: FC<DropdownProps> = ({
 				<label className="dropdown-label">{label}</label>
 			)}
 			<select
-				defaultValue={defaultOption}
+				value={defaultOption}
 				onChange={(e) => onChange(e.target.value)}
 				className="dropdown"
 			>
-				<option value="" disabled selected>
+				<option value="" disabled>
 					{emptyText}
 				</option>
 				{options.map((option, index) => (
