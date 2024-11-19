@@ -21,6 +21,7 @@ export const HomeScreen: React.FC<ScreenProps> = ({
     const elements = [
         {image: icon, navUrl: "/change-password",           text: "Change password"},
         {image: icon, navUrl: "/user-creation",             text: "Create new user"},
+        {image: icon, navUrl: "/rooms",                     text: "Rooms"},
         {image: icon, navUrl: "/rooms-management",          text: "Rooms Management"},
         {image: icon, navUrl: "/create-guest",              text: "Create guests"},
         {image: icon, navUrl: "/update-guest",              text: "Update guests"},

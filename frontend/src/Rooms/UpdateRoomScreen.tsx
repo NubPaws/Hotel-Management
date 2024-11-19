@@ -1,4 +1,4 @@
-import { FC, FormEvent, useState } from "react";
+import { FC, FormEvent, useEffect, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
@@ -16,18 +16,28 @@ const UpdateRoomScreen: FC<ScreenProps> = ({
     
     const [roomNumber, setRoomNumber] = useState(0);
     const [roomState, setRoomState] = useState("");
-    const [occupation, setOccupation] = useState("");
-    const [reservationId, setReservationId] = useState(0);
     
     const [ showModal ] = useModalError();
     const [ showPopup ] = usePopupError();
     
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
     
+    // Get the room state.
+    useEffect(() => {
+        const fetchRoomState = async () => {
+            
+        };
+        
+        fetchRoomState();
+    }, [userCredentials.token]);
+    
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
-    }
+        if (roomNumber <= 0) {
+            
+        }
+    };
     
     return <>
         <NavigationBar />
@@ -41,16 +51,6 @@ const UpdateRoomScreen: FC<ScreenProps> = ({
                 onChange={(e) => setRoomNumber(e.target.value ? parseInt(e.target.value) : 0)}
             />
             <RoomStateRadioButton value={roomState} setValue={setRoomState} />
-            <RoomOccupationRadioButton value={occupation} setValue={setOccupation} />
-            
-            <Input
-                id="reservation-id"
-                value={`${reservationId}`}
-                type={InputType.Number}
-                label="Reservation ID:"
-                placeholder="Enter reservation Id"
-                onChange={(e) => setReservationId(e.target.value ? parseInt(e.target.value) : 0)}
-            />
             
             <Input
                 id="update-room-btn"

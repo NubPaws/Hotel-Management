@@ -6,7 +6,6 @@ import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { ScreenProps } from "../Utils/Props";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { makeRequest, RequestError } from "../APIRequests/APIRequests";
-import useModal from "../Utils/Hooks/useModal";
 
 const RemoveRoomScreen: React.FC<ScreenProps> = ({
 	userCredentials,
@@ -14,7 +13,7 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 }) => {
 	const [roomNumber, setRoomNumber] = useState(0);
 	
-	const [modal, showModal] = useModal();
+	// const [modal, showModal] = useModal();
 	
 	useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
 	
@@ -22,7 +21,7 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 		event.preventDefault();
 		
 		if (roomNumber <= 0) {
-			showModal("Invalid room number", "Room must be positive.");
+			// showModal("Invalid room number", "Room must be positive.");
 		}
 		
 		try {
@@ -34,17 +33,17 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 				setShowConnectionErrorMessage(true);
 			}
 			if (error instanceof RequestError) {
-				showModal("Request failed", "Revalidate your fields.");
+				// showModal("Request failed", "Revalidate your fields.");
 			}
 		}
 	}
 	
 	const handleResponse = (res: Response) => {
-		if (res.ok) {
-			showModal("Success", "Successfully removed the room.");
-		} else {
-			showModal("Failed", "Failed to remove room.");
-		}
+		// if (res.ok) {
+		// 	showModal("Success", "Successfully removed the room.");
+		// } else {
+		// 	showModal("Failed", "Failed to remove room.");
+		// }
 	}
 	
 	return <>
@@ -66,7 +65,7 @@ const RemoveRoomScreen: React.FC<ScreenProps> = ({
 			/>
 		</FormContainer>
 		
-		{modal}
+		{/* {modal} */}
 	</>;
 };
 
