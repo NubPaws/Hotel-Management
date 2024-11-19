@@ -6,12 +6,12 @@ const RoomOccupationRadioButton: React.FC<RoomRadioButtonElementProps> = ({
     value, setValue
 }) => (
     <RadioButtonContainer
-        title="Select room occupation:"
+        title="Room occupation:"
         name="room-occupation"
         value={value}
         setValue={setValue}>
             <RadioButton>Occupied</RadioButton>
-            <RadioButton>Free</RadioButton>
+            <RadioButton>Vacant</RadioButton>
     </RadioButtonContainer>
 );
 

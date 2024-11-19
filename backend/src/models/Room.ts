@@ -215,7 +215,10 @@ async function isRoomOccupied(num: number): Promise<boolean> {
  * @throws RoomDoesNotExistError
  * @throws MissingReservationIdError
  */
-async function setRoomOccupation(num: number, occupied: boolean, reservationId?: number) {
+async function setRoomOccupation(num: number | null, occupied: boolean, reservationId?: number) {
+	if (num === null) {
+		return;
+	}
 	// If occupied is false.
 	if (!occupied) {
 		const room = await RoomModel.findOneAndUpdate(
@@ -285,6 +288,10 @@ async function getRoomByReservation(reservationId: number) {
     return await RoomModel.findOne({ reservation: reservationId });
 }
 
+async function getAllRoomTypes() {
+	return await RoomTypeModel.find({}) as RoomType[];
+}
+
 /**
  * Get rooms based on multiple filters: type, state, occupied, reservationId.
  * All filters are optional, and multiple filters can be combined.
@@ -346,6 +353,8 @@ export default {
 	getRoomsByOccupation,
 	getRoomByReservation,
 	getFilteredRooms,
+	
+	getAllRoomTypes,
 	
 	find,
 	count,

@@ -29,6 +29,8 @@ import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
+import CreateRoomScreen from './Rooms/CreateRoomScreen';
+import RemoveRoomScreen from './Rooms/RemoveRoomScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -41,7 +43,7 @@ function App() {
 
 
     return (
-        <div className="appContainer">
+        <div className="app-container">
             <BrowserRouter>
                 <Routes>
                     <Route path='/'
@@ -68,7 +70,11 @@ function App() {
                             setUserCredentials={setUserCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
                     </Route>
-                    <Route path='/home' element={<HomeScreen userCredentials={userCredentials} setUserCredentials={setUserCredentials} />}></Route>
+                    <Route path='/home'
+                        element={<HomeScreen
+                            userCredentials={userCredentials}
+                            setUserCredentials={setUserCredentials}
+                            setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>} />
                     
                     <Route path='/rooms-management/type'
                         element={<RoomTypeScreen
@@ -86,7 +92,7 @@ function App() {
                     />
                     <Route path="/rooms-management/add"
                         element={
-                            <RoomsManagementScreen
+                            <CreateRoomScreen
                                 userCredentials={userCredentials}
                                 setUserCredentials={setUserCredentials}
                                 setShowConnectionErrorMessage={setShowConnectionErrorMessage}
@@ -95,7 +101,7 @@ function App() {
                     />
                     <Route path="/rooms-management/remove"
                         element={
-                            <RoomsManagementScreen
+                            <RemoveRoomScreen
                                 userCredentials={userCredentials}
                                 setUserCredentials={setUserCredentials}
                                 setShowConnectionErrorMessage={setShowConnectionErrorMessage}

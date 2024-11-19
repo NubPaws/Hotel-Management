@@ -9,14 +9,15 @@ import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { AuthenticatedUserProps } from "../Utils/Props";
-import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import RoomEntry from "./Elements/RoomEntry";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials,
     setShowConnectionErrorMessage,
 }) => {
-    useAuthenticationRedirect(userCredentials.username);
+    useUserRedirect(userCredentials);
     
     const [roomType, setRoomType] = useState("");
     const [roomState, setRoomState] = useState("");
@@ -93,13 +94,12 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
                 message: "No rooms match your search criteria."
             });
         }
-        
     }
     
     return <>
         <NavigationBar />
         <CenteredLabel>Room Search</CenteredLabel>
-        <FormContainer onSubmit={handleSubmit}>
+        <FormContainer onSubmit={handleSubmit} maxWidth="500px">
             <Input
                 id="room-type"
                 label="Room type"
@@ -131,15 +131,15 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
         </FormContainer>
         
         {rooms.length > 0 && (
-            <ul>
+            <ul style={{ marginTop: "8px"}}>
                 {rooms.map((room) => (
-                    <div className="fieldsContainer">
-                        <p>Room Id: {room.roomId}</p>
-                        <p>Room Type: {room.type}</p>
-                        <p>Room State: {room.state}</p>
-                        <p>Room Occupation: {room.occupied ? "Occupied" : "Free"}</p>
-                        <p>Room Reservation Id: {room.reservation ? room.reservation : "No Reservation"}</p>
-                    </div>
+                    <RoomEntry
+                        roomId={room.roomId}
+                        type={room.type}
+                        state={room.state}
+                        occupied={room.occupied}
+                        reservation={room.reservation}
+                    />
                 ))}
             </ul>
         )}
