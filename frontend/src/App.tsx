@@ -89,17 +89,6 @@ function App() {
                             />
                         }
                     />
-                    
-                    <Route path="/rooms-management"
-                        element={
-                            <RoomsManagementScreen
-                                userCredentials={userCredentials}
-                                setUserCredentials={setUserCredentials}
-                                setShowConnectionErrorMessage={setShowConnectionErrorMessage}
-                            />
-                        }
-                    />
-                    
                     <Route path="/rooms/add"
                         element={
                             <CreateRoomScreen
