@@ -4,7 +4,6 @@ import { LoginScreen } from './Authentication/LoginScreen';
 import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
-import UpdateRoomScreen from './Rooms/UpdateRoomScreen';
 import Modal from './UIElements/Modal';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
@@ -28,11 +27,11 @@ import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
-import RemoveRoomScreen from './Rooms/RemoveRoomScreen';
 import { PopupErrorContextProvider } from './Utils/Contexts/PopupErrorContext';
 import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
 import RoomsScreen from './Rooms/RoomsScreen';
 import { PopupInfoContextProvider } from './Utils/Contexts/PopupInfoContext';
+import RoomTypesScreen from './Rooms/RoomTypesScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -110,21 +109,15 @@ function App() {
                             />
                         }
                     />
-                    <Route path="/rooms-management/remove"
+                    <Route path="/rooms/types"
                         element={
-                            <RemoveRoomScreen
+                            <RoomTypesScreen
                                 userCredentials={userCredentials}
                                 setUserCredentials={setUserCredentials}
                                 setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />
                         }
                     />
-                    <Route path='/rooms-management/update'
-                        element={<UpdateRoomScreen
-                            userCredentials={userCredentials}
-                            setUserCredentials={setUserCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
                     
                     <Route path='/create-guest'
                         element={<CreateGuestScreen

@@ -19,6 +19,7 @@ import "./RoomsScreen.css";
 import plusIcon from "../assets/plus-icon.svg";
 import { useNavigate } from "react-router-dom";
 import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
+import Button from "../UIElements/Buttons/Button";
 
 const RoomsScreen: FC<ScreenProps> = ({
 	userCredentials,
@@ -131,13 +132,21 @@ const RoomsScreen: FC<ScreenProps> = ({
     return <>
         <NavigationBar />
         <CenteredLabel>Rooms Management</CenteredLabel>
-        <IconButton
-            className="rooms-add-btns"
-            iconUrl={plusIcon}
-            onClick={() => navigate("/rooms/add")}
-        >
-            Add
-        </IconButton>
+        <div className="rooms-extra-btns">
+            <IconButton
+                className="rooms-add-btn"
+                iconUrl={plusIcon}
+                onClick={() => navigate("/rooms/add")}
+            >
+                Add room
+            </IconButton>
+            <Button
+                onClick={() => navigate("/rooms/types")}
+                textSize="14pt"
+            >
+                Room types
+            </Button>
+        </div>
         <FormContainer onSubmit={handleSubmit} maxWidth="500px">
             <Input
                 id="room-type"

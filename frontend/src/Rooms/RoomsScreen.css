@@ -1,4 +1,13 @@
 
-.rooms-add-btns {
+.rooms-extra-btns {
+	position: relative;
+	width: 100%;
+}
+
+.rooms-extra-btns > * {
 	position: absolute;
+}
+
+.rooms-add-btn {
+	right: 0;
 }
