@@ -82,9 +82,9 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     
     const handleResponse = async (res: Response) => {
         if (res.ok) {
-            showInfoPopup("Room created successfully");
+            showInfoPopup(`Room created successfully ${roomNumber}`);
         } else {
-            showErrorPopup(`Failed to create room ${await res.json()}`);
+            showErrorPopup(`Failed to create room, mayhaps the room already exists`);
         }
     }
     

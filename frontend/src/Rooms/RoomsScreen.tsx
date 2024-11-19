@@ -95,6 +95,39 @@ const RoomsScreen: FC<ScreenProps> = ({
         }
     }
     
+    const changeState = async (roomId: number, state: string) => {
+        const url = `api/Rooms/update`;
+        const newState = state.split(" ").join("");
+        
+        try {
+            const res = await makeRequest(url, "POST", "json", {
+                room: roomId,
+                state: newState,
+            }, userCredentials.token);
+            
+            console.log(newState);
+            
+            if (res.ok) {
+                showInfoPopup(`Successfully updated room state to ${state}`);
+                
+                const newRooms = rooms.map((value) => {
+                    if (value.roomId === roomId) {
+                        return {...value, state: state};
+                    }
+                    return value;
+                });
+                setRooms(newRooms);
+            }
+        } catch (error) {
+            if (error instanceof FetchError) {
+                showErrorPopup("Error connecting to the server");
+            }
+            if (error instanceof RequestError) {
+				showModal("General Error Occurred", error.message);
+            }
+        }
+    }
+    
     return <>
         <NavigationBar />
         <CenteredLabel>Rooms Management</CenteredLabel>
@@ -146,6 +179,7 @@ const RoomsScreen: FC<ScreenProps> = ({
                         state={room.state}
                         occupied={room.occupied}
                         reservation={room.reservation}
+                        changeState={changeState}
                         removeRoom={removeRoom}
                     />
                 ))}

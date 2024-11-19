@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react";
+import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
 import PopupMessage from "../../UIElements/PopupMessage";
 
 type PopupErrorContextType = [
@@ -12,19 +12,29 @@ type PopupErrorContextProviderProps = {
 }
 
 export const PopupErrorContextProvider: FC<PopupErrorContextProviderProps> = ({ children }) => {
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [messageQueue, setMessageQueue] = useState<string[]>([]);
+	const [currentMessage, setCurrentMessage] = useState<string | null>(null);
+	
+	useEffect(() => {
+		if (!currentMessage && messageQueue.length > 0) {
+			const nextMessage = messageQueue[0];
+			setCurrentMessage(nextMessage);
+			setMessageQueue((prevQueue) => prevQueue.slice(1));
+			
+			setTimeout(() => setCurrentMessage(null), 4000);
+		}
+	}, [currentMessage, messageQueue]);
 	
 	const show = (message: string) => {
-		setErrorMessage(message);
-		setTimeout(() => setErrorMessage(null), 5000);
+		setMessageQueue((prevQueue) => [...prevQueue, message]);
 	}
 	
 	return (
 		<PopupErrorContext.Provider value={[ show ]}>
 			{children}
-			{errorMessage && (
+			{currentMessage && (
 				<PopupMessage type="Error">
-					{errorMessage}
+					{currentMessage}
 				</PopupMessage>
 			)}
 		</PopupErrorContext.Provider>
