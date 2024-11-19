@@ -6,11 +6,11 @@ import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { RoomType } from "../APIRequests/ServerData";
-import PopupMessage from "../UIElements/PopupMessage";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import { usePopupError } from "../Utils/Contexts/PopupErrorContext";
+import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 
 const CreateRoomScreen: React.FC<ScreenProps> = ({
     userCredentials
@@ -24,7 +24,8 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     
     // const [modal, showModal] = useModal();
     const [showModal] = useModalError();
-    const [showPopup] = usePopupError();
+    const [showErrorPopup] = usePopupError();
+    const [showInfoPopup] = usePopupInfo();
     
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
     
@@ -42,7 +43,7 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
                 setRoomTypes(data.map(val => val.code));
             } catch (error) {
                 if (error instanceof FetchError) {
-                    showPopup("Failed to fetch room types from server.");
+                    showErrorPopup("Failed to fetch room types from server.");
                 }
                 if (error instanceof RequestError) {
                     showModal("Failed to fetch room types.", "Invalid error occurred, contact makers.");
@@ -58,8 +59,8 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         
-        if (roomNumber === 0 || roomTypes.includes(roomType)) {
-            // showModal("Invalid input", "Room number must be non-negative, room type must exist.");
+        if (roomNumber === 0 || !roomTypes.includes(roomType)) {
+            showModal("Invalid input", "Room number must be non-negative, room type must exist.");
         }
         
         try {
@@ -79,11 +80,11 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
         }
     }
     
-    const handleResponse = (res: Response) => {
+    const handleResponse = async (res: Response) => {
         if (res.ok) {
-            showModal("Success", "Room created successfully");
+            showInfoPopup("Room created successfully");
         } else {
-            showModal("Failed", "Failed to create room");
+            showErrorPopup(`Failed to create room ${await res.json()}`);
         }
     }
     

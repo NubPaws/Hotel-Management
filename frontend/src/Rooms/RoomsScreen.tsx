@@ -18,6 +18,7 @@ import IconButton from "../UIElements/Buttons/IconButton";
 import "./RoomsScreen.css";
 import plusIcon from "../assets/plus-icon.svg";
 import { useNavigate } from "react-router-dom";
+import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 
 const RoomsScreen: FC<ScreenProps> = ({
 	userCredentials,
@@ -33,8 +34,9 @@ const RoomsScreen: FC<ScreenProps> = ({
     
     const [rooms, setRooms] = useState<Room[]>([]);
     
-	const [ showModal ] = useModalError();
-	const [ showPopup ] = usePopupError();
+	const [showModal] = useModalError();
+	const [showErrorPopup] = usePopupError();
+    const [showInfoPopup] = usePopupInfo()
 	
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -46,7 +48,7 @@ const RoomsScreen: FC<ScreenProps> = ({
             handleResponse(res);
         } catch (error) {
             if (error instanceof FetchError) {
-                showPopup("Error connecting to the server");
+                showErrorPopup("Error connecting to the server");
             }
             if (error instanceof RequestError) {
 				showModal("General Error Occurred", error.message);
@@ -67,7 +69,29 @@ const RoomsScreen: FC<ScreenProps> = ({
         const fetchedRooms = await res.json() as Room[];
         setRooms(fetchedRooms);
         if (fetchedRooms.length === 0) {
-            showPopup("No rooms match your search criteria.");
+            showErrorPopup("No rooms match your search criteria.");
+        }
+    }
+    
+    const removeRoom = async (roomId: number) => {
+        const url = `api/Rooms/remove-room/${roomId}`;
+        
+        try {
+            const res = await makeRequest(url, "POST", "text", "", userCredentials.token);
+            if (res.ok) {
+                showInfoPopup(`Successfully removed room ${roomId}.`);
+                
+                setRooms((oldRooms) => oldRooms.filter((value) => value.roomId !== roomId));
+            } else {
+                showModal("Failed", `Failed removing room ${roomId}. ${await res.json()}`);
+            }
+        } catch (error: any) {
+            if (error instanceof FetchError) {
+                showErrorPopup("Error connecting to the server");
+            }
+            if (error instanceof RequestError) {
+				showModal("General Error Occurred", error.message);
+            }
         }
     }
     
@@ -122,6 +146,7 @@ const RoomsScreen: FC<ScreenProps> = ({
                         state={room.state}
                         occupied={room.occupied}
                         reservation={room.reservation}
+                        removeRoom={removeRoom}
                     />
                 ))}
             </ul>
