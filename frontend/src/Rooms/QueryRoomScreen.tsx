@@ -13,7 +13,7 @@ import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequest
 import RoomEntry from "./Elements/RoomEntry";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
-const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
+const QueryRoomScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials,
     setShowConnectionErrorMessage,
 }) => {
@@ -153,4 +153,4 @@ const RoomInformationScreen: React.FC<AuthenticatedUserProps> = ({
     </>;
 }
 
-export default RoomInformationScreen;
+export default QueryRoomScreen;

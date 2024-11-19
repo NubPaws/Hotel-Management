@@ -1,73 +1,64 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FC, FormEvent, useState } from "react";
 import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
-import Input from "../UIElements/Forms/Input";
-import Button from "../UIElements/Buttons/Button";
-import Modal from "../UIElements/Modal";
-import { updateRoom } from "./RoomUpdate";
-import { UserCredentials } from "../APIRequests/ServerData";
-import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
+import Input, { InputType } from "../UIElements/Forms/Input";
+import { ScreenProps } from "../Utils/Props";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+import useModal from "../Utils/Hooks/useModal";
 import RoomStateRadioButton from "./Elements/RoomRadioButtons";
+import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
+import FormContainer from "../UIElements/Forms/FormContainer";
 
-export function RoomUpdateScreen(props: {
-    userCredentials: UserCredentials,
-    setShowConnectionErrorMessage: React.Dispatch<React.SetStateAction<boolean>>
-}) {
-    const [showRoomUpdateSuccessMessage, setShowRoomUpdateSuccessMessage] = useState(false);
-    const [showRoomUpdateErrorMessage, setShowRoomUpdateErrorMessage] = useState(false);
-    const [showRoomNotFoundErrorMessage, setShowRoomNotFoundErrorMessage] = useState(false);
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (props.userCredentials.role !== "Admin") {
-            navigate("/login");
-        }
-        if (props.userCredentials.department !== "FrontDesk") {
-            navigate("/home");
-        }
-    }, [props.userCredentials, navigate]);
-
-    return (
-        <>
-            <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Update Room State"></CenteredLabel>
-            <form id="roomUpdateForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/update">
-                <Input id="roomNumber" className="field" type="number" name="roomNumber"
-                    placeholder="Enter room number" errorMessageId="roomNumberErrorMessage">
-                    Room number
-                </Input>
-                {/* <RoomStateRadioButton /> */}
-                {/* <RoomOccupationRadioButton /> */}
-
-                <Input id="reservationId" className="field" type="number" name="reservationId"
-                    placeholder="Enter reservation Id" errorMessageId="reservationIdErrorMessage">
-                    Reservation Id
-                </Input>
-
-                <Button
-                    className="fieldLabel"
-                    backgroundColor="white"
-                    textColor="black"
-                    borderWidth="1px"
-                    onClick={(event) => updateRoom(event,
-                        props.userCredentials.token,
-                        props.setShowConnectionErrorMessage,
-                        setShowRoomUpdateSuccessMessage,
-                        setShowRoomUpdateErrorMessage,
-                        setShowRoomNotFoundErrorMessage)}>
-                    Update Room
-                </Button>
-            </form>
-            <Modal title="Room Update Succeeded" onClose={() => { setShowRoomUpdateSuccessMessage(false) }}>
-                <h5>Room was updated successfully.</h5>
-            </Modal>
-            <Modal title="Room Update Failed" onClose={() => { setShowRoomUpdateErrorMessage(false) }}>
-                <h5>Failed to update room.</h5>
-            </Modal>
-            <Modal title="Room Not Found" onClose={() => { setShowRoomNotFoundErrorMessage(false) }}>
-                <h5>Failed to find room number.</h5>
-            </Modal>
-        </>
-    )
+const UpdateRoomScreen: FC<ScreenProps> = ({
+    userCredentials,
+    setShowConnectionErrorMessage,
+}) => {
+    
+    const [roomNumber, setRoomNumber] = useState(0);
+    const [roomState, setRoomState] = useState("");
+    const [occupation, setOccupation] = useState("");
+    const [reservationId, setReservationId] = useState(0);
+    
+    const [modal, showModal] = useModal();
+    
+    useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
+    
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        
+    }
+    
+    return <>
+        <NavigationBar />
+        <CenteredLabel>Update Room State</CenteredLabel>
+        <FormContainer onSubmit={handleSubmit}>
+            <Input
+                id="roomNumber"
+                type={InputType.Number}
+                value={`${roomNumber}`}
+                placeholder="Enter room number"
+                onChange={(e) => setRoomNumber(e.target.value ? parseInt(e.target.value) : 0)}
+            />
+            <RoomStateRadioButton value={roomState} setValue={setRoomState} />
+            <RoomOccupationRadioButton value={occupation} setValue={setOccupation} />
+            
+            <Input
+                id="reservation-id"
+                value={`${reservationId}`}
+                type={InputType.Number}
+                label="Reservation ID:"
+                placeholder="Enter reservation Id"
+                onChange={(e) => setReservationId(e.target.value ? parseInt(e.target.value) : 0)}
+            />
+            
+            <Input
+                id="update-room-btn"
+                type={InputType.Submit}
+                value="Update"
+            />
+        </FormContainer>
+        {modal}
+    </>;
 }
+
+export default UpdateRoomScreen;
