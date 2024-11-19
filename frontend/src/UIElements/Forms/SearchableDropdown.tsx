@@ -7,6 +7,7 @@ interface SearchableDropdownProps {
 	id: string
 	label?: string;
 	placeholder?: string;
+	required?: boolean;
 	
 	options: string[];
 	
@@ -17,8 +18,10 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
 	id,
 	label,
 	placeholder = "Search...",
+	required = false,
 	
 	options,
+	
 	setValue = () => {},
 }) => {
 	const elemId = `searchable-dropdown-${id}`;
@@ -87,6 +90,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
 				onBlur={handleOnBlur}
 				onKeyDown={handleKeyDown}
 				placeholder={placeholder}
+				required={required}
 			/>
 			{isOpen && filteredOptions.length > 0 && (
 				<ul className="dropdown-list">

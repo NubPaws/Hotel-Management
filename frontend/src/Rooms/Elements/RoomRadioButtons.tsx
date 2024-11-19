@@ -14,7 +14,7 @@ const RoomStateRadioButton: React.FC<RoomRadioButtonElementProps> = ({
             <RadioButton>Clean</RadioButton>
             <RadioButton>Inspected</RadioButton>
             <RadioButton>Dirty</RadioButton>
-            <RadioButton>Out of Order</RadioButton>
+            <RadioButton>Out Of Order</RadioButton>
     </RadioButtonContainer>
 );
 

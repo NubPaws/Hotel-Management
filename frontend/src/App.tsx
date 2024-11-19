@@ -4,10 +4,7 @@ import { LoginScreen } from './Authentication/LoginScreen';
 import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
-import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
-import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import Modal from './UIElements/Modal';
-import RoomInformationScreen from './Rooms/RoomInformationScreen';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
@@ -28,9 +25,12 @@ import UpdateExtraScreen from './Extras/UpdateExtraScreen';
 import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
-import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
-import RemoveRoomScreen from './Rooms/RemoveRoomScreen';
+import { PopupErrorContextProvider } from './Utils/Contexts/PopupErrorContext';
+import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
+import RoomsScreen from './Rooms/RoomsScreen';
+import { PopupInfoContextProvider } from './Utils/Contexts/PopupInfoContext';
+import RoomTypesScreen from './Rooms/RoomTypesScreen';
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -43,6 +43,9 @@ function App() {
 
 
     return (
+        <PopupErrorContextProvider>
+        <PopupInfoContextProvider>
+        <ModalErrorContextProvider>
         <div className="app-container">
             <BrowserRouter>
                 <Routes>
@@ -76,21 +79,16 @@ function App() {
                             setUserCredentials={setUserCredentials}
                             setShowConnectionErrorMessage={setShowConnectionErrorMessage}/>} />
                     
-                    <Route path='/rooms-management/type'
-                        element={<RoomTypeScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path="/rooms-management"
+                    <Route path="/rooms"
                         element={
-                            <RoomsManagementScreen
+                            <RoomsScreen
                                 userCredentials={userCredentials}
                                 setUserCredentials={setUserCredentials}
                                 setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />
                         }
                     />
-                    <Route path="/rooms-management/add"
+                    <Route path="/rooms/add"
                         element={
                             <CreateRoomScreen
                                 userCredentials={userCredentials}
@@ -99,25 +97,15 @@ function App() {
                             />
                         }
                     />
-                    <Route path="/rooms-management/remove"
+                    <Route path="/rooms/types"
                         element={
-                            <RemoveRoomScreen
+                            <RoomTypesScreen
                                 userCredentials={userCredentials}
                                 setUserCredentials={setUserCredentials}
                                 setShowConnectionErrorMessage={setShowConnectionErrorMessage}
                             />
                         }
                     />
-                    <Route path='/rooms-management/update'
-                        element={<RoomUpdateScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
-                    <Route path='/rooms-management/information'
-                        element={<RoomInformationScreen
-                            userCredentials={userCredentials}
-                            setShowConnectionErrorMessage={setShowConnectionErrorMessage} />}>
-                    </Route>
                     
                     <Route path='/create-guest'
                         element={<CreateGuestScreen
@@ -241,6 +229,9 @@ function App() {
                 </Modal>
             )}
         </div>
+        </ModalErrorContextProvider>
+        </PopupInfoContextProvider>
+        </PopupErrorContextProvider>
     )
 }
 
