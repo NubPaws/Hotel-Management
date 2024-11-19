@@ -18,11 +18,10 @@ import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 import Button from "../UIElements/Buttons/Button";
 import useFetchRoomTypes from "./Hooks/useFetchRoomTypes";
 import IconButton from "../UIElements/Buttons/IconButton";
-
+import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 
 import plusIcon from "../assets/plus-icon.svg";
 import "./RoomsScreen.css";
-import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 
 const RoomsScreen: FC<ScreenProps> = ({
 	userCredentials,
@@ -186,7 +185,7 @@ const RoomsScreen: FC<ScreenProps> = ({
         </FormContainer>
         
         {rooms.length > 0 && (
-            <ul style={{ marginTop: "8px"}}>
+            <ul className="room-entry-list-wrapper">
                 {rooms.map((room, index) => (
                     <RoomEntry
                         key={index}
