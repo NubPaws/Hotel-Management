@@ -6,12 +6,16 @@ import { RoomType } from "../../APIRequests/ServerData";
 
 type UseFetchRoomTypesResult = {
 	roomTypes: string[];
+    typesDescription: string[];
 	loading: boolean;
+    update: () => void;
 };
 
 const useFetchRoomTypes = (token: string | null): UseFetchRoomTypesResult => {
 	const [roomTypes, setRoomTypes] = useState<string[]>([]);
+    const [typesDescription, setTypesDescription] = useState<string[]>([]);
 	const [loading, setLoading] = useState(true);
+    const [updater, setUpdater] = useState(false);
 	
 	const [showModal] = useModalError();
 	const [showErrorPopup] = usePopupError();
@@ -27,6 +31,7 @@ const useFetchRoomTypes = (token: string | null): UseFetchRoomTypesResult => {
                 
                 const data: RoomType[] = await res.json();
                 setRoomTypes(data.map(val => val.code));
+                setTypesDescription(data.map(val => val.description));
             } catch (error) {
                 if (error instanceof FetchError) {
                     showErrorPopup("Failed to fetch room types from server.");
@@ -40,9 +45,13 @@ const useFetchRoomTypes = (token: string | null): UseFetchRoomTypesResult => {
         };
 		
 		fetchRoomTypes();
-	}, [token, showErrorPopup, showModal]);
+	}, [token, showErrorPopup, showModal, updater]);
 	
-	return { roomTypes, loading };
+    const update = () => {
+        setUpdater(!updater);
+    };
+    
+	return { roomTypes, typesDescription, loading, update };
 }
 
 export default useFetchRoomTypes;

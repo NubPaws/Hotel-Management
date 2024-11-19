@@ -9,6 +9,8 @@
 	padding: 8px 12px;
 	cursor: pointer;
 	outline: none;
+	
+	user-select: none;
 }
 
 .icon-btn:hover {

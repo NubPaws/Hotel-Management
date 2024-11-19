@@ -1,0 +1,20 @@
+
+.room-type-entry {
+	display: flex;
+	border: 1px solid black;
+	width: fit-content;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);;
+	border-radius: 4px;
+	height: 20pt;
+}
+
+.entry-name {
+	margin: auto 4px auto 8px;
+	padding: 0;
+	user-select: none;
+}
+
+.entry-remove-btn {
+	margin: auto 4px auto 8px;
+	padding: 0 4px 0 4px;
+}
