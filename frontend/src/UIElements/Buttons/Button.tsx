@@ -3,7 +3,7 @@ import "./Button.css";
 import Colors from "../../styles/Colors";
 
 interface ButtonProps {
-	className: string;
+	className?: string;
 	
 	backgroundColor?: string;
 	

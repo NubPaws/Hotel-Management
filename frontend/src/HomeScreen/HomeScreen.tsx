@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 
 import CenteredLabel from "../UIElements/CenteredLabel";
 
-import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
 import { ScreenProps } from "../Utils/Props";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 
 import icon from "../assets/react.svg";
 import person from "../assets/person.svg"
 import IconButton from "../UIElements/Buttons/IconButton";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 export const HomeScreen: React.FC<ScreenProps> = ({
     userCredentials
 }) => {
-    useAuthenticationRedirect(userCredentials.username);
-
+    useUserRedirect(userCredentials);
+    
     const navigate = useNavigate();
 
     const elements = [

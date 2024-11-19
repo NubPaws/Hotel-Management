@@ -27,29 +27,32 @@ export enum InputType {
 }
 
 interface InputProps {
-    id?: string;
+    id: string;
+    className?: string;
     type: InputType;
     label?: string;
     value?: string;
     placeholder?: string;
     hint?: string;
     isRequired?: boolean;
+    
     onChange?: ChangeEventHandler<HTMLInputElement>;
     onClick?: MouseEventHandler<HTMLInputElement>;
 }
 
 const Input: React.FC<InputProps> = ({
     id,
-    label,
+    className = "",
     type,
-    value,
-    placeholder,
-    hint,
+    label = "",
+    value = "",
+    placeholder = "",
+    hint = "",
     isRequired = false,
-    onChange,
-    onClick
+    onChange = () => {},
+    onClick = () => {},
 }) => (
-    <div className="input-field-wrapper">
+    <div className={`input-field-wrapper ${className}`}>
         {label && (
             <label htmlFor={id} className="input-label">
                 {label}
@@ -57,7 +60,7 @@ const Input: React.FC<InputProps> = ({
         }
         <input
             id={id}
-            className="input-field"
+            className={`input-field`}
             type={type}
             value={value}
             placeholder={placeholder}

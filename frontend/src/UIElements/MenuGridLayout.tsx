@@ -10,7 +10,7 @@ interface MenuGridLayoutProps {
 const MenuGridLayout: React.FC<MenuGridLayoutProps> = ({
 	children,
 	shadow = false,
-	width = "fit-content"
+	width = "fit-content",
 }) => {
 	const shadowClass = shadow ? "menu-grid-box-shadow" : "";
 	
@@ -18,12 +18,12 @@ const MenuGridLayout: React.FC<MenuGridLayoutProps> = ({
 		<div
 			className={`menu-grid-layout-container ${shadowClass}`}
 			style={{
-				width: width
+				width: width,
 			}}
 		>
 			{children}
 		</div>
 	);
-}
+};
 
 export default MenuGridLayout;

@@ -34,6 +34,9 @@ import ReservationsManagementsScreen from './Reservations/ReservationsManagement
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
 import GuestsManagementScreen from './Guests/GuestsManagementScreen';
 import AdministrationScreen from './Administration/AdministrationScreen';
+import CreateRoomScreen from './Rooms/CreateRoomScreen';
+import RemoveRoomScreen from './Rooms/RemoveRoomScreen';
+
 
 function App() {
     const [userCredentials, setUserCredentials] = useState<UserCredentials>({
@@ -55,10 +58,11 @@ function App() {
 
         { path: "/rooms-management/type", element: RoomTypeScreen },
         { path: "/rooms-management", element: RoomsManagementScreen },
-        { path: "/rooms-management/add", element: RoomsManagementScreen },
-        { path: "/rooms-management/remove", element: RoomsManagementScreen },
+        { path: "/rooms-management/add", element: CreateRoomScreen },
+        { path: "/rooms-management/remove", element: RemoveRoomScreen },
         { path: "/rooms-management/update", element: RoomUpdateScreen },
         { path: "/rooms-management/information", element: RoomInformationScreen },
+
 
         { path: "/guests-management/", element: GuestsManagementScreen },
         { path: "/create-guest", element: CreateGuestScreen },
@@ -101,7 +105,7 @@ function App() {
     }
 
     return (
-        <div className="appContainer">
+        <div className="app-container">
             <BrowserRouter>
                 {userCredentials.username !== "" && (
                     <NavigationBar setUserCredentials={setUserCredentials} />

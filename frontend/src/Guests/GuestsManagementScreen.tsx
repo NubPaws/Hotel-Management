@@ -2,16 +2,17 @@ import IconButton from "../UIElements/Buttons/IconButton";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { ScreenProps } from '../Utils/Props';
 import CenteredLabel from "../UIElements/CenteredLabel";
-import useAuthenticationRedirect from "../Utils/useAuthenticationRedirect";
 import { useNavigate } from "react-router-dom";
 import plus from "../assets/plus-icon.svg"
 import search from "../assets/search-plus.svg"
 import icon from "../assets/react.svg";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 const GuestsManagementScreen: React.FC<ScreenProps> = ({
 	userCredentials,
 }) => {
-    useAuthenticationRedirect(userCredentials.username);
+    useUserRedirect(userCredentials);
+    
     const navigate = useNavigate();
     const buttons = [
         {image: plus, navUrl: "/create-guest",     text: "Create guests"},
