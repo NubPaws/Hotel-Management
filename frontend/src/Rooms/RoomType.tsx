@@ -1,5 +1,4 @@
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
-import { ROOM_TYPE_REGEX } from "./RoomsRegex";
 
 async function createRoomType(
     event: any,
@@ -40,12 +39,12 @@ function validateRoomTypeCreation() {
     let roomTypeErrorMessage = document.getElementById("roomTypeErrorMessage") as HTMLInputElement;
     let roomDescriptionErrorMessage = document.getElementById("roomDescriptionErrorMessage") as HTMLInputElement;
 
-    if (!ROOM_TYPE_REGEX.test(roomTypeInput.value)) {
-        roomTypeErrorMessage.innerText = "Room type must contain letters or dash only";
-        return false;
-    } else {
-        roomTypeErrorMessage.innerText = "";
-    }
+    // if (!ROOM_TYPE_REGEX.test(roomTypeInput.value)) {
+    //     roomTypeErrorMessage.innerText = "Room type must contain letters or dash only";
+    //     return false;
+    // } else {
+    //     roomTypeErrorMessage.innerText = "";
+    // }
 
     if (roomDescriptionInput.value === "") {
         roomDescriptionErrorMessage.innerText = "Room description must not be empty";
@@ -95,12 +94,12 @@ function validateRoomTypeToRemove() {
     let roomNewTypeInput = document.getElementById("roomNewType") as HTMLInputElement;
     let roomNewTypeErrorMessage = document.getElementById("roomNewTypeErrorMessage") as HTMLInputElement;
 
-    if (!ROOM_TYPE_REGEX.test(roomTypeToRemoveInput.value)) {
-        roomTypeToRemoveErrorMessage.innerText = "Room type must contain letters or dash only";
-        return false;
-    } else {
-        roomTypeToRemoveErrorMessage.innerText = "";
-    }
+    // if (!ROOM_TYPE_REGEX.test(roomTypeToRemoveInput.value)) {
+    //     roomTypeToRemoveErrorMessage.innerText = "Room type must contain letters or dash only";
+    //     return false;
+    // } else {
+    //     roomTypeToRemoveErrorMessage.innerText = "";
+    // }
 
     if (roomNewTypeInput.value === "") {
         roomNewTypeErrorMessage.innerText = "Room type must not be empty";

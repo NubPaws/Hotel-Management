@@ -15,9 +15,10 @@ const RoomsManagementScreen: React.FC<ScreenProps> = ({
 	const navigate = useNavigate();
 	
 	const buttons = [
-		{image: myImage, navUrl: "add", text: "Add room"},
-		{image: myImage, navUrl: "remove", text: "Remove room"},
+		{image: myImage, navUrl: "add", text: "Add"},
+		{image: myImage, navUrl: "remove", text: "Remove"},
 		{image: myImage, navUrl: "information", text: "Query"},
+		{image: myImage, navUrl: "update", text: "Update"}
 	];
 	
 	const elements = [];

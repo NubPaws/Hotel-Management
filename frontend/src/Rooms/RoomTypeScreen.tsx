@@ -6,6 +6,7 @@ import Input from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
 import { createRoomType, removeRoomType } from "./RoomType";
 import Modal from "../UIElements/Modal";
+import { UserCredentials } from "../APIRequests/ServerData";
 
 export function RoomTypeScreen(props: {
     userCredentials: UserCredentials,
@@ -28,17 +29,17 @@ export function RoomTypeScreen(props: {
     return (
         <>
             <NavigationBar></NavigationBar>
-            <CenteredLabel labelName="Room Type Creation"></CenteredLabel>
+            {/* <CenteredLabel labelName="Room Type Creation"></CenteredLabel> */}
             <form id="roomTypeCreateForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/create-type/">
-                <Input id="roomType" className="field" type="text" name="roomType"
+                {/* <Input id="roomType" className="field" type="text" name="roomType"
                     placeholder="Enter room type" errorMessageId="roomTypeErrorMessage">
                     Room type
                 </Input>
                 <Input id="roomDescription" className="field" type="text" name="roomDescription"
                     placeholder="Enter room description" errorMessageId="roomDescriptionErrorMessage">
                     Room description
-                </Input>
-                <Button
+                </Input> */}
+                {/* <Button
                     className="fieldLabel"
                     bgColor="white"
                     textColor="black"
@@ -49,18 +50,18 @@ export function RoomTypeScreen(props: {
                         setShowRoomTypeCreationSuccessMessage,
                         setShowRoomTypeCreationErrorMessage)}>
                     Create Room Type
-                </Button>
+                </Button> */}
             </form>
-            <Modal title="Room Type Successfully created" show={showRoomTypeCreationSuccessMessage} onClose={() => { setShowRoomTypeCreationSuccessMessage(false) }}>
+            {/* <Modal title="Room Type Successfully created" show={showRoomTypeCreationSuccessMessage} onClose={() => { setShowRoomTypeCreationSuccessMessage(false) }}>
                 <h5>Succeeded in creating room type</h5>
             </Modal>
             <Modal title="Room Type Creation Failed" show={showRoomTypeCreationErrorMessage} onClose={() => { setShowRoomTypeCreationErrorMessage(false) }}>
                 <h5>Failed in creating room type</h5>
-            </Modal>
+            </Modal> */}
 
-            <CenteredLabel labelName="Room Type Removal"></CenteredLabel>
+            {/* <CenteredLabel labelName="Room Type Removal"></CenteredLabel> */}
             <form id="roomTypeRemovalForm" className="fieldsContainer" action="http://localhost:8000/api/Rooms/remove-type/">
-                <Input id="roomTypeToRemove" className="field" type="text" name="roomTypeToRemove"
+                {/* <Input id="roomTypeToRemove" className="field" type="text" name="roomTypeToRemove"
                     placeholder="Enter room type to remove" errorMessageId="roomTypeToRemoveErrorMessage">
                     Room type to remove
                 </Input>
@@ -79,14 +80,14 @@ export function RoomTypeScreen(props: {
                                                        setShowRoomTypeRemovalSuccessMessage,
                                                        setShowRoomTypeRemovalErrorMessage)}>
                     Remove Room Type
-                </Button>
+                </Button> */}
             </form>
-            <Modal title="Room Type Successfully removed" show={showRoomTypeRemovalSuccessMessage} onClose={() => { setShowRoomTypeRemovalSuccessMessage(false) }}>
+            {/* <Modal title="Room Type Successfully removed" show={showRoomTypeRemovalSuccessMessage} onClose={() => { setShowRoomTypeRemovalSuccessMessage(false) }}>
                 <h5>Succeeded in removing room type</h5>
             </Modal>
             <Modal title="Room Type Removal Failed" show={showRoomTypeRemovalErrorsMessage} onClose={() => { setShowRoomTypeRemovalErrorMessage(false) }}>
                 <h5>Failed in removing room type</h5>
-            </Modal>
+            </Modal> */}
         </>
     )
 }

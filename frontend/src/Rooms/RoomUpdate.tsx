@@ -1,6 +1,5 @@
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
 import { validateRadioButton } from "../Authentication/Validation";
-import { ROOM_NUMBER_REGEX } from "./RoomsRegex";
 
 async function updateRoom(
     event: any,
@@ -67,20 +66,20 @@ function validateRoomUpdate() {
     let roomNumberInput = document.getElementById("roomNumber") as HTMLInputElement;
     let roomNumberErrorMessage = document.getElementById("roomNumberErrorMessage") as HTMLInputElement;
 
-    if (!ROOM_NUMBER_REGEX.test(roomNumberInput.value)) {
-        roomNumberErrorMessage.innerText = "Room number must numbers only";
-        return false;
-    } else {
-        roomNumberErrorMessage.innerText = "";
-    }
+    // if (!ROOM_NUMBER_REGEX.test(roomNumberInput.value)) {
+    //     roomNumberErrorMessage.innerText = "Room number must numbers only";
+    //     return false;
+    // } else {
+    //     roomNumberErrorMessage.innerText = "";
+    // }
 
-    if (!validateRadioButton("state", "roomStateErrorMessage", "Room state must be selected")) {
-        return false;
-    }
+    // if (!validateRadioButton("state", "roomStateErrorMessage", "Room state must be selected")) {
+    //     return false;
+    // }
 
-    if (!validateRadioButton("occupation", "roomOccupationErrorMessage", "Occupation must be selected")) {
-        return false;
-    }
+    // if (!validateRadioButton("occupation", "roomOccupationErrorMessage", "Occupation must be selected")) {
+    //     return false;
+    // }
     return true;
 }
 
