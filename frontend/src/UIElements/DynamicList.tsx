@@ -30,8 +30,17 @@ interface DynamicListProps {
     addItemButtonValue: string;
 }
 
-export const DynamicList: React.FC<DynamicListProps> = (
-    { list, setList, listId, itemId, itemLabel, itemPlaceHolder, removeItemId, addItemId, addItemButtonValue }) => (
+export const DynamicList: React.FC<DynamicListProps> = ({
+    list,
+    setList,
+    listId,
+    itemId,
+    itemLabel,
+    itemPlaceHolder,
+    removeItemId,
+    addItemId,
+    addItemButtonValue
+}) => (
     <>
         <div id={listId}>
             {list.map((item, index) => (
