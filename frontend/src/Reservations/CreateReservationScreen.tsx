@@ -8,6 +8,7 @@ import { DynamicList } from "../UIElements/DynamicList";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
+import DateInput from "../UIElements/Forms/DateInput";
 
 const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials, setShowConnectionErrorMessage
@@ -115,6 +116,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="guestId"
                     label="Guest Id"
+                    value={`${guest}`}
                     type={InputType.Number}
                     placeholder="Enter guest Id"
                     onChange={(e) => setGuest(Number(e.target.value))}
@@ -122,6 +124,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="guestName"
                     label="Guest Name"
+                    value={guestName}
                     type={InputType.Text}
                     placeholder="Enter guest name"
                     onChange={(e) => setGuestName(e.target.value)}
@@ -129,6 +132,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="guestEmail"
                     label="Guest email"
+                    value={email}
                     type={InputType.Email}
                     placeholder="Enter guest email"
                     onChange={(e) => setEmail(e.target.value)}
@@ -136,6 +140,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="guestPhone"
                     label="Guest phone"
+                    value={phone}
                     type={InputType.Text}
                     placeholder="Enter guest phone"
                     onChange={(e) => setPhone(e.target.value)}
@@ -143,6 +148,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="room"
                     label="Room number"
+                    value={`${room}`}
                     type={InputType.Number}
                     placeholder="Enter room number"
                     onChange={(e) => setRoom(Number(e.target.value))}
@@ -151,17 +157,19 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="roomType"
                     label="Room type"
+                    value={roomType}
                     type={InputType.Text}
                     placeholder="Enter room type"
                     onChange={(e) => setRoomType(e.target.value)}
                 />
-                <Input
+                <DateInput
                     id="startDate"
                     label="Start date"
-                    type={InputType.Date}
+                    value={startDate}
                     placeholder="Enter start date"
-                    onChange={(e) => setStartDate(new Date(e.target.value))}
+                    onChange={(year, month, day) => {setStartDate(new Date(year, month - 1, day))}}
                 />
+                {/* TODO: Add values to those */}
                 <Input
                     id="startTime"
                     label="Start time"

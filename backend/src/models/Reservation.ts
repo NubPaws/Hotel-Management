@@ -623,12 +623,15 @@ export default {
  *       required:
  *         - reservationId
  *         - reservationMade
+ *         - comment
  *         - startDate
  *         - startTime
  *         - nightCount
  *         - endTime
  *         - prices
+ *         - roomType
  *         - guest
+ *         - guestName
  *         - email
  *         - phone
  *       properties:
@@ -639,20 +642,20 @@ export default {
  *         reservationMade:
  *           type: string
  *           format: date-time
- *           description: Date and time when the reservation was made.
- *           example: "2024-10-16T10:30:00.000Z"
+ *           description: Date and time when the reservation was created.
+ *           example: "2024-11-20T10:00:00.000Z"
  *         comment:
  *           type: string
- *           description: Comment associated with the reservation.
- *           example: "Late check-in requested."
+ *           description: Additional notes or comments about the reservation.
+ *           example: "Late arrival expected."
  *         startDate:
  *           type: string
- *           format: date-time
- *           description: Start date of the reservation.
- *           example: "2024-11-01T00:00:00.000Z"
+ *           format: date
+ *           description: Start date of the reservation in YYYY-MM-DD format.
+ *           example: "2024-11-25"
  *         startTime:
  *           type: string
- *           description: Start time of the reservation in HH:mm format (24-hour).
+ *           description: Start time of the reservation in HH:mm (24-hour) format.
  *           example: "15:00"
  *         nightCount:
  *           type: integer
@@ -660,39 +663,61 @@ export default {
  *           example: 3
  *         endTime:
  *           type: string
- *           description: End time of the reservation in HH:mm format.
+ *           description: End time of the reservation in HH:mm (24-hour) format.
  *           example: "12:00"
+ *         endDate:
+ *           type: string
+ *           format: date
+ *           description: End date of the reservation in YYYY-MM-DD format.
+ *           example: "2024-11-28"
  *         prices:
  *           type: array
  *           items:
  *             type: number
- *           description: Prices for each night of the stay.
- *           example: [100, 120, 150]
- *         guest:
+ *           description: List of nightly prices for the reservation.
+ *           example: [120.5, 130.0, 125.0]
+ *         roomType:
+ *           type: string
+ *           description: Type of room requested for the reservation.
+ *           example: "Deluxe Suite"
+ *         room:
  *           type: integer
- *           description: ID of the guest making the reservation.
- *           example: 7890
- *         email:
+ *           nullable: true
+ *           description: Assigned room number, or null if not yet assigned.
+ *           example: 101
+ *         state:
  *           type: string
- *           description: Email address of the guest.
- *           example: "guest@example.com"
- *         phone:
- *           type: string
- *           description: Phone number of the guest.
- *           example: "+972 50 123 4567"
+ *           enum:
+ *             - Pending
+ *             - Arriving
+ *             - Active
+ *             - Departing
+ *             - Passed
+ *             - NoShow
+ *             - Cancelled
+ *           description: Current status of the reservation.
+ *           example: "Active"
  *         extras:
  *           type: array
  *           items:
  *             type: integer
  *           description: Array of extra service IDs associated with the reservation.
- *           example: [101, 102, 103]
- *         room:
+ *           example: [101, 102]
+ *         guest:
  *           type: integer
- *           description: Room ID assigned to the reservation.
- *           example: 101
- *         state:
+ *           description: ID of the guest making the reservation.
+ *           example: 7890
+ *         guestName:
  *           type: string
- *           enum: [Pending, Arriving, Active, Departing, Passed, NoShow, Cancelled]
- *           description: Current state of the reservation.
- *           example: "Active"
+ *           description: Name of the guest making the reservation.
+ *           example: "John Doe"
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Email address of the guest.
+ *           example: "john.doe@example.com"
+ *         phone:
+ *           type: string
+ *           description: Phone number of the guest.
+ *           example: "+1-555-123-4567"
  */

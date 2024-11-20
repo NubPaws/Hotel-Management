@@ -13,6 +13,7 @@ import IconButton from "../UIElements/Buttons/IconButton";
 import plus from "../assets/plus-icon.svg";
 import "./ReservationsScreen.css";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
 
 const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials, setShowConnectionErrorMessage
@@ -96,7 +97,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 New
             </IconButton>
         </div>
-        <FormContainer onSubmit={(e) => handleSubmit(e)}>
+        <FormContainer onSubmit={(e) => handleSubmit(e)} maxWidth="500px">
             <Input
                 id="guestIdentification"
                 label="Guest Identification number"
@@ -113,22 +114,24 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 onChange={(e) => setRoom(Number(e.target.value))}
                 required={false}
             />
-            <Input
-                id="startDate"
-                label="Start date"
-                type={InputType.Date}
-                placeholder="Enter start date"
-                onChange={(e) => setStartDate(new Date(e.target.value))}
-                required={false}
-            />
-            <Input
-                id="endDate"
-                label="End date"
-                type={InputType.Date}
-                placeholder="Enter end date"
-                onChange={(e) => setEndDate(new Date(e.target.value))}
-                required={false}
-            />
+            <MenuGridLayout>
+                <Input
+                    id="startDate"
+                    label="Start date"
+                    type={InputType.Date}
+                    placeholder="Enter start date"
+                    onChange={(e) => setStartDate(new Date(e.target.value))}
+                    required={false}
+                />
+                <Input
+                    id="endDate"
+                    label="End date"
+                    type={InputType.Date}
+                    placeholder="Enter end date"
+                    onChange={(e) => setEndDate(new Date(e.target.value))}
+                    required={false}
+                />
+            </MenuGridLayout>
             <Input
                 id="guestEmail"
                 label="Guest email"
