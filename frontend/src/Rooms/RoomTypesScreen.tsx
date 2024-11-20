@@ -7,9 +7,9 @@ import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 import RoomTypeEntry from "./Elements/RoomTypeEntry";
-import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import { makeRequest } from "../APIRequests/APIRequests";
+import usePopup from "../Utils/Contexts/PopupContext";
 
 import "./RoomTypesScreen.css"
 
@@ -24,7 +24,7 @@ const RoomTypesScreen: FC<ScreenProps> = ({
     const [description, setDescription] = useState("");
     
     const [showModal] = useModalError();
-    const [showInfoPopup] = usePopupInfo();
+    const [_, showInfoPopup] = usePopup();
     
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();

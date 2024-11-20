@@ -1,0 +1,12 @@
+
+.reservation-management-wrapper {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+
+.reservation-add-btn {
+	position: absolute;
+	right: 0;
+}

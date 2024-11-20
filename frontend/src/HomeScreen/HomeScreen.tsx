@@ -21,6 +21,7 @@ export const HomeScreen: React.FC<ScreenProps> = ({
     const elements = [
         { image: icon, navUrl: "/reservations", text: "Reservations" },
         { image: person, navUrl: "/guests-management", text: "Guests" },
+        { image: icon, navUrl: "/rooms", text: "Rooms"},
         // {image: icon, navUrl: "/change-password",           text: "Change password"},
         // {image: icon, navUrl: "/user-creation",             text: "Create new user"},
         // {image: icon, navUrl: "/create-guest",              text: "Create guests"},
@@ -41,7 +42,6 @@ export const HomeScreen: React.FC<ScreenProps> = ({
         // {image: icon, navUrl: "/update-extra",              text: "Update extra"},
         // {image: icon, navUrl: "/search-reservation",        text: "Search reservation"},
         // {image: icon, navUrl: "/update-reservation",        text: "Update reservation"},
-        // {image: icon, navUrl: "/end-of-day",                text: "End of day"},
 
     ];
 

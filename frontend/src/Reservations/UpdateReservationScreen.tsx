@@ -130,7 +130,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Email}
                     placeholder="Enter guest email"
                     onChange={(e) => setEmail(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="guestPhone"
@@ -138,7 +138,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter guest phone"
                     onChange={(e) => setPhone(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="room"
@@ -146,7 +146,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Number}
                     placeholder="Enter room number"
                     onChange={(e) => setRoom(Number(e.target.value))}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="roomType"
@@ -154,7 +154,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter room type"
                     onChange={(e) => setRoomType(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="startDate"
@@ -162,7 +162,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Date}
                     placeholder="Enter start date"
                     onChange={(e) => setStartDate(new Date(e.target.value))}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="startTime"
@@ -170,7 +170,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Time}
                     placeholder="Enter start time"
                     onChange={(e) => setStartTime(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="endTime"
@@ -178,7 +178,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Time}
                     placeholder="Enter end time"
                     onChange={(e) => setEndTime(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <DynamicList
                     list={prices}
@@ -197,7 +197,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter comment"
                     onChange={(e) => setComment(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="updateReservationButton"

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useModalError } from "../../Utils/Contexts/ModalErrorContext";
-import { usePopupError } from "../../Utils/Contexts/PopupErrorContext";
 import { FetchError, makeRequest, RequestError } from "../../APIRequests/APIRequests";
 import { RoomType } from "../../APIRequests/ServerData";
+import usePopup from "../../Utils/Contexts/PopupContext";
 
 type UseFetchRoomTypesResult = {
 	roomTypes: string[];
@@ -18,7 +18,7 @@ const useFetchRoomTypes = (token: string | null): UseFetchRoomTypesResult => {
     const [updater, setUpdater] = useState(false);
 	
 	const [showModal] = useModalError();
-	const [showErrorPopup] = usePopupError();
+	const [showErrorPopup] = usePopup();
 	
 	useEffect(() => {
 		if (!token) {

@@ -146,7 +146,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Number}
                     placeholder="Enter room number"
                     onChange={(e) => setRoom(Number(e.target.value))}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="roomType"

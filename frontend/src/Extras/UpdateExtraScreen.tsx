@@ -86,7 +86,7 @@ const UpdateExtraScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter item name"
                     onChange={(e) => setName(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="price"
@@ -94,7 +94,7 @@ const UpdateExtraScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Number}
                     placeholder="Enter item price"
                     onChange={(e) => setPrice(Number(e.target.value))}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="description"
@@ -102,7 +102,7 @@ const UpdateExtraScreen: React.FC<AuthenticatedUserProps> = ({
                     type={InputType.Text}
                     placeholder="Enter item description"
                     onChange={(e) => setDescription(e.target.value)}
-                    isRequired={false}
+                    required={false}
                 />
                 <Input
                     id="addExtraButton"

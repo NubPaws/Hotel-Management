@@ -6,7 +6,7 @@ import Dropdown from "../../UIElements/Dropdown";
 
 import "./RoomEntry.css";
 
-const ROOM_OPTIONS = ["Clean", "Inspected", "Dirty", "Out Of Order"];
+const ROOM_OPTIONS = ["Clean", "Inspected", "Dirty", "OutOfOrder"];
 
 interface RoomEntryProps extends Room {
 	changeState: (roomId: number, newState: string) => void;

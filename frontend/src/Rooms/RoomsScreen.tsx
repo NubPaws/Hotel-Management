@@ -8,17 +8,15 @@ import RoomStateRadioButton from "./Elements/RoomRadioButtons";
 import RoomOccupationRadioButton from "./Elements/RoomOccupationRadioButtons";
 import RoomEntry from "./Elements/RoomEntry";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
-import { usePopupError } from "../Utils/Contexts/PopupErrorContext";
 import { Room } from "../APIRequests/ServerData";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { useNavigate } from "react-router-dom";
-import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 import Button from "../UIElements/Buttons/Button";
 import useFetchRoomTypes from "./Hooks/useFetchRoomTypes";
 import IconButton from "../UIElements/Buttons/IconButton";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
-
+import usePopup from "../Utils/Contexts/PopupContext";
 import plusIcon from "../assets/plus-icon.svg";
 import "./RoomsScreen.css";
 
@@ -38,8 +36,7 @@ const RoomsScreen: FC<ScreenProps> = ({
     const [rooms, setRooms] = useState<Room[]>([]);
     
 	const [showModal] = useModalError();
-	const [showErrorPopup] = usePopupError();
-    const [showInfoPopup] = usePopupInfo()
+	const [showErrorPopup, showInfoPopup] = usePopup();
 	
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();

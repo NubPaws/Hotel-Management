@@ -7,9 +7,8 @@ import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequest
 import FormContainer from "../UIElements/Forms/FormContainer";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
-import { usePopupError } from "../Utils/Contexts/PopupErrorContext";
-import { usePopupInfo } from "../Utils/Contexts/PopupInfoContext";
 import useFetchRoomTypes from "./Hooks/useFetchRoomTypes";
+import usePopup from "../Utils/Contexts/PopupContext";
 
 const CreateRoomScreen: React.FC<ScreenProps> = ({
     userCredentials
@@ -20,10 +19,8 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     const [roomType, setRoomType] = useState("");
     const [roomNumber, setRoomNumber] = useState(0);
     
-    // const [modal, showModal] = useModal();
     const [showModal] = useModalError();
-    const [showErrorPopup] = usePopupError();
-    const [showInfoPopup] = usePopupInfo();
+    const [showErrorPopup, showInfoPopup] = usePopup();
     
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
     

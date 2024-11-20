@@ -22,20 +22,18 @@ import RemoveExtraScreen from './Reservations/RemoveExtraScreen';
 import UserCreationScreen from './Authentication/UserCreationScreen';
 import { UserCredentials } from './APIRequests/ServerData';
 import UpdateExtraScreen from './Extras/UpdateExtraScreen';
-import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import { NavigationBar } from './UIElements/NavigationBar';
-import ReservationsManagementsScreen from './Reservations/ReservationsManagementScreen';
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
 import GuestsManagementScreen from './Guests/GuestsManagementScreen';
 import AdministrationScreen from './Administration/AdministrationScreen';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
-import { PopupErrorContextProvider } from './Utils/Contexts/PopupErrorContext';
 import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
 import RoomsScreen from './Rooms/RoomsScreen';
-import { PopupInfoContextProvider } from './Utils/Contexts/PopupInfoContext';
 import RoomTypesScreen from './Rooms/RoomTypesScreen';
+import ReservationsScreen from './Reservations/ReservationsScreen';
+import { PopupContextProvider } from './Utils/Contexts/PopupContext';
 
 
 function App() {
@@ -79,9 +77,8 @@ function App() {
         { path: "/add-extra", element: AddExtraScreen },
         { path: "/remove-extra", element: RemoveExtraScreen },
         { path: "/update-extra", element: UpdateExtraScreen },
-        { path: "/search-reservation", element: SearchReservationScreen },
         { path: "/update-reservation", element: UpdateReservationScreen },
-        { path: "/reservations", element: ReservationsManagementsScreen },
+        { path: "/reservations", element: ReservationsScreen },
 
         { path: "/back-office/end-of-day", element: EndOfDayScreen },
         { path: "/back-office", element: BackOfficeScreen}
@@ -101,8 +98,7 @@ function App() {
     }
 
     return (
-        <PopupErrorContextProvider>
-        <PopupInfoContextProvider>
+        <PopupContextProvider>
         <ModalErrorContextProvider>
         <div className="app-container">
             <BrowserRouter>
@@ -120,9 +116,8 @@ function App() {
             )}
         </div>
         </ModalErrorContextProvider>
-        </PopupInfoContextProvider>
-        </PopupErrorContextProvider>
-    )
+        </PopupContextProvider>
+    );
 }
 
 export default App;
