@@ -5,6 +5,7 @@
 	font-family: var(--font-league-spartan-family);
 	padding: 0.25rem 0.5rem;
 	border-style: solid;
+	user-select: none;
 }
 
 .btn:hover {

@@ -34,7 +34,7 @@ interface InputProps {
     value?: string;
     placeholder?: string;
     hint?: string;
-    isRequired?: boolean;
+    required?: boolean;
     
     onChange?: ChangeEventHandler<HTMLInputElement>;
     onClick?: MouseEventHandler<HTMLInputElement>;
@@ -48,7 +48,7 @@ const Input: React.FC<InputProps> = ({
     value = "",
     placeholder = "",
     hint = "",
-    isRequired = false,
+    required = false,
     onChange = () => {},
     onClick = () => {},
 }) => (
@@ -66,7 +66,7 @@ const Input: React.FC<InputProps> = ({
             placeholder={placeholder}
             onChange={onChange}
             onClick={onClick}
-            required={isRequired}
+            required={required}
         />
         {hint && (
             <span className="input-hint">{hint}</span>

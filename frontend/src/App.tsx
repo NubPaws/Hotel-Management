@@ -4,10 +4,7 @@ import { LoginScreen } from './Authentication/LoginScreen';
 import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
-import { RoomTypeScreen } from './Rooms/RoomTypeScreen';
-import { RoomUpdateScreen } from './Rooms/RoomUpdateScreen';
 import Modal from './UIElements/Modal';
-import RoomInformationScreen from './Rooms/RoomInformationScreen';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
 import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
@@ -28,14 +25,17 @@ import UpdateExtraScreen from './Extras/UpdateExtraScreen';
 import SearchReservationScreen from './Reservations/SearchReservationScreen';
 import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
-import RoomsManagementScreen from './Rooms/RoomsManagementScreen';
 import { NavigationBar } from './UIElements/NavigationBar';
 import ReservationsManagementsScreen from './Reservations/ReservationsManagementScreen';
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
 import GuestsManagementScreen from './Guests/GuestsManagementScreen';
 import AdministrationScreen from './Administration/AdministrationScreen';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
-import RemoveRoomScreen from './Rooms/RemoveRoomScreen';
+import { PopupErrorContextProvider } from './Utils/Contexts/PopupErrorContext';
+import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
+import RoomsScreen from './Rooms/RoomsScreen';
+import { PopupInfoContextProvider } from './Utils/Contexts/PopupInfoContext';
+import RoomTypesScreen from './Rooms/RoomTypesScreen';
 
 
 function App() {
@@ -56,13 +56,9 @@ function App() {
 
         { path: "/home", element: HomeScreen },
 
-        { path: "/rooms-management/type", element: RoomTypeScreen },
-        { path: "/rooms-management", element: RoomsManagementScreen },
-        { path: "/rooms-management/add", element: CreateRoomScreen },
-        { path: "/rooms-management/remove", element: RemoveRoomScreen },
-        { path: "/rooms-management/update", element: RoomUpdateScreen },
-        { path: "/rooms-management/information", element: RoomInformationScreen },
-
+        { path: "/rooms/types", element: RoomTypesScreen },
+        { path: "/rooms/add", element: CreateRoomScreen },
+        { path: "/rooms", element: RoomsScreen },
 
         { path: "/guests-management/", element: GuestsManagementScreen },
         { path: "/create-guest", element: CreateGuestScreen },
@@ -105,6 +101,9 @@ function App() {
     }
 
     return (
+        <PopupErrorContextProvider>
+        <PopupInfoContextProvider>
+        <ModalErrorContextProvider>
         <div className="app-container">
             <BrowserRouter>
                 {userCredentials.username !== "" && (
@@ -120,6 +119,9 @@ function App() {
                 </Modal>
             )}
         </div>
+        </ModalErrorContextProvider>
+        </PopupInfoContextProvider>
+        </PopupErrorContextProvider>
     )
 }
 

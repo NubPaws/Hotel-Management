@@ -2,6 +2,7 @@ import Colors from "../../styles/Colors";
 import "./IconButton.css"
 
 interface IconButtonProps {
+	className?: string;
 	children?: string;
 	iconUrl: string;
 	borderWidth?: string;
@@ -12,6 +13,7 @@ interface IconButtonProps {
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
+	className,
 	children,
 	iconUrl,
 	borderWidth = "1px",
@@ -23,7 +25,7 @@ const IconButton: React.FC<IconButtonProps> = ({
 	return (
 		<button
 			onClick={onClick}
-			className="icon-btn"
+			className={`icon-btn ${className}`}
 			style={{
 				borderWidth,
 				borderRadius,

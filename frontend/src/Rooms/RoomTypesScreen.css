@@ -1,0 +1,9 @@
+
+.room-type-entries-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	row-gap: 16px;
+	justify-items: center;
+	margin: 16px auto;
+	max-width: 600px;
+}

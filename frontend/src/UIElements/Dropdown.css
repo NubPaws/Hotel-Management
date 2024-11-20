@@ -1,0 +1,17 @@
+
+.dropdown-wrapper {
+	margin: 1rem 0;
+}
+
+.dropdown-label {
+	display: block;
+	margin-bottom: 0.5rem;
+}
+
+.dropdown {
+	padding: 0.3rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-size: 14pt;
+	text-align: center;
+}
