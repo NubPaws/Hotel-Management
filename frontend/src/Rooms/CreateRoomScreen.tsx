@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { ScreenProps } from "../Utils/Props";
@@ -65,7 +64,6 @@ const CreateRoomScreen: React.FC<ScreenProps> = ({
     }
     
     return <>
-        <NavigationBar />
         <CenteredLabel>Create Room</CenteredLabel>
         <FormContainer onSubmit={handleSubmit}>
             <SearchableDropdown

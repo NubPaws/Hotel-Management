@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import { ScreenProps } from "../Utils/Props";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
@@ -138,7 +137,6 @@ const RoomsScreen: FC<ScreenProps> = ({
     }
     
     return <>
-        <NavigationBar />
         <CenteredLabel>Rooms Management</CenteredLabel>
         <div className="rooms-extra-btns">
             <IconButton

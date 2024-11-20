@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
@@ -116,7 +115,6 @@ const SearchReservationScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar />
             <CenteredLabel>Search Reservation</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input

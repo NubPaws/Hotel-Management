@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useEffect, useState } from "react";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -22,7 +21,6 @@ export function SearchTaskByIdScreen(props: AuthenticatedUserProps) {
     }, [props.userCredentials, navigate]);
 
     return <>
-        <NavigationBar />
         <CenteredLabel>Search task by Id</CenteredLabel>
         <form id="taskSearchByIdForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/">
             <Input
@@ -113,7 +111,6 @@ export function SearchTaskByDepartmentScreen(props: AuthenticatedUserProps) {
 
     return (
         <>
-            <NavigationBar />
             <CenteredLabel>Search task by department</CenteredLabel>
             <form id="taskSearchByDepartmentForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/department/">
                 {/* <UserDepartmentRadioButton></UserDepartmentRadioButton> */}

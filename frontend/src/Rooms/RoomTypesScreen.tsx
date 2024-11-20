@@ -1,5 +1,4 @@
 import { FC, FormEvent, useState } from "react";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
@@ -71,7 +70,6 @@ const RoomTypesScreen: FC<ScreenProps> = ({
     
     return (
     <>
-        <NavigationBar />
         <CenteredLabel>Room Types Management</CenteredLabel>
         <FormContainer onSubmit={handleSubmit}>
             <SearchableDropdown

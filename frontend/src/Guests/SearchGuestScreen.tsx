@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -22,7 +21,6 @@ export function SearchGuestScreen(props: AuthenticatedUserProps) {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
             <CenteredLabel>Search Guest Information</CenteredLabel>
             <form id="guestSearchForm" className="fieldsContainer" action="http://localhost:8000/api/Guests/search">
                 <Input

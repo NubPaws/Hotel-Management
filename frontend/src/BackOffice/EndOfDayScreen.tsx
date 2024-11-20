@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import FormContainer from "../UIElements/Forms/FormContainer";
@@ -55,7 +54,6 @@ const EndOfDayScreen: React.FC<AuthenticatedUserProps> = ({
 
     return (
         <>
-            <NavigationBar></NavigationBar>
             <CenteredLabel>End Of Day Procedure</CenteredLabel>
             <FormContainer onSubmit={(e) => handleSubmit(e)}>
                 <Input

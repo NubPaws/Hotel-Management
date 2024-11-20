@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthenticatedUserProps } from "../Utils/Props";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../UIElements/NavigationBar";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
@@ -20,7 +19,6 @@ export function UpdateTaskScreen(props: AuthenticatedUserProps) {
 
     return (
         <>
-            <NavigationBar></NavigationBar>
             <CenteredLabel labelName="Update task"></CenteredLabel>
             <form id="taskUpdateForm" className="fieldsContainer" action="http://localhost:8000/api/Tasks/">
                 <Input id="taskId" className="field" type="number" name="taskId"
