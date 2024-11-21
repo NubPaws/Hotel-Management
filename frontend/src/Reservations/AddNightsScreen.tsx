@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import FormContainer from "../UIElements/Forms/FormContainer";
-import { DynamicList } from "../UIElements/DynamicList";
+import DynamicList from "../UIElements/DynamicList";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
@@ -114,7 +114,7 @@ const AddNightsScreen: React.FC<AuthenticatedUserProps> = ({
                     itemPlaceHolder="Enter night price"
                     removeItemId="removePriceButton"
                     addItemId="addPriceButton"
-                    addItemButtonValue="Add Price"
+                    addButtonText="Add Price"
                 />
                 <Input
                     id="addNightsButton"

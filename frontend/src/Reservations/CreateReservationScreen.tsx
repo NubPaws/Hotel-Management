@@ -3,11 +3,14 @@ import { useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import { DynamicList } from "../UIElements/DynamicList";
+import DynamicList from "../UIElements/DynamicList";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import DateInput from "../UIElements/Forms/DateInput";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
+import useFetchRoomTypes from "../Rooms/Hooks/useFetchRoomTypes";
+import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 
 const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials, setShowConnectionErrorMessage
@@ -16,7 +19,6 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const [guestName, setGuestName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [room, setRoom] = useState<number | null>(null);
     const [roomType, setRoomType] = useState("");
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState("");
@@ -24,7 +26,9 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const [nightCount, setNightCount] = useState<number>(0);
     const [prices, setPrices] = useState<number[]>([]);
     const [comment, setComment] = useState("");
-
+    
+    const { roomTypes } = useFetchRoomTypes(userCredentials.token);
+    
     const [createReservationMessage, setCreateReservationMessage] = useState<ModalController | undefined>(undefined);
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
 
@@ -41,7 +45,6 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 guestName,
                 email,
                 phone,
-                room,
                 roomType,
                 startDate,
                 startTime,
@@ -106,78 +109,76 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     return (
     <>
         <CenteredLabel>Create Reservation</CenteredLabel>
-        <FormContainer onSubmit={(e) => handleSubmit(e)}>
+        <FormContainer onSubmit={(e) => handleSubmit(e)} maxWidth="600px">
+            <MenuGridLayout>
+                <Input
+                    id="guestId"
+                    label="Guest Id"
+                    value={guest ? `${guest}` : ""}
+                    type={InputType.Number}
+                    placeholder="Enter guest Id"
+                    onChange={(e) => setGuest(Math.max(Number(e.target.value), 0))}
+                />
+                <Input
+                    id="guestName"
+                    label="Guest Name"
+                    value={guestName}
+                    type={InputType.Text}
+                    placeholder="Enter guest name"
+                    onChange={(e) => setGuestName(e.target.value)}
+                />
+                <Input
+                    id="guestEmail"
+                    label="Guest email"
+                    value={email}
+                    type={InputType.Email}
+                    placeholder="Enter guest email"
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <Input
+                    id="guestPhone"
+                    label="Guest phone"
+                    value={phone}
+                    type={InputType.Text}
+                    placeholder="Enter guest phone"
+                    onChange={(e) => setPhone(e.target.value)}
+                />
+                <SearchableDropdown
+                    id="create-reserve-room-type-drop-down"
+                    options={roomTypes}
+                    label="Room type"
+                    setValue={setRoomType}
+                />
+                <DateInput
+                    id="startDate"
+                    label="Start date"
+                    value={startDate}
+                    placeholder="Enter start date"
+                    onChange={(date) => { setStartDate(date) }}
+                />
+                <Input
+                    id="startTime"
+                    label="Start time"
+                    value={startTime}
+                    type={InputType.Time}
+                    placeholder="Enter start time"
+                    onChange={(e) => setStartTime(e.target.value)}
+                />
+                <Input
+                    id="endTime"
+                    label="End time"
+                    value={endTime}
+                    type={InputType.Time}
+                    placeholder="Enter end time"
+                    onChange={(e) => setEndTime(e.target.value)}
+                />
+            </MenuGridLayout>
             <Input
-                id="guestId"
-                label="Guest Id"
-                value={guest ? `${guest}` : ""}
-                type={InputType.Number}
-                placeholder="Enter guest Id"
-                onChange={(e) => setGuest(Math.max(Number(e.target.value), 0))}
-            />
-            <Input
-                id="guestName"
-                label="Guest Name"
-                value={guestName}
+                id="comment"
+                label="Comment"
                 type={InputType.Text}
-                placeholder="Enter guest name"
-                onChange={(e) => setGuestName(e.target.value)}
-            />
-            <Input
-                id="guestEmail"
-                label="Guest email"
-                value={email}
-                type={InputType.Email}
-                placeholder="Enter guest email"
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-                id="guestPhone"
-                label="Guest phone"
-                value={phone}
-                type={InputType.Text}
-                placeholder="Enter guest phone"
-                onChange={(e) => setPhone(e.target.value)}
-            />
-            <Input
-                id="room"
-                label="Room number"
-                value={room ? `${room}` : ""}
-                type={InputType.Number}
-                placeholder="Enter room number"
-                onChange={(e) => setRoom(Math.max(Number(e.target.value), 0))}
-                required={false}
-            />
-            <Input
-                id="roomType"
-                label="Room type"
-                value={roomType}
-                type={InputType.Text}
-                placeholder="Enter room type"
-                onChange={(e) => setRoomType(e.target.value)}
-            />
-            <DateInput
-                id="startDate"
-                label="Start date"
-                value={startDate}
-                placeholder="Enter start date"
-                onChange={(date) => { setStartDate(date) }}
-            />
-            <Input
-                id="startTime"
-                label="Start time"
-                value={startTime}
-                type={InputType.Time}
-                placeholder="Enter start time"
-                onChange={(e) => setStartTime(e.target.value)}
-            />
-            <Input
-                id="endTime"
-                label="End time"
-                value={endTime}
-                type={InputType.Time}
-                placeholder="Enter end time"
-                onChange={(e) => setEndTime(e.target.value)}
+                placeholder="Enter comment"
+                onChange={(e) => setComment(e.target.value)}
             />
             <Input
                 id="nightCount"
@@ -188,23 +189,13 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 onChange={(e) => setNightCount(Math.max(Number(e.target.value), 0))}
             />
             <DynamicList
+                id="room-night-list"
                 list={prices}
                 setList={setPrices}
-                listId="priceInputs"
-                itemId="price"
-                itemLabel="Night price"
-                itemPlaceHolder="Enter night price"
-                removeItemId="removePriceButton"
-                addItemId="addPriceButton"
-                addItemButtonValue="Add Price"
+                label="Night price"
+                addButtonText="Add Price"
             />
-            <Input
-                id="comment"
-                label="Comment"
-                type={InputType.Text}
-                placeholder="Enter comment"
-                onChange={(e) => setComment(e.target.value)}
-            />
+            
             <Input
                 id="createReservationButton"
                 type={InputType.Submit}

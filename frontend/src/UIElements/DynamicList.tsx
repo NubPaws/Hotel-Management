@@ -1,72 +1,86 @@
 import Input, { InputType } from "./Forms/Input";
+import { ReactSetStateDispatch } from '../Utils/Types';
+import { ChangeEvent, FC, MouseEvent, useCallback } from "react";
+import Button from "./Buttons/Button";
 
-const createHandleAddItem = (
-    list: number[],
-    setList: React.Dispatch<React.SetStateAction<number[]>>,
-): React.MouseEventHandler<HTMLInputElement> => {
-    return () => {
-        setList([...list, 0]);
-    };
-};
-
-const handleRemoveItem = (index: number, list: number[], setList: React.Dispatch<React.SetStateAction<number[]>>) => {
-    setList(list.filter((_, i) => i !== index));
-};
-
-const handleValueChange = (index: number, list: number[], value: number, setList: React.Dispatch<React.SetStateAction<number[]>>) => {
-    const newValues = list.map((price, i) => (i === index ? value : price));
-    setList(newValues);
-};
+import "./DynamicList.css";
 
 interface DynamicListProps {
+    id: string;
     list: number[];
-    setList: React.Dispatch<React.SetStateAction<number[]>>;
-    listId: string;
-    itemId: string;
-    itemLabel: string;
-    itemPlaceHolder: string;
-    removeItemId: string;
-    addItemId: string;
-    addItemButtonValue: string;
+    setList: ReactSetStateDispatch<number[]>;
+    label: string;
+    addButtonText: string;
 }
 
-export const DynamicList: React.FC<DynamicListProps> = ({
+const DynamicList: FC<DynamicListProps> = ({
+    id,
     list,
     setList,
-    listId,
-    itemId,
-    itemLabel,
-    itemPlaceHolder,
-    removeItemId,
-    addItemId,
-    addItemButtonValue
-}) => (
-    <>
-        <div id={listId}>
-            {list.map((item, index) => (
-                <div key={index}>
-                    <Input
-                        id={itemId}
-                        label={itemLabel}
-                        type={InputType.Number}
-                        placeholder={itemPlaceHolder}
-                        value={item.toString()}
-                        onChange={(e) => handleValueChange(index, list, Number(e.target.value), setList)}
-                    />
-                    <Input
-                        id={removeItemId}
-                        type={InputType.Button}
-                        value="Remove"
-                        onClick={() => handleRemoveItem(index, list, setList)}
-                    />
-                </div>
-            ))}
-        </div>
-        <Input
-            id={addItemId}
-            type={InputType.Button}
-            value={addItemButtonValue}
-            onClick={createHandleAddItem(list, setList)}
-        />
-    </>
-);
+    label,
+    addButtonText,
+}) => {
+    
+    const handleAddItem = useCallback(
+        (event: MouseEvent<HTMLButtonElement>) => {
+            event.preventDefault();
+            setList((prevList) => [...prevList, 0]);
+        },
+        [setList]
+    );
+    
+    const handleRemoveItem = useCallback(
+        (event: MouseEvent<HTMLButtonElement>, index: number) => {
+            event.preventDefault();
+            setList(prevList => prevList.filter((_, i) => i !== index))
+        },
+        [setList]
+    );
+    
+    const handleValueChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>, index: number, value: number) => {
+            event.preventDefault();
+            setList(prevList =>
+                prevList.map((item, i) => (i === index ? value : item))
+            );
+        },
+        [setList]
+    );
+    
+    return (
+    <div className="dynamic-list-container">
+        {list.map((item, index) => (
+            <div key={index} className="dynamic-list-fields-container">
+                <label
+                    className="dynamic-list-input-field-label"
+                    htmlFor={`${id}-input-${index}`}
+                >
+                    {`${label} ${index + 1}`}:
+                </label>
+                <Input
+                    id={`${id}-input-${index}`}
+                    className="dynamic-list-input-field"
+                    type={InputType.Number}
+                    value={`${item}`}
+                    
+                    onChange={(e) => handleValueChange(e, index, Number(e.target.value))}
+                />
+                <Button
+                    className="dynamic-list-remove-btn"
+                    onClick={(e) => handleRemoveItem(e, index)}
+                >
+                    -
+                </Button>
+            </div>
+        ))}
+        <Button
+            className="dynamic-list-add-item-btn"
+            onClick={handleAddItem}
+        >
+            {addButtonText}
+        </Button>
+    </div>
+    );
+};
+
+export default DynamicList;

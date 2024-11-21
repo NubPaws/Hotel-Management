@@ -29,7 +29,6 @@ const DateInput: FC<DateInputProps> = ({
 	
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const prevValue = isoDateToArray(formattedValue);
-		console.log(event.target.value);
 		const currValue = isoDateToArray(event.target.value);
 		
 		// Calculate the difference.

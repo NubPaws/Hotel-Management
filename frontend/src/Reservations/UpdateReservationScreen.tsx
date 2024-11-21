@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import { DynamicList } from "../UIElements/DynamicList";
+import DynamicList from "../UIElements/DynamicList";
 import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
@@ -189,7 +189,7 @@ const UpdateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     itemPlaceHolder="Enter night price"
                     removeItemId="removePriceButton"
                     addItemId="addPriceButton"
-                    addItemButtonValue="Add Price"
+                    addButtonText="Add Price"
                 />
                 <Input
                     id="comment"

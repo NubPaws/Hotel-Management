@@ -1,0 +1,32 @@
+
+.dynamic-list-container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+}
+
+.dynamic-list-fields-container {
+	display: grid;
+	grid-template-columns: 5fr 14fr 1fr;
+	column-gap: 16px;
+	margin: 8px 0;
+}
+
+.dynamic-list-input-field {
+	margin: 0;
+}
+
+.dynamic-list-input-field-label {
+	margin: auto 0;
+}
+
+.dynamic-list-remove-btn {
+	margin: auto auto;
+}
+
+.dynamic-list-add-item-btn {
+	align-self: flex-end;
+	margin: 8px 0;
+}
