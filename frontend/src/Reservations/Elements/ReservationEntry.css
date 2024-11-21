@@ -1,0 +1,31 @@
+
+.reservation-entry-fields-container {
+	display: grid;
+	grid-template-columns: 1fr 2fr 1fr 1fr 1fr 3fr 1fr;
+	height: 50px;
+	box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.reservation-entry-fields-container * {
+	margin: auto auto;
+}
+
+.reservation-entry-comment {
+	margin: auto 0;
+}
+
+.reservation-entry-id {
+	margin: auto 16px;
+}
+
+.reservation-entry-date {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+.reservation-entry-date-value {
+	text-align: right;
+	flex-grow: 1;
+}

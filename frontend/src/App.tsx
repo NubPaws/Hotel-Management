@@ -71,6 +71,7 @@ function App() {
         { path: "/search-task-by-department", element: SearchTaskByDepartmentScreen },
 
         { path: "/create-reservation", element: CreateReservationScreen },
+        { path: "/reservations", element: ReservationsScreen },
         { path: "/cancel-reservation", element: CancelReservationScreen },
         { path: "/add-nights", element: AddNightsScreen },
         { path: "/remove-nights", element: RemoveNightScreen },
@@ -78,7 +79,6 @@ function App() {
         { path: "/remove-extra", element: RemoveExtraScreen },
         { path: "/update-extra", element: UpdateExtraScreen },
         { path: "/update-reservation", element: UpdateReservationScreen },
-        { path: "/reservations", element: ReservationsScreen },
 
         { path: "/back-office/end-of-day", element: EndOfDayScreen },
         { path: "/back-office", element: BackOfficeScreen}

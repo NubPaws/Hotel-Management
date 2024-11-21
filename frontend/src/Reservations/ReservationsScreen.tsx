@@ -6,7 +6,7 @@ import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { Reservation } from "../APIRequests/ServerData";
-import ReservationEntry from "./ReservationEntry";
+import ReservationEntry from "./Elements/ReservationEntry";
 import IconButton from "../UIElements/Buttons/IconButton";
 
 import plus from "../assets/plus-icon.svg";
@@ -60,13 +60,20 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
             return;
         }
         
-        const receivedReservation = await res.json() as Reservation[];
+        const receivedReservation = await res.json();
         if (receivedReservation.length === 0) {
             showErrorPopup("Could not find reservation with the specified parameters");
-            setReservations([]);
             return;
         }
-        setReservations(receivedReservation);
+        setReservations(
+            receivedReservation.map((r: any) => ({
+                    ...r,
+                    reservationMade: new Date(r.reservationMade),
+                    startDate: new Date(r.startDate),
+                    endDate: new Date(r.endDate),
+                })
+            )
+        );
     };
 
     return <>
@@ -132,14 +139,16 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                     placeholder="Enter guest id"
                     onChange={(e) => setGuestIdentification(e.target.value)}
                 />
+                <Input
+                    id="searchReservationButton"
+                    className="search-reservation-input-btn"
+                    type={InputType.Submit}
+                    value="Search"
+                />
             </MenuGridLayout>
-            <Input
-                id="searchReservationButton"
-                type={InputType.Submit}
-                value="Search reservation"
-            />
         </FormContainer>
         {reservations && (
+            <div className="reservation-entry-list-container">
             <ul>
                 {reservations.map((reservation) => (
                     <ReservationEntry
@@ -147,7 +156,9 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                         reservation={reservation}
                     />
                 ))}
+            
             </ul>
+            </div>
         )}
     </>;
 }

@@ -47,13 +47,13 @@ export interface Task {
 
 export interface Reservation {
     reservationId: number,
-    reservationMade: string,
+    reservationMade: Date,
     comment: string,
-    startDate: string,
+    startDate: Date,
     startTime: string,
     nightCount: number,
     endTime: string,
-    endDate: string,
+    endDate: Date,
     prices: number[],
     roomType: string,
     room: number,
