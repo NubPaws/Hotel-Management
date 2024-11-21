@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import useFetchReservationInfo from "./Hooks/useFetchReservationInfo";
 
 import "./EditReservationScreen.css";
+import Button from "../UIElements/Buttons/Button";
 
 const EditReservationScreen: FC<ScreenProps> = ({
 	userCredentials,
@@ -24,8 +25,13 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		return <p>Loading reservation...</p>
 	}
 	
+	return <>
 	
-	return <></>;
+	<div>
+		<Button>Back</Button>
+		<Button>Accept</Button>
+	</div>
+	</>;
 };
 
 export default EditReservationScreen;
