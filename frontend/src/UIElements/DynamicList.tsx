@@ -10,6 +10,7 @@ interface DynamicListProps {
     list: number[];
     setList: ReactSetStateDispatch<number[]>;
     label: string;
+    totalText?: string;
     addButtonText: string;
 }
 
@@ -18,6 +19,7 @@ const DynamicList: FC<DynamicListProps> = ({
     list,
     setList,
     label,
+    totalText = "Total",
     addButtonText,
 }) => {
     
@@ -49,36 +51,27 @@ const DynamicList: FC<DynamicListProps> = ({
     
     return (
     <div className="dynamic-list-container">
+        <div className="dynamic-list-controls">
+            <span>{totalText}: {list.length}</span>
+            <Button
+                onClick={handleAddItem}
+            >
+                {addButtonText}
+            </Button>
+        </div>
         {list.map((item, index) => (
             <div key={index} className="dynamic-list-fields-container">
-                <label
-                    className="dynamic-list-input-field-label"
-                    htmlFor={`${id}-input-${index}`}
-                >
-                    {`${label} ${index + 1}`}:
-                </label>
+                <label htmlFor={`${id}-input-${index}`} style={{fontSize: "16pt"}}>{`${label} ${index + 1}`}:</label>
                 <Input
                     id={`${id}-input-${index}`}
-                    className="dynamic-list-input-field"
                     type={InputType.Number}
                     value={`${item}`}
                     
                     onChange={(e) => handleValueChange(e, index, Number(e.target.value))}
                 />
-                <Button
-                    className="dynamic-list-remove-btn"
-                    onClick={(e) => handleRemoveItem(e, index)}
-                >
-                    -
-                </Button>
+                <Button onClick={(e) => handleRemoveItem(e, index)}>-</Button>
             </div>
         ))}
-        <Button
-            className="dynamic-list-add-item-btn"
-            onClick={handleAddItem}
-        >
-            {addButtonText}
-        </Button>
     </div>
     );
 };

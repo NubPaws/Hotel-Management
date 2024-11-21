@@ -23,7 +23,6 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [nightCount, setNightCount] = useState<number>(0);
     const [prices, setPrices] = useState<number[]>([]);
     const [comment, setComment] = useState("");
     
@@ -49,7 +48,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 startDate,
                 startTime,
                 endTime,
-                nightCount,
+                nightCount: prices.length,
                 prices,
                 comment
             }, userCredentials.token);
@@ -69,14 +68,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
 
     const validateInputs = () => {
         const ERROR_TITLE = "Failed to process form";
-        if (nightCount !== prices.length) {
-            setCreateReservationMessage({
-                title: ERROR_TITLE,
-                message: "Nights and prices needs to match"
-            });
-            return false;
-        }
-        if (nightCount <= 0) {
+        if (prices.length === 0) {
             setCreateReservationMessage({
                 title: ERROR_TITLE,
                 message: "Nights must be positive"
@@ -180,20 +172,13 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                 placeholder="Enter comment"
                 onChange={(e) => setComment(e.target.value)}
             />
-            <Input
-                id="nightCount"
-                label="Number of nights"
-                value={`${nightCount}`}
-                type={InputType.Number}
-                placeholder="Enter number of nights"
-                onChange={(e) => setNightCount(Math.max(Number(e.target.value), 0))}
-            />
             <DynamicList
                 id="room-night-list"
                 list={prices}
                 setList={setPrices}
                 label="Night price"
-                addButtonText="Add Price"
+                totalText="Number of nights"
+                addButtonText="Add Night"
             />
             
             <Input

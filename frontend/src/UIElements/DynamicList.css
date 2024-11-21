@@ -14,19 +14,16 @@
 	margin: 8px 0;
 }
 
-.dynamic-list-input-field {
-	margin: 0;
-}
-
-.dynamic-list-input-field-label {
+.dynamic-list-fields-container * {
 	margin: auto 0;
 }
 
-.dynamic-list-remove-btn {
-	margin: auto auto;
+.dynamic-list-controls {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	margin-bottom: 16px;
 }
 
-.dynamic-list-add-item-btn {
-	align-self: flex-end;
-	margin: 8px 0;
+.dynamic-list-controls * {
+	margin: auto 0;
 }
