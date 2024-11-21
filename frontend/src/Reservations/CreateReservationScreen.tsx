@@ -4,18 +4,19 @@ import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import DynamicList from "../UIElements/DynamicList";
-import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import DateInput from "../UIElements/Forms/DateInput";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import useFetchRoomTypes from "../Rooms/Hooks/useFetchRoomTypes";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import { useNavigate } from "react-router-dom";
 
 const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
-    userCredentials, setShowConnectionErrorMessage
+    userCredentials
 }) => {
-    const [guest, setGuest] = useState<number | null>(null);
+    const [guestIdentification, setGuestIdentification] = useState("");
     const [guestName, setGuestName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
@@ -27,149 +28,126 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
     const [comment, setComment] = useState("");
     
     const { roomTypes } = useFetchRoomTypes(userCredentials.token);
+    const [showModal] = useModalError();
     
-    const [createReservationMessage, setCreateReservationMessage] = useState<ModalController | undefined>(undefined);
+    const navigate = useNavigate();
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
-
-    const handleSubmit = async (event: React.FormEvent) => {
+    
+    const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-
-        if (!validateInputs()) {
-            return;
-        }
-
-        try {
-            const res = await makeRequest("api/Reservations/create", "POST", "json", {
-                guest,
-                guestName,
-                email,
-                phone,
-                roomType,
-                startDate,
-                startTime,
-                endTime,
-                nightCount: prices.length,
-                prices,
-                comment
-            }, userCredentials.token);
-            handleResponse(res);
-        } catch (error: any) {
-            if (error instanceof FetchError) {
-                setShowConnectionErrorMessage(true);
-            }
-            if (error instanceof RequestError) {
-                setCreateReservationMessage({
-                    title: "General Error Occurred",
-                    message: error.message,
-                });
-            }
-        }
-    }
-
-    const validateInputs = () => {
-        const ERROR_TITLE = "Failed to process form";
-        if (prices.length === 0) {
-            setCreateReservationMessage({
-                title: ERROR_TITLE,
-                message: "Nights must be positive"
+        
+        const requestBody = {
+            guest: guestIdentification,
+            comment,
+            startDate,
+            startTime,
+            nightCount: prices.length,
+            endTime,
+            prices,
+            roomType,
+            guestName,
+            email,
+            phone,
+        };
+        
+        const url = "api/Reservations/create"
+        
+        makeRequest(url, "POST", "json", requestBody, userCredentials.token)
+            .then((res) => {
+                if (res.ok) {
+                    showModal("Success!", "Successfully created reservation!");
+                    navigate(-1);
+                } else {
+                    res.text().then((value) => showModal("Failed!", value));
+                }
+            })
+            .catch((error) => {
+                if (error instanceof FetchError) {
+                    showModal("Failed to connect to server", error.message);
+                }
+                if (error instanceof RequestError) {
+                    showModal("General Error Occurred", error.message);
+                }
             });
-            return false;
-        }
-        return true;
-    };
-
-    const handleResponse = async (res: Response) => {
-        switch (res.status) {
-            case 201:
-                setCreateReservationMessage({
-                    title: "Success!",
-                    message: "Successfully created reservation!",
-                });
-                break;
-            case 400:
-                setCreateReservationMessage({
-                    title: "Failed!",
-                    message: await res.text(),
-                });
-                break;
-            default:
-                setShowConnectionErrorMessage(true);
-                break;
-        }
-    };
-
+    }
+    
     return (
     <>
         <CenteredLabel>Create Reservation</CenteredLabel>
         <FormContainer onSubmit={(e) => handleSubmit(e)} maxWidth="600px">
             <MenuGridLayout>
                 <Input
-                    id="guestId"
-                    label="Guest Id"
-                    value={guest ? `${guest}` : ""}
+                    id="create-reserve-guest-identification"
+                    label="Guest Identification"
+                    value={guestIdentification}
                     type={InputType.Number}
-                    placeholder="Enter guest Id"
-                    onChange={(e) => setGuest(Math.max(Number(e.target.value), 0))}
+                    placeholder="Enter guest identification"
+                    onChange={(e) => setGuestIdentification(e.target.value)}
+                    required
                 />
                 <Input
-                    id="guestName"
-                    label="Guest Name"
+                    id="create-reserve-full-name"
+                    label="Full Name"
                     value={guestName}
                     type={InputType.Text}
-                    placeholder="Enter guest name"
+                    placeholder="Enter name"
                     onChange={(e) => setGuestName(e.target.value)}
+                    required
                 />
                 <Input
-                    id="guestEmail"
-                    label="Guest email"
+                    id="create-reserve-email"
+                    label="Email address"
                     value={email}
                     type={InputType.Email}
-                    placeholder="Enter guest email"
+                    placeholder="Enter email"
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                 />
                 <Input
-                    id="guestPhone"
-                    label="Guest phone"
+                    id="create-reserve-phone-number"
+                    label="Phone number"
                     value={phone}
-                    type={InputType.Text}
-                    placeholder="Enter guest phone"
+                    type={InputType.Tel}
+                    placeholder="Enter phone"
                     onChange={(e) => setPhone(e.target.value)}
+                    required
                 />
                 <SearchableDropdown
                     id="create-reserve-room-type-drop-down"
                     options={roomTypes}
                     label="Room type"
                     setValue={setRoomType}
+                    required
                 />
                 <DateInput
-                    id="startDate"
+                    id="create-reserve-start-date"
                     label="Start date"
                     value={startDate}
-                    placeholder="Enter start date"
-                    onChange={(date) => { setStartDate(date) }}
+                    onChange={setStartDate}
+                    required
                 />
                 <Input
-                    id="startTime"
-                    label="Start time"
+                    id="create-reserve-start-time"
+                    label="Start at"
+                    type={InputType.Time}
                     value={startTime}
-                    type={InputType.Time}
-                    placeholder="Enter start time"
                     onChange={(e) => setStartTime(e.target.value)}
+                    required
                 />
                 <Input
-                    id="endTime"
-                    label="End time"
-                    value={endTime}
+                    id="create-reserve-end-time"
+                    label="End at"
                     type={InputType.Time}
-                    placeholder="Enter end time"
+                    value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
+                    required
                 />
             </MenuGridLayout>
             <Input
-                id="comment"
-                label="Comment"
+                id="create-reserve-comments"
+                label="Comments"
                 type={InputType.Text}
-                placeholder="Enter comment"
+                placeholder="Enter comments"
                 onChange={(e) => setComment(e.target.value)}
             />
             <DynamicList
@@ -182,16 +160,11 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
             />
             
             <Input
-                id="createReservationButton"
+                id="create-reserve-submit-btn"
                 type={InputType.Submit}
-                value="Create reservation"
+                value="Create"
             />
         </FormContainer>
-        {createReservationMessage && (
-            <Modal title={createReservationMessage.title} onClose={() => setCreateReservationMessage(undefined)}>
-                {createReservationMessage.message}
-            </Modal>
-        )}
     </>
     );
 };
