@@ -4,7 +4,6 @@ import { useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import Modal, { ModalController } from "../UIElements/Modal";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { Reservation } from "../APIRequests/ServerData";
 import ReservationEntry from "./ReservationEntry";
@@ -14,73 +13,60 @@ import plus from "../assets/plus-icon.svg";
 import "./ReservationsScreen.css";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
+import DateInput from "../UIElements/Forms/DateInput";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import usePopup from "../Utils/Contexts/PopupContext";
 
 const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
-    userCredentials, setShowConnectionErrorMessage
+    userCredentials
 }) => {
     const [guestIdentification, setGuestIdentification] = useState("");
-    const [room, setRoom] = useState(-1);
-    const [startDate, setStartDate] = useState(new Date(0));
-    const [endDate, setEndDate] = useState(new Date(0));
+    const [room, setRoom] = useState(0);
+    const [startDate, setStartDate] = useState<Date>(new Date());
+    const [endDate, setEndDate] = useState<Date>(new Date());
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [guestName, setGuestName] = useState("");
-    const [searchReservationMessage, setSearchReservationMessage] = useState<ModalController | undefined>(undefined);
     const [reservations, setReservations] = useState<Reservation[]>();
     
     useUserRedirect(userCredentials);
     const navigate = useNavigate();
     
-    const handleSubmit = async (event: React.FormEvent) => {
+    const [showModal] = useModalError();
+    const [showErrorPopup] = usePopup();
+    
+    const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-
-        try {
-            let url = buildURL(guestIdentification, room, startDate, endDate, email, phone, guestName);
-            const res = await makeRequest(url, "GET", "text", undefined, userCredentials.token);
-            handleResponse(res);
-        } catch (error: any) {
-            if (error instanceof FetchError) {
-                setShowConnectionErrorMessage(true);
-            }
-            if (error instanceof RequestError) {
-                setSearchReservationMessage({
-                    title: "General Error Occurred",
-                    message: error.message,
-                });
-            }
-        }
+        
+        const url = buildURL(guestIdentification, room, startDate, endDate, email, phone, guestName);
+        
+        makeRequest(url, "GET", "text", undefined, userCredentials.token)
+            .then(res => {
+                handleResponse(res);
+            })
+            .catch(error => {
+                if (error instanceof FetchError) {
+                    showModal("Connection error occured", error.message);
+                }
+                if (error instanceof RequestError) {
+                    showModal("General Error Occurred",error.message);
+                }
+            });
     }
 
     const handleResponse = async (res: Response) => {
-        switch (res.status) {
-            case 200:
-                let receivedReservation = await res.json();
-                if (receivedReservation.length === 0) {
-                    setSearchReservationMessage({
-                        title: "Reservation not found",
-                        message: "Could not find reservation with the specified parameters",
-                    });
-                    setReservations(receivedReservation);
-                    break;
-                }
-                const parsedReservations = receivedReservation.map((reservation: Reservation) => ({
-                    ...reservation,
-                    reservationMade: new Date(reservation.reservationMade),
-                    startDate: new Date(reservation.startDate),
-                    endDate: new Date(reservation.endDate)
-                }));
-                setReservations(parsedReservations);
-                break;
-            case 400:
-                setSearchReservationMessage({
-                    title: "Failed!",
-                    message: await res.text(),
-                });
-                break;
-            default:
-                setShowConnectionErrorMessage(true);
-                break;
+        if (!res.ok) {
+            showModal("Failed!", await res.text());
+            return;
         }
+        
+        const receivedReservation = await res.json() as Reservation[];
+        if (receivedReservation.length === 0) {
+            showErrorPopup("Could not find reservation with the specified parameters");
+            setReservations([]);
+            return;
+        }
+        setReservations(receivedReservation);
     };
 
     return <>
@@ -91,105 +77,75 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 className="reservation-add-btn"
                 borderWidth="2px"
                 borderRadius="5px"
-                fontSize="18pt"
+                fontSize="14pt"
                 onClick={() => navigate("/create-reservation")}
             >
                 New
             </IconButton>
         </div>
-        <FormContainer onSubmit={(e) => handleSubmit(e)} maxWidth="500px">
-            <Input
-                id="guestIdentification"
-                label="Guest Identification number"
-                type={InputType.Text}
-                placeholder="Enter guest identification number"
-                onChange={(e) => setGuestIdentification(e.target.value)}
-                required={false}
-            />
-            <Input
-                id="roomNumber"
-                label="Room number"
-                type={InputType.Number}
-                placeholder="Enter room number"
-                onChange={(e) => setRoom(Number(e.target.value))}
-                required={false}
-            />
+        <FormContainer onSubmit={(e) => handleSubmit(e)} maxWidth="600px">
             <MenuGridLayout>
                 <Input
-                    id="startDate"
-                    label="Start date"
-                    type={InputType.Date}
-                    placeholder="Enter start date"
-                    onChange={(e) => setStartDate(new Date(e.target.value))}
-                    required={false}
+                    id="search-reserve-guest-name"
+                    label="Guest Name"
+                    type={InputType.Text}
+                    placeholder="Enter guest name"
+                    onChange={(e) => setGuestName(e.target.value)}
                 />
                 <Input
-                    id="endDate"
-                    label="End date"
-                    type={InputType.Date}
-                    placeholder="Enter end date"
-                    onChange={(e) => setEndDate(new Date(e.target.value))}
-                    required={false}
+                    id="search-reserve-room"
+                    label="Room number"
+                    type={InputType.Number}
+                    placeholder="Enter room number"
+                    onChange={(e) => setRoom(Number(e.target.value))}
+                />
+                <DateInput
+                    id="search-reserve-startDate"
+                    value={startDate}
+                    label="Checked in"
+                    onChange={(date) => setStartDate(new Date(date))}
+                />
+                <DateInput
+                    id="search-reserve-end-date"
+                    value={endDate}
+                    label="Checked out"
+                    onChange={(date) => setEndDate(new Date(date))}
+                />
+                <Input
+                    id="search-reserve-email"
+                    label="Email"
+                    type={InputType.Email}
+                    placeholder="Enter email"
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <Input
+                    id="search-reserve-phone"
+                    label="Phone number"
+                    type={InputType.Tel}
+                    placeholder="Enter phone"
+                    onChange={(e) => setPhone(e.target.value)}
+                />
+                <Input
+                    id="reserve-screen-guest-id"
+                    label="Guest Identification"
+                    type={InputType.Number}
+                    placeholder="Enter guest id"
+                    onChange={(e) => setGuestIdentification(e.target.value)}
                 />
             </MenuGridLayout>
-            <Input
-                id="guestEmail"
-                label="Guest email"
-                type={InputType.Email}
-                placeholder="Enter guest email"
-                onChange={(e) => setEmail(e.target.value)}
-                required={false}
-            />
-            <Input
-                id="guestPhone"
-                label="Guest phone"
-                type={InputType.Text}
-                placeholder="Enter guest phone"
-                onChange={(e) => setPhone(e.target.value)}
-                required={false}
-            />
-            <Input
-                id="guestName"
-                label="Guest Name"
-                type={InputType.Text}
-                placeholder="Enter guest name"
-                onChange={(e) => setGuestName(e.target.value)}
-                required={false}
-            />
             <Input
                 id="searchReservationButton"
                 type={InputType.Submit}
                 value="Search reservation"
             />
         </FormContainer>
-        {searchReservationMessage && (
-            <Modal title={searchReservationMessage.title} onClose={() => setSearchReservationMessage(undefined)}>
-                {searchReservationMessage.message}
-            </Modal>
-        )}
         {reservations && (
             <ul>
                 {reservations.map((reservation) => (
                     <ReservationEntry
                         key={reservation.reservationId}
-                        reservationId={reservation.reservationId}
-                        reservationMade={reservation.reservationMade}
-                        comment={reservation.comment}
-                        startDate={reservation.startDate}
-                        startTime={reservation.startTime}
-                        nightCount={reservation.nightCount}
-                        endTime={reservation.endTime}
-                        endDate={reservation.endDate}
-                        prices={reservation.prices}
-                        roomType={reservation.roomType}
-                        room={reservation.room}
-                        state={reservation.state}
-                        extras={reservation.extras}
-                        guest={reservation.guest}
-                        guestName={reservation.guestName}
-                        email={reservation.email}
-                        phone={reservation.phone}>
-                    </ReservationEntry>
+                        reservation={reservation}
+                    />
                 ))}
             </ul>
         )}
@@ -197,35 +153,35 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
 }
 
 const buildURL = (
-    guestIdentification: string,
-    room: number,
-    startDate: Date,
-    endDate: Date,
-    email: string,
-    phone: string,
-    guestName: string
+    guestIdentification?: string,
+    room?: number,
+    startDate?: Date,
+    endDate?: Date,
+    email?: string,
+    phone?: string,
+    guestName?: string
 ) => {
     let url = "api/Reservations/query?";
     if (guestIdentification) {
-        url += "guestIdentification=" + guestIdentification + "&";
+        url += `guestIdentification=${guestIdentification}&`;
     }
     if (room !== -1) {
-        url += "room=" + room + "&";
+        url += `room=${room}&`;
     }
     if (startDate && startDate.getTime() !== (new Date(0)).getTime()) {
-        url += "startDate=" + startDate + "&";
+        url += `startDate=${startDate}&`;
     }
     if (endDate && endDate.getTime() !== (new Date(0)).getTime()) {
-        url += "endDate=" + endDate + "&";
+        url += `endDate=${endDate}&`;
     }
     if (email) {
-        url += "email=" + email + "&";
+        url += `email=${email}&`;
     }
     if (phone) {
-        url += "phone=" + phone + "&";
+        url += `phone=${phone}&`;
     }
     if (guestName) {
-        url += "guestName=" + guestName + "&";
+        url += `guestName=${guestName}&`;
     }
     return url;
 };

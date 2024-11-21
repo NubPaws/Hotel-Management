@@ -3,25 +3,20 @@ import { Reservation } from "../APIRequests/ServerData";
 
 import "./ReservationEntry.css";
 
-const ReservationEntry: FC<Reservation> = ({
-    reservationId,
-    reservationMade,
-    comment,
-    startDate,
-    startTime,
-    nightCount,
-    endTime,
-    endDate,
-    prices,
-    roomType,
-    room,
-    state,
-    extras,
-    guest,
-    guestName,
-    email,
-    phone
+type ReservationEntryProps = {
+	reservation: Reservation;
+};
+
+const ReservationEntry: FC<ReservationEntryProps> = ({
+	reservation,
 }) => {
+	
+	const {
+		reservationId, reservationMade, comment, startDate, startTime, nightCount,
+		endTime, endDate, prices, roomType, room, state, extras, guest, guestName,
+		email, phone
+	} = reservation;
+	
     return (
 	<div className="reservation-entry-fields-container">
 		<p>Reservation Id: {reservationId}</p>
