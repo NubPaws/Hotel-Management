@@ -147,27 +147,13 @@ const GuestsScreen: React.FC<ScreenProps> = ({
                             identification={guest.identification}
                             fullName={guest.fullName}
                             title={guest.title}
-                            email={guest.email ? guest.email : "No email provided"}
-                            phone={guest.phone ? guest.phone : "No phone provided"}
+                            email={guest.email}
+                            phone={guest.phone}
                             reservations={guest.reservations}>
                         </GuestEntry>
                     ))}
                 </ul>
             )}
-        {/* <MenuGridLayout shadow>
-            <IconButton
-                iconUrl={search}
-                borderWidth="2px"
-                borderRadius="5px"
-                fontSize="18pt"
-                onClick={() => navigate("/search-guest")}
-                >
-                    Search Guest
-                </IconButton>
-            {(userCredentials.department === "FrontDesk" || userCredentials.role === "Admin" )&& (
-                elements
-            )}
-		</MenuGridLayout> */}
     </>;
 }
 

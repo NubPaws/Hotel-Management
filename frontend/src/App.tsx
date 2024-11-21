@@ -6,7 +6,7 @@ import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
 import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
-import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
+import UpdateGuestScreen from './Guests/UpdateGuestScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
 import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
@@ -59,7 +59,7 @@ function App() {
 
         { path: "/guests/", element: GuestsScreen },
         { path: "/create-guest", element: CreateGuestScreen },
-        { path: "/update-guest", element: UpdateGuestScreen },
+        { path: "/guests/update-guest", element: UpdateGuestScreen },
         { path: "/add-reservation", element: AddReservationScreen },
 
         { path: "/create-task", element: CreateTaskScreen },
