@@ -78,7 +78,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
                 Add guest
             </IconButton>
         </div>
-        <FormContainer onSubmit={(e) => handleSubmit(e)}>
+        <FormContainer maxWidth="600px" onSubmit={(e) => handleSubmit(e)}>
             <Input
                 id="guest-id"
                 label="Identification"
