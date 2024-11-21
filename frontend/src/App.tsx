@@ -5,7 +5,7 @@ import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
-import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
+import CreateGuestScreen from './Guests/CreateGuestScreen';
 import UpdateGuestScreen from './Guests/UpdateGuestScreen';
 import { AddReservationScreen } from './Guests/AddReservationScreen';
 import { CreateTaskScreen } from './Tasks/CreateTask';
@@ -58,7 +58,7 @@ function App() {
         { path: "/rooms", element: RoomsScreen },
 
         { path: "/guests/", element: GuestsScreen },
-        { path: "/create-guest", element: CreateGuestScreen },
+        { path: "/guests/add", element: CreateGuestScreen },
         { path: "/guests/update-guest", element: UpdateGuestScreen },
         { path: "/add-reservation", element: AddReservationScreen },
 

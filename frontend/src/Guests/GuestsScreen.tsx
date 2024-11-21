@@ -3,7 +3,7 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { ScreenProps } from '../Utils/Props';
 import CenteredLabel from "../UIElements/CenteredLabel";
 import { useNavigate } from "react-router-dom";
-import plus from "../assets/plus-icon.svg"
+import plusIcon from "../assets/plus-icon.svg"
 import search from "../assets/search-plus.svg"
 import icon from "../assets/react.svg";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
@@ -32,7 +32,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
     const [showModal] = useModalError();
     const [showErrorPopup, showInfoPopup] = usePopup();
 
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     // const buttons = [
     //     {image: plus, navUrl: "/create-guest",     text: "Create guests"},
     //     {image: icon, navUrl: "/update-guest",     text: "Update guests"},
@@ -91,18 +91,33 @@ const GuestsScreen: React.FC<ScreenProps> = ({
 
     return <>
         <CenteredLabel>Guests Management</CenteredLabel>
+        <div className="guests-extra-btns">
+            <IconButton
+                className="guest-add-btn"
+                iconUrl={plusIcon}
+                onClick={() => navigate("/guests/add")}
+            >
+                Add guest
+            </IconButton>
+            {/* <Button
+                onClick={() => navigate("/rooms/types")}
+                textSize="14pt"
+            >
+                Room types
+            </Button> */}
+        </div>
         <FormContainer onSubmit={(e) => handleSubmit(e)}>
             <Input
                 id="guest-id"
-                label="Guest Identification"
+                label="Identification"
                 type={InputType.Text}
-                placeholder="Enter guest Id"
+                placeholder="Enter guest identification"
                 value={`${id}`}
                 onChange={(e) => setId(e.target.value)}
             />
             <Input
                 id="guest-name"
-                label="Guest Name"
+                label="Name"
                 type={InputType.Text}
                 placeholder="Enter guest name"
                 value={fullName}
@@ -110,7 +125,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             />
             <Input
                 id="guest-email"
-                label="Guest Email"
+                label="Email"
                 type={InputType.Email}
                 placeholder="Enter guest email"
                 value={email}
@@ -118,7 +133,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             />
             <Input
                 id="guest-phone"
-                label="Guest Phone"
+                label="Phone"
                 type={InputType.Tel}
                 placeholder="Enter guest phone"
                 value={phone}
