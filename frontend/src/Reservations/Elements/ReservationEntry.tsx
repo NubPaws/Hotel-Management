@@ -46,30 +46,10 @@ const ReservationEntry: FC<ReservationEntryProps> = ({
 		<p className="reservation-entry-comment">{comment}</p>
 		<Button
 			className="reservation-entry-update-btn"
-			onClick={() => navigate(``)}
+			onClick={() => navigate(`/reservations/edit?id=${reservationId}`)}
 		>
-			View
+			Edit
 		</Button>
-		{/* {prices.length > 0 && (
-			<div>
-				<p>Prices:</p>
-				<ul>
-					{prices.map((price, index) => (
-						<li key={index}>{price}</li>
-					))}
-				</ul>
-			</div>
-		)} */}
-		{/* {extras.length > 0 && (
-			<div>
-				<p>Extras:</p>
-				<ul>
-					{extras.map((extra, index) => (
-						<li key={index}>{extra}</li>
-					))}
-				</ul>
-			</div>
-		)} */}
 	</div>;
 };
 

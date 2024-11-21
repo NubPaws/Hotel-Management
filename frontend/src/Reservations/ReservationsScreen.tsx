@@ -85,7 +85,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 borderWidth="2px"
                 borderRadius="5px"
                 fontSize="14pt"
-                onClick={() => navigate("/create-reservation")}
+                onClick={() => navigate("/reservations/create")}
             >
                 New
             </IconButton>

@@ -34,6 +34,7 @@ import RoomsScreen from './Rooms/RoomsScreen';
 import RoomTypesScreen from './Rooms/RoomTypesScreen';
 import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
+import EditReservationScreen from './Reservations/EditReservationScreen';
 
 
 function App() {
@@ -70,8 +71,9 @@ function App() {
         { path: "/search-task-by-id", element: SearchTaskByIdScreen },
         { path: "/search-task-by-department", element: SearchTaskByDepartmentScreen },
 
-        { path: "/create-reservation", element: CreateReservationScreen },
         { path: "/reservations", element: ReservationsScreen },
+        { path: "/reservations/create", element: CreateReservationScreen },
+        { path: "/reservations/edit", element: EditReservationScreen },
         { path: "/cancel-reservation", element: CancelReservationScreen },
         { path: "/add-nights", element: AddNightsScreen },
         { path: "/remove-nights", element: RemoveNightScreen },

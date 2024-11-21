@@ -550,4 +550,58 @@ router.get("/query", verifyUser, async (req, res, next) => {
 	
 });
 
+/**
+ * @swagger
+ * /api/Reservations/{id}:
+ *   get:
+ *     summary: Get a reservation by ID
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The reservation ID
+ *     responses:
+ *       200:
+ *         description: Reservation retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reservation'
+ *       403:
+ *         description: Unauthorized, requires front desk or admin
+ *       404:
+ *         description: Reservation not found
+ */
+router.get("/:id", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
+	}
+
+	const { id } = req.params;
+
+	if (!id || isNaN(Number(id))) {
+		return res.status(StatusCode.BadRequest).json({
+			message: "Invalid reservation ID"
+		});
+	}
+
+	try {
+		const reservation = await ReservationModel.getById(Number(id));
+		if (!reservation) {
+			return res.status(StatusCode.NotFound).json({
+				message: "Reservation not found"
+			});
+		}
+		res.status(StatusCode.Ok).json(reservation);
+	} catch (error) {
+		next(error);
+	}
+});
+
 export const ReservationsRouter = router;
