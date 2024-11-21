@@ -1,71 +1,79 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import Button from "../UIElements/Buttons/Button";
-import { addReservation } from "./AddReservation";
-import Modal from "../UIElements/Modal";
-import { AuthenticatedUserProps } from "../Utils/Props";
+import { ScreenProps } from "../Utils/Props";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+import FormContainer from "../UIElements/Forms/FormContainer";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import usePopup from "../Utils/Contexts/PopupContext";
 
-export function AddReservationScreen(props: AuthenticatedUserProps) {
-    const [showAddReservationSuccessMessage, setShowAddReservationSuccessMessage] = useState(false);
-    const [showInvalidInputMessage, setShowInvalidInputMessage] = useState(false);
-    const [showGuestNotFoundMessage, setShowGuestNotFoundMessage] = useState(false);
+const AddReservationScreen: React.FC<ScreenProps> = ({
+    userCredentials,
+}) => {
+    useUserRedirect(userCredentials);
 
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (props.userCredentials.username === "") {
-            navigate("/home");
+    const [guestId, setGuestId] = useState(0);
+    const [reservationId, setReservationId] = useState(0);
+    
+    const [showModal] = useModalError();
+    const [showErrorPopup, showInfoPopup] = usePopup();
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        const data = { guestId, reservationId }
+
+        try {
+            const res = await makeRequest("api/Guests/add-reservation", "POST", "json", data, userCredentials.token);
+            handleResponse(res);
+        } catch (error) {
+            if (error instanceof FetchError) {
+                showErrorPopup("Error connecting to the server");
+            }
+            if (error instanceof RequestError) {
+                showModal("General Error Occurred", error.message);
+            }
         }
-    }, [props.userCredentials, navigate]);
+    }
 
-    return (
-        <>
-            <CenteredLabel>Add Reservation to guest</CenteredLabel>
-            <form id="addReservationForm" className="fieldsContainer" action="http://localhost:8000/api/Guests/add-reservation">
-                <Input
-                    id="guestId"
-                    label="Guest Id"
-                    type={InputType.Text}
-                    placeholder="Enter guest Id"
-                />
-                <Input
-                    id="reservationId"
-                    label="Reservation Id"
-                    type={InputType.Number}
-                    placeholder="Enter reservation Id"
-                />    
-                <Button
-                    className="fieldLabel"
-                    backgroundColor="white"
-                    textColor="black"
-                    borderWidth="1px"
-                    onClick={(event) => addReservation(event,
-                        props.userCredentials.token,
-                        props.setShowConnectionErrorMessage,
-                        setShowAddReservationSuccessMessage,
-                        setShowInvalidInputMessage,
-                        setShowGuestNotFoundMessage,
-                        )}>
-                    Add Reservation
-                </Button>
-            </form>
-            {showAddReservationSuccessMessage && (
-                <Modal title="Reservation Added successfully" onClose={() => { setShowAddReservationSuccessMessage(false) }}>
-                    Successfully update guest
-                </Modal>
-            )}
-            {showInvalidInputMessage && (
-                <Modal title="Invalid input" onClose={() => { setShowInvalidInputMessage(false) }}>
-                    Received invalid input when trying to add reservation
-                </Modal>
-            )}
-            {showGuestNotFoundMessage && (
-                <Modal title="Guest not found" onClose={() => { setShowGuestNotFoundMessage(false) }}>
-                    Failed to find guest when trying to add reservation
-               </Modal>
-            )}
-            
-        </>
-    )
+    const handleResponse = async (res: Response) => {
+        if (res.status === 200) {
+            showInfoPopup("Successfully added reservation to guest");
+            return;
+        }
+        if (res.status === 400) {
+            showModal("Failed to add reservation", "Failed to add reservation to guest, make sure your input is valid and try again.");
+            return;
+        }
+    }
+
+    return <>
+        <CenteredLabel>Add Reservation to guest</CenteredLabel>
+        <FormContainer onSubmit={(e) => handleSubmit(e)}>
+            <Input
+                id="guest-id"
+                label="Guest Id"
+                type={InputType.Text}
+                placeholder="Enter guest Id"
+                value={`${guestId}`}
+                onChange={(e) => setGuestId(Number(e.target.value))}
+            />
+            <Input
+                id="reservation-id"
+                label="Reservation Id"
+                type={InputType.Number}
+                placeholder="Enter reservation Id"
+                value={`${reservationId}`}
+                onChange={(e) => setReservationId(Number(e.target.value))}
+            />
+            <Input
+                id="add-reservation-to-guest"
+                type={InputType.Submit}
+                value="Add reservation"
+            />
+        </FormContainer>
+    </>;
 }
+
+export default AddReservationScreen;

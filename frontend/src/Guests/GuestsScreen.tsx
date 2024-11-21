@@ -1,11 +1,8 @@
 import IconButton from "../UIElements/Buttons/IconButton";
-import MenuGridLayout from "../UIElements/MenuGridLayout";
 import { ScreenProps } from '../Utils/Props';
 import CenteredLabel from "../UIElements/CenteredLabel";
 import { useNavigate } from "react-router-dom";
 import plusIcon from "../assets/plus-icon.svg"
-import search from "../assets/search-plus.svg"
-import icon from "../assets/react.svg";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
@@ -15,6 +12,8 @@ import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequest
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 import GuestEntry from "./Elements/GuestEntry";
+
+import "./GuestsScreen.css"
 
 const GuestsScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -30,30 +29,9 @@ const GuestsScreen: React.FC<ScreenProps> = ({
     const [guests, setGuests] = useState<Guest[]>([]);
 
     const [showModal] = useModalError();
-    const [showErrorPopup, showInfoPopup] = usePopup();
+    const [showErrorPopup, _] = usePopup();
 
     const navigate = useNavigate();
-    // const buttons = [
-    //     {image: plus, navUrl: "/create-guest",     text: "Create guests"},
-    //     {image: icon, navUrl: "/update-guest",     text: "Update guests"},
-    //     {image: plus, navUrl: "/add-reservation",  text: "Add reservation to guest"},
-    // ];
-
-    // const elements = [];
-    // for (const btn of buttons) {
-    // 	elements.push(
-    // 		<IconButton
-    // 			key={btn.navUrl}
-    // 			iconUrl={btn.image}
-    // 			borderWidth="2px"
-    // 			borderRadius="5px"
-    // 			fontSize="18pt"
-    // 			onClick={() => navigate(`/${btn.navUrl}`)}
-    // 		>
-    // 			{btn.text}
-    // 		</IconButton>
-    // 	);
-    // }
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -99,12 +77,6 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             >
                 Add guest
             </IconButton>
-            {/* <Button
-                onClick={() => navigate("/rooms/types")}
-                textSize="14pt"
-            >
-                Room types
-            </Button> */}
         </div>
         <FormContainer onSubmit={(e) => handleSubmit(e)}>
             <Input

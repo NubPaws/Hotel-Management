@@ -1,10 +1,11 @@
 
+
 .guests-extra-btns {
 	position: relative;
 	width: 100%;
 }
 
-.guest-extra-btns > * {
+.guests-extra-btns > * {
 	position: absolute;
 }
 
