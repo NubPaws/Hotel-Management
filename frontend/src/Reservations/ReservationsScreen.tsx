@@ -95,6 +95,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="search-reserve-guest-name"
                     label="Guest Name"
+                    value={guestName}
                     type={InputType.Text}
                     placeholder="Enter guest name"
                     onChange={(e) => setGuestName(e.target.value)}
@@ -102,9 +103,10 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="search-reserve-room"
                     label="Room number"
+                    value={`${room}`}
                     type={InputType.Number}
                     placeholder="Enter room number"
-                    onChange={(e) => setRoom(Number(e.target.value))}
+                    onChange={(e) => setRoom(Math.max(Number(e.target.value), 0))}
                 />
                 <DateInput
                     id="search-reserve-startDate"
@@ -121,6 +123,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="search-reserve-email"
                     label="Email"
+                    value={email}
                     type={InputType.Email}
                     placeholder="Enter email"
                     onChange={(e) => setEmail(e.target.value)}
@@ -128,6 +131,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="search-reserve-phone"
                     label="Phone number"
+                    value={phone}
                     type={InputType.Tel}
                     placeholder="Enter phone"
                     onChange={(e) => setPhone(e.target.value)}
@@ -135,6 +139,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 <Input
                     id="reserve-screen-guest-id"
                     label="Guest Identification"
+                    value={guestIdentification}
                     type={InputType.Number}
                     placeholder="Enter guest id"
                     onChange={(e) => setGuestIdentification(e.target.value)}

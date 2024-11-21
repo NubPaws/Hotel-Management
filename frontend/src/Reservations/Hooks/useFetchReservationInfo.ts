@@ -3,12 +3,16 @@ import { Reservation } from '../../APIRequests/ServerData';
 import { useModalError } from '../../Utils/Contexts/ModalErrorContext';
 import { FetchError, makeRequest, RequestError } from '../../APIRequests/APIRequests';
 
-const useFetchReservationInfo = (token: string, reservationId: number): Reservation | undefined => {
+const useFetchReservationInfo = (token: string | null, reservationId: number): Reservation | undefined => {
 	const [reservation, setReservation] = useState<Reservation | undefined>(undefined);
 	
 	const [showModal] = useModalError();
 	
 	useEffect(() => {
+		if (!token) {
+			return;
+		}
+		
 		makeRequest(`api/Reservations/${reservationId}`, "GET", "text", "", token)
             .then(res => {
                 handleResponse(res);

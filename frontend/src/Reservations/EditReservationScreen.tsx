@@ -15,13 +15,17 @@ const EditReservationScreen: FC<ScreenProps> = ({
 	const [searchParams] = useSearchParams();
 	const id = searchParams.get("id");
 	
+	const reservation = useFetchReservationInfo(userCredentials.token, Number(id));
+	
 	if (!id) {
 		return <p>Id should be provided to access this screen.</p>
 	}
+	if (!reservation) {
+		return <p>Loading reservation...</p>
+	}
 	
-	const reservation = useFetchReservationInfo(userCredentials.token, Number(id));
 	
-	return <>{reservation?.comment}</>;
+	return <></>;
 };
 
 export default EditReservationScreen;
