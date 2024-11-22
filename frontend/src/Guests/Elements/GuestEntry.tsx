@@ -33,9 +33,11 @@ const GuestEntry: React.FC<Guest> = ({
         <div>{email ? email : "No email provided"}</div>
         <div>{phone ? phone : "No phone provided"}</div>
         <Button
+            borderRadius="5px"
+            borderWidth="2px"
             textSize="14pt"
         >
-            View
+            Reservations
         </Button>
     </div>
 }
