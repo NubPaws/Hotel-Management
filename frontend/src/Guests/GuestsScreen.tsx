@@ -126,7 +126,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             />
         </FormContainer>
         {guests.length > 0 && (
-                <ul>
+                <ul className="guest-entry-list-wrapper">
                     {guests.map((guest) => (
                         <GuestEntry
                             key={guest.guestId}
