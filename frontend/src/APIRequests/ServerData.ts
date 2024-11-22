@@ -56,7 +56,7 @@ export interface Reservation {
     endDate: Date,
     prices: number[],
     roomType: string,
-    room: number,
+    room: number | null,
     state: string,
     extras: number[],
     guest: number,

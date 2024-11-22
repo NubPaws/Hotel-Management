@@ -20,10 +20,14 @@ import usePopup from "../Utils/Contexts/PopupContext";
 const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials
 }) => {
+    const today = new Date();
+    const aYearAgo = new Date();
+    aYearAgo.setFullYear(aYearAgo.getFullYear() - 1)
+    
     const [guestIdentification, setGuestIdentification] = useState("");
     const [room, setRoom] = useState(0);
-    const [startDate, setStartDate] = useState<Date>(new Date());
-    const [endDate, setEndDate] = useState<Date>(new Date());
+    const [startDate, setStartDate] = useState<Date>(new Date(aYearAgo));
+    const [endDate, setEndDate] = useState<Date>(new Date(today));
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [guestName, setGuestName] = useState("");

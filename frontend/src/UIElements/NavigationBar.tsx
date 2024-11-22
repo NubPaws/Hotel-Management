@@ -49,6 +49,6 @@ export const NavigationBar: React.FC<NavigationProps> = ({
                 Logout
             </Button>
         </div>
-        <hr></hr>
+        <hr />
     </>;
 }
