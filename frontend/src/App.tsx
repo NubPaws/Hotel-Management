@@ -5,10 +5,8 @@ import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
-import { CreateGuestScreen } from './Guests/CreateGuestsScreen';
-import { UpdateGuestScreen } from './Guests/UpdateGuestsScreen';
-import { AddReservationScreen } from './Guests/AddReservationScreen';
-import { SearchGuestScreen } from './Guests/SearchGuestScreen';
+import CreateGuestScreen from './Guests/CreateGuestScreen';
+import UpdateGuestScreen from './Guests/UpdateGuestScreen';
 import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
@@ -26,7 +24,7 @@ import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import { NavigationBar } from './UIElements/NavigationBar';
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
-import GuestsManagementScreen from './Guests/GuestsManagementScreen';
+import GuestsScreen from './Guests/GuestsScreen';
 import AdministrationScreen from './Administration/AdministrationScreen';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
 import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
@@ -58,11 +56,9 @@ function App() {
         { path: "/rooms/add", element: CreateRoomScreen },
         { path: "/rooms", element: RoomsScreen },
 
-        { path: "/guests-management/", element: GuestsManagementScreen },
-        { path: "/create-guest", element: CreateGuestScreen },
-        { path: "/update-guest", element: UpdateGuestScreen },
-        { path: "/add-reservation", element: AddReservationScreen },
-        { path: "/search-guest", element: SearchGuestScreen },
+        { path: "/guests/", element: GuestsScreen },
+        { path: "/guests/add", element: CreateGuestScreen },
+        { path: "/guests/update-guest", element: UpdateGuestScreen },
 
         { path: "/create-task", element: CreateTaskScreen },
         { path: "/update-task", element: UpdateTaskScreen },

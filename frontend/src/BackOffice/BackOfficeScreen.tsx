@@ -19,7 +19,7 @@ const BackOfficeScreen: React.FC<AuthenticatedUserProps> = ({
 
     
     const elements = [
-        {image: plus, navUrl: "/create-guest",              text: "Create guests"},
+        {image: plus, navUrl: "/guests/add",              text: "Create guests"},
         {image: icon, navUrl: "/back-office/end-of-day",    text: "End of day"},
     ];
 

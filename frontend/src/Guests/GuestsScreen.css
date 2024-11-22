@@ -1,0 +1,22 @@
+.guests-extra-btns {
+	position: relative;
+	width: 100%;
+}
+
+.guests-extra-btns > * {
+	position: absolute;
+}
+
+.guest-add-btn {
+	right: 0;
+}
+
+.guest-entry-list-wrapper {
+	max-height: 400px;
+	width: 100%;
+	overflow-y: auto;
+	width: fit-content;
+	padding: 8px;
+	margin: 8px auto;
+	border-top: 1px solid rgba(0, 0, 0, 0.05);
+}

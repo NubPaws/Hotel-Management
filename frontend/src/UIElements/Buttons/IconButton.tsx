@@ -33,16 +33,30 @@ const IconButton: React.FC<IconButtonProps> = ({
 				backgroundColor,
 			}}
 		>
-			<img
-				className="icon-btn-image"
-				src={iconUrl}
-				alt="icon"
-				style={{
-					width: fontSize,
-					height: fontSize,
-				}}
-			></img>
-			<span>{children}</span>
+			{children && (
+				<>
+					<img
+						className="icon-btn-image"
+						src={iconUrl}
+						alt="icon"
+						style={{
+							width: fontSize,
+							height: fontSize,
+						}}
+					></img>
+					<span>{children}</span>
+				</>
+			)}
+			{!children && (
+				<img
+					src={iconUrl}
+					alt="icon"
+					style={{
+						width: fontSize,
+						height: fontSize,
+					}}
+				></img>
+			)}
 		</button>
 	);
 }
