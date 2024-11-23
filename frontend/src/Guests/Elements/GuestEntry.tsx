@@ -26,12 +26,11 @@ const GuestEntry: React.FC<Guest> = ({
             fontSize="10pt"
             onClick={() => navigate("/guests/update-guest", { state })}
         />
-        <div>{guestId}</div>
-        <div>{identification}</div>
-        <div>{fullName}</div>
-        <div>{title}</div>
-        <div>{email ? email : "No email provided"}</div>
-        <div>{phone ? phone : "No phone provided"}</div>
+        <div className="guest-entry-cell" style={{width:"50px"}}>{identification}</div>
+        <div className="guest-entry-cell" style={{width:"100px"}}>{fullName}</div>
+        <div className="guest-entry-cell" style={{width:"50px"}}>{title}</div>
+        <div className="guest-entry-cell" style={{width:"100px"}}>{email ? email : ""}</div>
+        <div className="guest-entry-cell" style={{width:"100px"}}>{phone ? phone : ""}</div>
         <Button
             borderRadius="5px"
             borderWidth="2px"
