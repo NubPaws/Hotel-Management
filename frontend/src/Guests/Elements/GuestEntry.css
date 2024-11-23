@@ -1,16 +1,22 @@
 .guest-entry {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+	grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+
 	gap: 20px;
 
 	padding: 4px 7px;
 	margin: 0 auto;
 
 	background-color: #f9f9f9;
-	align-items: center;
-	justify-items: center;
-	justify-content: center;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
 	max-width: 800px;
+}
+
+.guest-entry > * {
+	margin: 0 auto;
+}
+
+.guest-entry-cell {
+	white-space: nowrap;
+	overflow-x: hidden;
 }
