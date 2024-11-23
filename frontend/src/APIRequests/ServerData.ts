@@ -35,7 +35,7 @@ export interface Guest {
 
 export interface Task {
     taskId: number,
-    timeCreated: string
+    timeCreated: Date
     room: number,
     description: string,
     urgency: number,

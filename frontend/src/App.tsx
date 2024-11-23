@@ -10,7 +10,6 @@ import UpdateGuestScreen from './Guests/UpdateGuestScreen';
 import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
-import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
 import CancelReservationScreen from './Reservations/CancelReservationScreen';
 import AddNightsScreen from './Reservations/AddNightsScreen';
@@ -32,6 +31,7 @@ import RoomsScreen from './Rooms/RoomsScreen';
 import RoomTypesScreen from './Rooms/RoomTypesScreen';
 import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
+import TasksScreen from './Tasks/TasksScreen';
 
 
 function App() {
@@ -60,11 +60,10 @@ function App() {
         { path: "/guests/add", element: CreateGuestScreen },
         { path: "/guests/update-guest", element: UpdateGuestScreen },
 
+        { path: "/tasks", element: TasksScreen },
         { path: "/create-task", element: CreateTaskScreen },
         { path: "/update-task", element: UpdateTaskScreen },
         { path: "/remove-task", element: RemoveTaskScreen },
-        { path: "/search-task-by-id", element: SearchTaskByIdScreen },
-        { path: "/search-task-by-department", element: SearchTaskByDepartmentScreen },
 
         { path: "/create-reservation", element: CreateReservationScreen },
         { path: "/cancel-reservation", element: CancelReservationScreen },

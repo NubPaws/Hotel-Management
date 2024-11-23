@@ -9,6 +9,7 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 import icon from "../assets/react.svg";
 import person from "../assets/person.svg"
 import IconButton from "../UIElements/Buttons/IconButton";
+import tasksIcon from "../assets/tasks.svg"
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 export const HomeScreen: React.FC<ScreenProps> = ({
@@ -22,14 +23,13 @@ export const HomeScreen: React.FC<ScreenProps> = ({
         { image: icon, navUrl: "/reservations", text: "Reservations" },
         { image: person, navUrl: "/guests", text: "Guests" },
         { image: icon, navUrl: "/rooms", text: "Rooms"},
-        // {image: icon, navUrl: "/change-password",           text: "Change password"},
+        { image: tasksIcon, navUrl: "/tasks", text: "Tasks"},
         // {image: icon, navUrl: "/user-creation",             text: "Create new user"},
         // {image: icon, navUrl: "/add-reservation",           text: "Add reservation to guest"},
         // {image: icon, navUrl: "/create-task",               text: "Create tasks"},
         // {image: icon, navUrl: "/update-task",               text: "Update tasks"},
         // {image: icon, navUrl: "/remove-task",               text: "Remove tasks"},
         // {image: icon, navUrl: "/search-task-by-id",         text: "Search task by Id"},
-        // {image: icon, navUrl: "/search-task-by-department", text: "Search task by department"},
         // {image: icon, navUrl: "/create-reservation",        text: "Create reservation"},
         // {image: icon, navUrl: "/cancel-reservation",        text: "Cancel reservation"},
         // {image: icon, navUrl: "/add-nights",                text: "Add nights"},
@@ -39,7 +39,6 @@ export const HomeScreen: React.FC<ScreenProps> = ({
         // {image: icon, navUrl: "/update-extra",              text: "Update extra"},
         // {image: icon, navUrl: "/search-reservation",        text: "Search reservation"},
         // {image: icon, navUrl: "/update-reservation",        text: "Update reservation"},
-
     ];
 
     const buttons = [];
