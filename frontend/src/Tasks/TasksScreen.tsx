@@ -6,20 +6,32 @@ import { ScreenProps } from "../Utils/Props";
 import plusIcon from "../assets/plus-icon.svg";
 import useFetchTasksByDepartment from "./Hooks/useFetchTasksByDepartment";
 import TaskEntry from "./Elements/TaskEntry";
+import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
+import Dropdown from "../UIElements/Dropdown";
+import { useState } from "react";
+import { Department } from "../APIRequests/ServerData";
 
 const TasksScreen: React.FC<ScreenProps> = ({
     userCredentials,
 }) => {
     useUserRedirect(userCredentials);
 
-    const {tasks, loading, update} = useFetchTasksByDepartment(userCredentials.token, userCredentials.department);
-
+    const DEPARTMENT_OPTIONS = ["General", "FrontDesk", "HouseKeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"]
+    const [department, setDepartment] = useState<Department | undefined>(userCredentials.department);
+    const { tasks, loading, update } = useFetchTasksByDepartment(userCredentials.token, department);
     const navigate = useNavigate();
 
     if (loading) {
         return <p>Loading room types.</p>;
     }
 
+    const updateTasks = async (newDepartment: string) => {
+        const allowedValues: Department[] = ["General", "FrontDesk", "HouseKeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"];
+
+        if (allowedValues.includes(newDepartment as Department)) {
+            setDepartment(newDepartment as Department);
+        }
+    }
 
     return <>
         <CenteredLabel>Tasks</CenteredLabel>
@@ -30,16 +42,22 @@ const TasksScreen: React.FC<ScreenProps> = ({
         >
             Add Task
         </IconButton>
+        <SearchableDropdown
+                id="tasks-screen-departments"
+                label="Department"
+                options={DEPARTMENT_OPTIONS}
+                setValue={(value) => updateTasks(value)}
+            />
         {tasks && (
-                <ul>
-                    {tasks.map((task) => (
-                        <TaskEntry
-                            key={task.taskId}
-                            task={task}
-                        />
-                    ))}
-                </ul>
-            )}
+            <ul>
+                {tasks.map((task) => (
+                    <TaskEntry
+                        key={task.taskId}
+                        task={task}
+                    />
+                ))}
+            </ul>
+        )}
     </>;
 }
 

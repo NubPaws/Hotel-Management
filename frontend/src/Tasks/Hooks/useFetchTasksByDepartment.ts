@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useModalError } from "../../Utils/Contexts/ModalErrorContext";
 import usePopup from "../../Utils/Contexts/PopupContext";
 import { FetchError, makeRequest, RequestError } from "../../APIRequests/APIRequests";
-import { Task } from "../../APIRequests/ServerData";
+import { Department, Task } from "../../APIRequests/ServerData";
 
 type UseFetchTasksByDepartmentResult = {
     tasks: Task[];
@@ -10,7 +10,7 @@ type UseFetchTasksByDepartmentResult = {
     update: () => void;
 };
 
-const useFetchTasksByDepartment = (token: string | null, department: string | null): UseFetchTasksByDepartmentResult => {
+const useFetchTasksByDepartment = (token: string | null, department: Department | undefined): UseFetchTasksByDepartmentResult => {
     const [tasks, setTasks] = useState<Task[]>([]);
 
     const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ const useFetchTasksByDepartment = (token: string | null, department: string | nu
         };
 
         fetchTasks();
-    }, [token, showErrorPopup, showModal, updater]);
+    }, [token, department, showErrorPopup, showModal, updater]);
 
     const update = () => {
         setUpdater(!updater);
