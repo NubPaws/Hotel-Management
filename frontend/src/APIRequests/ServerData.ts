@@ -48,22 +48,30 @@ export interface Task {
 export type ReservationState = "Pending" | "Arriving" | "Active" | "Departing"
     | "Passed" | "NoShow" | "Cancelled";
 
-export interface Reservation {
-    reservationId: number,
-    reservationMade: Date,
-    comment: string,
-    startDate: Date,
-    startTime: string,
-    nightCount: number,
-    endTime: string,
-    endDate: Date,
-    prices: number[],
-    roomType: string,
-    room: number | null,
-    state: ReservationState,
-    extras: number[],
-    guest: number,
-    guestName: string,
-    email: string,
-    phone: string,
+export type Reservation = {
+    reservationId: number;
+    reservationMade: Date;
+    comment: string;
+    startDate: Date;
+    startTime: string;
+    nightCount: number;
+    endTime: string;
+    endDate: Date;
+    prices: number[];
+    roomType: string;
+    room: number | null;
+    state: ReservationState;
+    extras: number[];
+    guest: number;
+    guestName: string;
+    email: string;
+    phone: string;
 }
+
+export type Extra = {
+    extraId: number;
+    item: string;
+    description: string;
+    price: number;
+    reservationId: number;
+};

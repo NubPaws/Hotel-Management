@@ -35,6 +35,7 @@ import RoomTypesScreen from './Rooms/RoomTypesScreen';
 import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
 import EditReservationScreen from './Reservations/EditReservationScreen';
+import BillingScreen from './Reservations/BillingScreen';
 
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
         { path: "/reservations", element: ReservationsScreen },
         { path: "/reservations/create", element: CreateReservationScreen },
         { path: "/reservations/edit", element: EditReservationScreen },
+        { path: "/reservations/billing", element: BillingScreen },
         { path: "/cancel-reservation", element: CancelReservationScreen },
         { path: "/add-nights", element: AddNightsScreen },
         { path: "/remove-nights", element: RemoveNightScreen },
