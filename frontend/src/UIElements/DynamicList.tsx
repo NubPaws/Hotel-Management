@@ -12,6 +12,7 @@ interface DynamicListProps {
     label: string;
     totalText?: string;
     addButtonText: string;
+    maxHeight?: string;
 }
 
 const DynamicList: FC<DynamicListProps> = ({
@@ -21,6 +22,7 @@ const DynamicList: FC<DynamicListProps> = ({
     label,
     totalText = "Total",
     addButtonText,
+    maxHeight = "200px",
 }) => {
     
     const handleAddItem = useCallback(
@@ -59,6 +61,8 @@ const DynamicList: FC<DynamicListProps> = ({
                 {addButtonText}
             </Button>
         </div>
+        
+        <div className="dynamic-list-scrollable" style={{maxHeight}}>
         {list.map((item, index) => (
             <div key={index} className="dynamic-list-fields-container">
                 <label htmlFor={`${id}-input-${index}`} style={{fontSize: "16pt"}}>{`${label} ${index + 1}`}:</label>
@@ -72,6 +76,7 @@ const DynamicList: FC<DynamicListProps> = ({
                 <Button onClick={(e) => handleRemoveItem(e, index)}>-</Button>
             </div>
         ))}
+        </div>
     </div>
     );
 };

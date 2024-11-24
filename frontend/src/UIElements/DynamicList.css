@@ -7,6 +7,10 @@
 	padding: 0;
 }
 
+.dynamic-list-scrollable {
+	overflow-y: auto;
+}
+
 .dynamic-list-fields-container {
 	display: grid;
 	grid-template-columns: 5fr 14fr 1fr;
