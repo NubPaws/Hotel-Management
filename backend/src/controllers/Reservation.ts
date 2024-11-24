@@ -604,4 +604,74 @@ router.get("/:id", verifyUser, async (req, res, next) => {
 	}
 });
 
+/**
+ * @swagger
+ * /api/Reservations/checkin:
+ *   post:
+ *     summary: Check in a guest by updating the reservation state to "Active"
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reservationId:
+ *                 type: integer
+ *                 description: ID of the reservation to check in
+ *     responses:
+ *       200:
+ *         description: Reservation state updated to "Active"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid input or missing required fields
+ *       403:
+ *         description: Unauthorized, requires front desk or admin
+ *       404:
+ *         description: Reservation not found
+ */
+router.post("/checkin", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
+	}
+
+	const { reservationId } = req.body;
+
+	const validation = dataValidate({ reservationId });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+
+	try {
+		// Retrieve the reservation
+		const reservation = await ReservationModel.getById(Number(reservationId));
+		if (!reservation) {
+			return res.status(StatusCode.NotFound).json({
+				message: "Reservation not found"
+			});
+		}
+
+		// Ensure the reservation is in a state that allows check-in
+		if (reservation.state !== ReservationState.Arriving) {
+			return res.status(StatusCode.BadRequest).json({
+				message: `Cannot check in a reservation in state: ${reservation.state}`
+			});
+		}
+
+		// Update the state to "Active"
+		const updatedReservation = await ReservationModel.setState(reservationId, ReservationState.Active);
+
+		res.status(StatusCode.Ok).json(updatedReservation);
+	} catch (error) {
+		next(error);
+	}
+});
+
 export const ReservationsRouter = router;

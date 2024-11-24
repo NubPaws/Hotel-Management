@@ -3,5 +3,24 @@
 	background: white;
 }
 
+.edit-reservation-fields-container {
+	margin: 16px 4px;
+	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.guest-information-label {
+	font-size: 16pt;
+	margin-left: 1rem;
+	
+}
+
 .edit-reservation-controls {
+	display: flex;
+	justify-content: space-between;
+	margin: 0 1rem;
+}
+
+.edit-reservation-right-btns {
+	display: flex;
+	gap: 0.5rem;
 }

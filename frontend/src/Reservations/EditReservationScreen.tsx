@@ -4,13 +4,11 @@ import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useFetchReservationInfo from "./Hooks/useFetchReservationInfo";
 import Button from "../UIElements/Buttons/Button";
-
-import "./EditReservationScreen.css";
-import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import DateInput from "../UIElements/Forms/DateInput";
-import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
+
+import "./EditReservationScreen.css";
 
 const EditReservationScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -28,7 +26,6 @@ const EditReservationScreen: FC<ScreenProps> = ({
 	const [startTime, setStartTime] = useState("");
 	const [endTime, setEndTime] = useState("");
 	const [room, setRoom] = useState<number | null>(0);
-	const [reservationState, setReservationState] = useState("");
 	const [guestId, setGuestId] = useState(0);
 	const [guestName, setGuestName] = useState("");
 	const [email, setEmail] = useState("");
@@ -43,7 +40,6 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		setStartTime(reservation.startTime);
 		setEndTime(reservation.endTime);
 		setRoom(reservation.room);
-		setReservationState(reservation.state);
 		setGuestId(reservation.guest);
 		setGuestName(reservation.guestName);
 		setEmail(reservation.email);
@@ -58,17 +54,34 @@ const EditReservationScreen: FC<ScreenProps> = ({
 	}
 	
 	const {
-		reservationMade: dateMade, nightCount, roomType, extras, endDate,
+		reservationMade: dateMade, nightCount, roomType, endDate, state
 	} = reservation;
+	
+	const checkButtonEnabled = state === "Arriving" || state === "Departing";
+	const checkButtonText = state === "Arriving" ? "Check in" : "Check out";
 	
 	// TODO: Add edit night option.
 	// TODO: Add option to check guest in and out.
 	// TODO: Forgot the balance
 	
-	return <>
-		<div className="edit-reservation-wrapper">
+	const deleteReservation = () => {
 		
-		<FormContainer onSubmit={() => {}} maxWidth="800px">
+	};
+	
+	const checkIn = () => {
+		
+	};
+	
+	const checkOut = () => {
+		
+	};
+	
+	const saveReservation = () => {
+		
+	};
+	
+	return <div className="edit-reservation-wrapper">
+		<div className="edit-reservation-fields-container">
 			<MenuGridLayout columns="1fr 1fr 2fr 1fr">
 				<Input
 					id="edit-reservation-id"
@@ -138,7 +151,7 @@ const EditReservationScreen: FC<ScreenProps> = ({
 				<Input
 					id="edit-reservation-state"
 					label="State"
-					value={reservationState}
+					value={state}
 					type={InputType.Text}
 				/>
 				<Input
@@ -150,7 +163,7 @@ const EditReservationScreen: FC<ScreenProps> = ({
 				/>
 			</MenuGridLayout>
 			
-			<p>Guest information</p>
+			<p className="guest-information-label">Guest information</p>
 			<MenuGridLayout columns="1fr 2fr 2fr 2fr">
 				<Input
 					id="edit-reservation-guest-id"
@@ -181,15 +194,37 @@ const EditReservationScreen: FC<ScreenProps> = ({
 					onChange={(e) => setEmail(e.target.value)}
 				/>
 			</MenuGridLayout>
-		</FormContainer>
+		</div>
 		
 		<div className="edit-reservation-controls">
-			<Button>Delete</Button>
-			<Button onClick={() => navigate(-1)}>Back</Button>
-			<Button>Accept</Button>
+			<Button backgroundColor="#FF0000" textColor="#FFF" onClick={deleteReservation}>Delete</Button>
+			<div className="edit-reservation-right-btns">
+				<Button onClick={() => navigate(-1)}>Back</Button>
+				
+				<Button onClick={() => navigate(`/reservations/extras?id=${id}`)}>Extras</Button>
+				
+				<Button
+					onClick={
+						state === "Arriving"
+							? checkIn
+							: state === "Departing"
+							? checkOut
+							: undefined
+					}
+					disabled={state !== "Arriving" && state !== "Departing"}
+				>
+					{state === "Arriving"
+						? "Check in"
+						: state === "Departing"
+						? "Check out"
+						: "Check in/out"
+					}
+				</Button>
+				
+				<Button onClick={saveReservation}>Save</Button>
+			</div>
 		</div>
-		</div>
-	</>;
+	</div>;
 };
 
 export default EditReservationScreen;

@@ -45,6 +45,9 @@ export interface Task {
     history: string[]
 }
 
+export type ReservationState = "Pending" | "Arriving" | "Active" | "Departing"
+    | "Passed" | "NoShow" | "Cancelled";
+
 export interface Reservation {
     reservationId: number,
     reservationMade: Date,
@@ -57,7 +60,7 @@ export interface Reservation {
     prices: number[],
     roomType: string,
     room: number | null,
-    state: string,
+    state: ReservationState,
     extras: number[],
     guest: number,
     guestName: string,

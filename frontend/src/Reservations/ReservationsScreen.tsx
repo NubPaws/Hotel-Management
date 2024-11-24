@@ -8,14 +8,14 @@ import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequest
 import { Reservation } from "../APIRequests/ServerData";
 import ReservationEntry from "./Elements/ReservationEntry";
 import IconButton from "../UIElements/Buttons/IconButton";
-
-import plus from "../assets/plus-icon.svg";
-import "./ReservationsScreen.css";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import DateInput from "../UIElements/Forms/DateInput";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
+
+import plus from "../assets/plus-icon.svg";
+import "./ReservationsScreen.css";
 
 const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials
@@ -156,7 +156,8 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
                 />
             </MenuGridLayout>
         </FormContainer>
-        {reservations && (
+        {reservations && (<>
+            <hr />
             <div className="reservation-entry-list-container">
             <ul>
                 {reservations.map((reservation) => (
@@ -168,7 +169,7 @@ const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
             
             </ul>
             </div>
-        )}
+        </>)}
     </>;
 }
 

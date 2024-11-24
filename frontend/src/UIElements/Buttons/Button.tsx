@@ -1,6 +1,6 @@
 import React from "react";
-import "./Button.css";
 import Colors from "../../styles/Colors";
+import "./Button.css";
 
 interface ButtonProps {
 	className?: string;
@@ -13,6 +13,8 @@ interface ButtonProps {
 	borderWidth?: string;
 	borderRadius?: string;
 	
+	disabled?: boolean;
+	
 	onClick?: React.MouseEventHandler<HTMLButtonElement>;
 	children: React.ReactNode;
 }
@@ -24,6 +26,7 @@ const Button: React.FC<ButtonProps> = ({
 	textSize = "16pt",
 	borderWidth = "1px",
 	borderRadius = "5px",
+	disabled = false,
 	onClick,
 	children
 }) => {
@@ -41,7 +44,10 @@ const Button: React.FC<ButtonProps> = ({
 			className={`btn ${className}`}
 			style={buttonStyles}
 			onClick={onClick}
-		>{children}</button>
+			disabled={disabled}
+		>
+			{children}
+		</button>
 	);
 }
 
