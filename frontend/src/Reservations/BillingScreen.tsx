@@ -9,6 +9,7 @@ import { makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import DynamicList from "../UIElements/DynamicList";
 import ExtraEntry from "./Elements/ExtraEntry";
+import Button from "../UIElements/Buttons/Button";
 
 const BillingScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -73,6 +74,10 @@ const BillingScreen: FC<ScreenProps> = ({
 		getExtras();
 	}, [reservation]);
 	
+	const onRemove = (extraId: number) => {
+		
+	};
+	
 	const nightsTotalPrice = prices.reduce((prev, curr) => prev + curr, 0);
 	const extrasTotalPrice = extras.reduce((prev, curr) => prev + curr.price, 0);
 	
@@ -92,10 +97,12 @@ const BillingScreen: FC<ScreenProps> = ({
 			/>
 		</div>
 		<div className="billing-extras-containers">
+			<Button>Add extra</Button>
 			{extras && extras.length > 0 && extras.map((extra, index) => (
 				<ExtraEntry
 					key={index}
 					extra={extra}
+					onRemove={onRemove}
 				/>
 			))}
 		</div>
