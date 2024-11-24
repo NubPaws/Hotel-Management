@@ -9,6 +9,9 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 import DateInput from "../UIElements/Forms/DateInput";
 
 import "./EditReservationScreen.css";
+import { makeRequest, RequestError } from "../APIRequests/APIRequests";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import usePopup from "../Utils/Contexts/PopupContext";
 
 const EditReservationScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -30,6 +33,9 @@ const EditReservationScreen: FC<ScreenProps> = ({
 	const [guestName, setGuestName] = useState("");
 	const [email, setEmail] = useState("");
 	const [phoneNumber, setPhoneNumber] = useState("");
+	
+	const [showModal] = useModalError();
+	const [_, showInfoPopup] = usePopup();
 	
 	useEffect(() => {
 		if (!reservation) {
@@ -57,27 +63,70 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		reservationMade: dateMade, nightCount, roomType, endDate, state
 	} = reservation;
 	
-	const checkButtonEnabled = state === "Arriving" || state === "Departing";
-	const checkButtonText = state === "Arriving" ? "Check in" : "Check out";
-	
 	// TODO: Add edit night option.
 	// TODO: Add option to check guest in and out.
 	// TODO: Forgot the balance
 	
 	const deleteReservation = () => {
-		
+		const url = "api/Reservations/cancel";
+		const body = { reservationId: id };
+		makeRequest(url, "POST", "json", body, userCredentials.token)
+			.then(res => {
+				if (!res.ok) {
+					res.json().then(text => showModal("Failed to cancel reservation", text));
+					return;
+				}
+				
+				showInfoPopup(`Successfully cancelled reservation ${id}`);
+				navigate("/reservations");
+			})
+			.catch(error => {
+				if (error instanceof TypeError) {
+					showModal("Connection error", error.message);
+				}
+				if (error instanceof RequestError) {
+					showModal("Request error", error.message);
+				}
+			});
 	};
 	
 	const checkIn = () => {
-		
+		// TODO: Need to implement on the backend.
 	};
 	
 	const checkOut = () => {
-		
+		// TODO: Need to implement on the backend.
 	};
 	
 	const saveReservation = () => {
-		
+		const url = "api/Reservations/update";
+		const body = {
+			reservationId: id,
+			comment,
+			email,
+			phone: phoneNumber,
+			startDate,
+			startTime,
+			endTime,
+			room,
+		}
+		makeRequest(url, "POST", "json", body, userCredentials.token)
+			.then(res => {
+				if (!res.ok) {
+					res.json().then(text => showModal("Failed to save changes", text));
+					return;
+				}
+				
+				showInfoPopup("Saved reservation.");
+			})
+			.catch(error => {
+				if (error instanceof TypeError) {
+					showModal("Connection error", error.message);
+				}
+				if (error instanceof RequestError) {
+					showModal("Request error", error.message);
+				}
+			});
 	};
 	
 	return <div className="edit-reservation-wrapper">
@@ -197,11 +246,19 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		</div>
 		
 		<div className="edit-reservation-controls">
-			<Button backgroundColor="#FF0000" textColor="#FFF" onClick={deleteReservation}>Delete</Button>
+			<Button
+				backgroundColor="#FF0000"
+				textColor="#FFF"
+				onClick={deleteReservation}
+				disabled={state === "Cancelled"}
+			>
+				Delete
+			</Button>
+			
 			<div className="edit-reservation-right-btns">
 				<Button onClick={() => navigate(-1)}>Back</Button>
 				
-				<Button onClick={() => navigate(`/reservations/extras?id=${id}`)}>Extras</Button>
+				<Button onClick={() => navigate(`/reservations/billing?id=${id}`)}>Billing</Button>
 				
 				<Button
 					onClick={
