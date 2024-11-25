@@ -1,33 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
+import React, { useState } from "react";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import CenteredLabel from "../UIElements/CenteredLabel";
-import Modal, { ModalController } from "../UIElements/Modal";
 import { ScreenProps } from "../Utils/Props";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
 import RadioButton from "../UIElements/Forms/Radio/RadioButton";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
-
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 
 const UserCreationScreen: React.FC<ScreenProps> = ({
-    userCredentials, setShowConnectionErrorMessage
+    userCredentials, 
 }) => {
-    const [userCreationMessage, setUserCreationMessage] = useState<ModalController | undefined>(undefined);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPasword, setConfirmPassword] = useState("");
     const [role, setRole] = useState("");
     const [department, setDepartment] = useState("");
     
-    const navigate = useNavigate();
+    const [showModal] = useModalError();
     
-    useEffect(() => {
-        if (userCredentials.role !== "Admin") {
-            navigate("/login");
-        }
-    }, [userCredentials, navigate]);
+    useUserRedirect(userCredentials, ["Admin"]);
     
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -44,13 +37,10 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
             handleResponse(res);
         } catch (error: any) {
             if (error instanceof FetchError) {
-                setShowConnectionErrorMessage(true);
+                showModal("Failed to connect to server", error.message);
             }
             if (error instanceof RequestError) {
-                setUserCreationMessage({
-                    title: "General Error Occurred",
-                    message: error.message,
-                });
+                showModal("General Error Occurred", error.message);
             }
         }
     };
@@ -58,47 +48,33 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
     const validateInputs = () => {
         const ERROR_TITLE = "Failed to process form";
         if (password !== confirmPasword) {
-            setUserCreationMessage({
-                title: ERROR_TITLE,
-                message: "Password and confirm password must be the same."
-            });
+            showModal(ERROR_TITLE, "Password and confirm password must be the same.");
             return false;
         }
         if (!role || !department) {
-            setUserCreationMessage({
-                title: ERROR_TITLE,
-                message: "Role or department not chosen."
-            })
+            showModal(ERROR_TITLE, "Role or department not chosen.")
             return false;
         }
         return true;
     };
     
     const handleResponse = async (res: Response) => {
-        switch (res.status) {
-            case 200:
-                setUserCreationMessage({
-                    title: "Success!",
-                    message: "User created successfully!",
-                });
-                clearForm();
-                break;
-            case 400:
-                    setUserCreationMessage({
-                        title: "Failed!",
-                        message: await res.text(),
-                    });
-                    break;
-            case 409:
-                setUserCreationMessage({
-                    title: "User already exists!",
-                    message: "User with that username already exists. Choose another username and try again.",
-                });
-                break;
-            default:
-                setShowConnectionErrorMessage(true);
-                break;
+        if (!res.ok) {
+            if (res.status === 400) {
+                showModal("Failed!", await res.text());
+            } else if (res.status === 409) {
+                showModal(
+                    "User already exists!",
+                    "User with that username already exists. Choose another username and try again."
+                );
+            } else {
+                showModal("Failed to connect to server", "Connection to the server failed.");
+            }
+            return;
         }
+        
+        showModal("Success!", "User created successfully!");
+        clearForm();
     };
     
     const clearForm = () => {
@@ -169,12 +145,6 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
                 type={InputType.Submit}
                 value="Create User" />
         </FormContainer>
-        
-        {userCreationMessage && (
-            <Modal title={userCreationMessage.title} onClose={() => setUserCreationMessage(undefined) }>
-                {userCreationMessage.message}
-            </Modal>
-        )}
     </>;
 }
 
