@@ -3,11 +3,12 @@ import Input, { InputType } from "../UIElements/Forms/Input";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import { ScreenProps } from "../Utils/Props";
 import FormContainer from "../UIElements/Forms/FormContainer";
-import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
-import RadioButton from "../UIElements/Forms/Radio/RadioButton";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import RoleRadioButtons from "./Elements/RoleRadioButton";
+import DepartmentRadioButtons from "./Elements/DepartmentRadioButton";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
 
 const UserCreationScreen: React.FC<ScreenProps> = ({
     userCredentials, 
@@ -87,7 +88,7 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
     
     return <>
         <CenteredLabel>Create New User</CenteredLabel>
-        <FormContainer onSubmit={handleSubmit}>
+        <FormContainer onSubmit={handleSubmit} maxWidth="500px">
             <Input
                 id="username"
                 label="Username"
@@ -114,32 +115,16 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
                 value={confirmPasword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            
-            <RadioButtonContainer
-                title="Select User's Role:"
-                name="role"
-                value={role}
-                setValue={setRole}
-            >
-                <RadioButton>User</RadioButton>
-                <RadioButton>Admin</RadioButton>
-            </RadioButtonContainer>
-            
-            <RadioButtonContainer
-                title="Select User's Department:"
-                name="department"
-                value={department}
-                setValue={setDepartment}
-            >
-                <RadioButton>General</RadioButton>
-                <RadioButton>Front Desk</RadioButton>
-                <RadioButton>Housekeeping</RadioButton>
-                <RadioButton>Maintenance</RadioButton>
-                <RadioButton>Food and Beverage</RadioButton>
-                <RadioButton>Security</RadioButton>
-                <RadioButton>Concierge</RadioButton>
-            </RadioButtonContainer>
-            
+            <MenuGridLayout>
+                <RoleRadioButtons
+                    value={role}
+                    setValue={setRole}
+                />
+                <DepartmentRadioButtons
+                    value={department}
+                    setValue={setDepartment}
+                />
+            </MenuGridLayout>
             <Input
                 id="create-user-button"
                 type={InputType.Submit}
