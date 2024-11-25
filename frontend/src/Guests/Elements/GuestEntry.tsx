@@ -2,21 +2,21 @@ import { useNavigate } from "react-router-dom";
 import { Guest } from "../../APIRequests/ServerData";
 import IconButton from "../../UIElements/Buttons/IconButton";
 import edit from "../../assets/edit.svg"
-
-import "./GuestEntry.css"
-import { GuestUpdateState } from "../UpdateGuestState";
 import Button from "../../UIElements/Buttons/Button";
 
-const GuestEntry: React.FC<Guest> = ({
-    guestId,
-    identification,
-    fullName,
-    title,
-    email,
-    phone,
+import "./GuestEntry.css";
+
+type GuestEntryProps = {
+    guest: Guest;
+};
+
+const GuestEntry: React.FC<GuestEntryProps> = ({
+    guest,
 }) => {
+    const { guestId, identification, email, phone, fullName, title } = guest;
+    
     const navigate = useNavigate();
-    const state: GuestUpdateState = { email, guestId, phone, fullName };
+    const state: Partial<Guest> = { email, guestId, phone, fullName };
     return <div className="guest-entry">
         <IconButton
             className="guest-entry-button"

@@ -1,3 +1,4 @@
+
 .guests-extra-btns {
 	position: relative;
 	width: 100%;
@@ -19,4 +20,8 @@
 	padding: 8px;
 	margin: 8px auto;
 	border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.guest-search-guest-btn {
+	margin: auto 0;
 }

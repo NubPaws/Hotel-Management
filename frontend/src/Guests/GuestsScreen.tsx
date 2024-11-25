@@ -12,8 +12,9 @@ import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequest
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 import GuestEntry from "./Elements/GuestEntry";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
 
-import "./GuestsScreen.css"
+import "./GuestsScreen.css";
 
 const GuestsScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -79,6 +80,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             </IconButton>
         </div>
         <FormContainer maxWidth="600px" onSubmit={(e) => handleSubmit(e)}>
+            <MenuGridLayout>
             <Input
                 id="guest-id"
                 label="Identification"
@@ -120,24 +122,21 @@ const GuestsScreen: React.FC<ScreenProps> = ({
                 onChange={(e) => setReservationId(Number(e.target.value))}
             />
             <Input
-                id="search-guest"
+                id="search-guest-btn"
+                className="guest-search-guest-btn"
                 type={InputType.Submit}
                 value="Search"
+                label=" "
             />
+            </MenuGridLayout>
         </FormContainer>
         {guests.length > 0 && (
                 <ul className="guest-entry-list-wrapper">
                     {guests.map((guest) => (
                         <GuestEntry
                             key={guest.guestId}
-                            guestId={guest.guestId}
-                            identification={guest.identification}
-                            fullName={guest.fullName}
-                            title={guest.title}
-                            email={guest.email}
-                            phone={guest.phone}
-                            reservations={guest.reservations}>
-                        </GuestEntry>
+                            guest={guest}
+                        />
                     ))}
                 </ul>
             )}
