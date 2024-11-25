@@ -87,9 +87,49 @@ const BillingScreen: FC<ScreenProps> = ({
 		
 	};
 	
-	const onRemove = (extraId: number) => {
+	// TODO: Add a confirmation to make sure that the user actually wants to delete the item.
+	// Like a modal.
+	const onRemove = async (extraId: number) => {
+		const url = "api/Reservations/remove-extra";
+		const body = {
+			reservationId: id,
+			extraId: extraId,
+		}
 		
+		try {
+			const res = await makeRequest(url, "POST", "json", body, userCredentials.token);
+			
+			if (!res.ok) {
+				showModal("Invalid request made", await res.json());
+				return;
+			}
+			
+			setExtras(prev => prev.filter(value => value.extraId !== extraId));
+			showInfoPopup(`Successfully deleted extra ${extraId} from reservation ${id}`);
+		} catch (error: any) {
+			showModal("Request error has occured", error.message);
+		}
 	};
+	
+	const onEdit = async (extra: Extra) => {
+		const url = "api/Extras/update";
+		
+		try {
+			const res = await makeRequest(url, "POST", "json", extra, userCredentials.token);
+			
+			if (!res.ok) {
+				showModal("Invalid input has been sent", await res.json());
+				return;
+			}
+			
+			const newExtra = await res.json() as Extra;
+			
+			setExtras(prev => prev.map(value => value.extraId === newExtra.extraId ? newExtra : value));
+			showInfoPopup("Extra updated successfully");
+		} catch (error: any) {
+			showModal("Request error has occured", error.message);
+		}
+	}
 	
 	const showAddExtraInputModal = () => setAddExtraFields([
 		{ name: "item", label: "Item name", type: InputType.Text, placeholder: "Item name..." },
@@ -99,16 +139,18 @@ const BillingScreen: FC<ScreenProps> = ({
 	
 	const hideAddExtraInputModal = () => setAddExtraFields(undefined);
 	
-	const handleAddExtra = (formData: Record<string, any>) => {
+	const handleAddExtra = async (formData: Record<string, any>) => {
 		hideAddExtraInputModal();
 		const item = formData["item"] as string;
 		const description = formData["description"] ? formData["description"] as string : "";
 		const price = formData["price"] as number;
 		
+		// Validate input.
 		if (!item || !price) {
 			showModal("Invalid input", "Must provide item name and price.");
 		}
 		
+		// Prepare the packets.
 		const url = "api/Reservations/add-extra";
 		const body = {
 			reservationId: id,
@@ -116,22 +158,25 @@ const BillingScreen: FC<ScreenProps> = ({
 			price: price,
 			description: description,
 		};
-		makeRequest(url, "POST", "json", body, userCredentials.token)
-			.then(handleAddExtraResponse)
-			.catch(error => showModal("Error occured", error.message));
-	}
-	
-	const handleAddExtraResponse = async (res: Response) => {
-		if (!res.ok) {
-			showModal("Failed to add extra", await res.json());
+		
+		// Make the request.
+		try {
+			const res = await makeRequest(url, "POST", "json", body, userCredentials.token);
+			
+			if (!res.ok) {
+				showModal("Failed to add extra", await res.json());
+			}
+			
+			const extra = await res.json() as Extra;
+			
+			setExtras(prev => [...prev, extra])
+			showInfoPopup("Successfully added extra");
+		} catch (error: any) {
+			showModal("Error occured", error.message)
 		}
-		
-		const extra = await res.json() as Extra;
-		
-		setExtras(prev => [...prev, extra])
-		showInfoPopup("Successfully added extra");
 	}
 	
+	// TODO: Cap the height of the reservations.
 	return <>
 	<div className="billing-screen-wrapper">
 		<div className="billing-screen-controls">
@@ -169,6 +214,7 @@ const BillingScreen: FC<ScreenProps> = ({
 				<ExtraEntry
 					key={index}
 					extra={extra}
+					onEdit={onEdit}
 					onRemove={onRemove}
 				/>
 			))}

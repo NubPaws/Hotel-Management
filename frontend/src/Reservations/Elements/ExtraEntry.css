@@ -13,7 +13,6 @@
 }
 
 .extra-entry-container:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -40,4 +39,10 @@
     font-size: 1rem;
     font-weight: bold;
     color: #27ae60;
+}
+
+.extra-entry-controls {
+    display: flex;
+    direction: row;
+    gap: 0.5rem;
 }
