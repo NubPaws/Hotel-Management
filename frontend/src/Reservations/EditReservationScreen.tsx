@@ -12,6 +12,7 @@ import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 
 import "./EditReservationScreen.css";
+import Colors from "../styles/Colors";
 
 const EditReservationScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -63,7 +64,7 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		reservationMade: dateMade, nightCount, roomType, endDate, state
 	} = reservation;
 	
-	const deleteReservation = () => {
+	const cancelReservation = () => {
 		const url = "api/Reservations/cancel";
 		const body = { reservationId: id };
 		makeRequest(url, "POST", "json", body, userCredentials.token)
@@ -243,12 +244,11 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		
 		<div className="edit-reservation-controls">
 			<Button
-				backgroundColor="#FF0000"
-				textColor="#FFF"
-				onClick={deleteReservation}
+				backgroundColor={Colors.red}
+				onClick={cancelReservation}
 				disabled={state === "Cancelled"}
 			>
-				Delete
+				Cancel Reservation
 			</Button>
 			
 			<div className="edit-reservation-right-btns">
