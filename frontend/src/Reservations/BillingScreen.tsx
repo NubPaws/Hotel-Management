@@ -10,13 +10,13 @@ import DynamicList from "../UIElements/DynamicList";
 import ExtraEntry from "./Elements/ExtraEntry";
 import Button from "../UIElements/Buttons/Button";
 import IconButton from "../UIElements/Buttons/IconButton";
+import InputModal, { InputModalField } from "../UIElements/InputModal";
+import { InputType } from "../UIElements/Forms/Input";
+import usePopup from "../Utils/Contexts/PopupContext";
 
 import backIcon from "../assets/back.svg";
 import saveIcon from "../assets/save.svg";
 import "./BillingScreen.css";
-import InputModal, { InputModalField } from "../UIElements/InputModal";
-import { InputType } from "../UIElements/Forms/Input";
-import usePopup from "../Utils/Contexts/PopupContext";
 
 const BillingScreen: FC<ScreenProps> = ({
 	userCredentials
