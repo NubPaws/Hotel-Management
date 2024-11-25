@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { LoginScreen } from './Authentication/LoginScreen';
-import { ChangePasswordScreen } from './Authentication/PasswordChangeScreen';
+import { LoginScreen } from './Users/LoginScreen';
+import { ChangePasswordScreen } from './Users/PasswordChangeScreen';
 import { useState } from "react";
 import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
@@ -12,13 +12,13 @@ import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
-import CreateUserScreen from './Authentication/CreateUserScreen.tsx';
+import CreateUserScreen from './Users/CreateUserScreen.tsx';
 import { UserCredentials } from './APIRequests/ServerData';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import NavigationBar from './UIElements/NavigationBar';
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
 import GuestsScreen from './Guests/GuestsScreen';
-import AdministrationScreen from './Authentication/AdministrationScreen.tsx';
+import AdministrationScreen from './Users/AdministrationScreen.tsx';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
 import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
 import RoomsScreen from './Rooms/RoomsScreen';
@@ -27,7 +27,7 @@ import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
 import EditReservationScreen from './Reservations/EditReservationScreen';
 import BillingScreen from './Reservations/BillingScreen';
-import EditUserScreen from './Authentication/EditUserScreen.tsx';
+import EditUserScreen from './Users/EditUserScreen.tsx';
 
 
 function App() {
