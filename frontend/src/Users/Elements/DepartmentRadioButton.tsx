@@ -21,7 +21,7 @@ const DepartmentRadioButtons: FC<DepartmentRadioButtonsProps> = ({
 				<RadioButton>Front Desk</RadioButton>
 				<RadioButton>Housekeeping</RadioButton>
 				<RadioButton>Maintenance</RadioButton>
-				<RadioButton>Food and Beverage</RadioButton>
+				<RadioButton>Food And Beverage</RadioButton>
 				<RadioButton>Security</RadioButton>
 				<RadioButton>Concierge</RadioButton>
 	</RadioButtonContainer>

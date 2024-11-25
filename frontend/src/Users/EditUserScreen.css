@@ -2,6 +2,8 @@
 .edit-user-container {
 	max-width: 600px;
 	margin: 1rem auto;
+	padding: 1rem 2rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .edit-user-search {
@@ -15,4 +17,9 @@
 .edit-user-search-user-btn {
 	margin-bottom: 0;
 	margin-left: 1rem;
+}
+
+.edit-user-save-btn {
+	margin-left: auto;
+	margin-right: 0;
 }
