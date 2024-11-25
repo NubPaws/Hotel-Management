@@ -65,10 +65,6 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		reservationMade: dateMade, nightCount, roomType, endDate, state
 	} = reservation;
 	
-	// TODO: Add edit night option.
-	// TODO: Add option to check guest in and out.
-	// TODO: Forgot the balance
-	
 	const deleteReservation = () => {
 		const url = "api/Reservations/cancel";
 		const body = { reservationId: id };
