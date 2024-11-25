@@ -1,6 +1,11 @@
+
 .edit-reservation-wrapper {
 	width: 100%;
 	background: white;
+}
+
+.edit-reservation-back-btn {
+	margin: 1rem;
 }
 
 .edit-reservation-fields-container {
