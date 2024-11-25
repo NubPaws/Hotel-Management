@@ -1,4 +1,4 @@
-import { FC, MouseEvent, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -83,8 +83,26 @@ const BillingScreen: FC<ScreenProps> = ({
 		getExtras();
 	}, [reservation]);
 	
-	const onSave = (event: MouseEvent<HTMLButtonElement>) => {
-		// TODO: this function
+	const onSave = async () => {
+		const url = "api/Reservations/set-nights";
+		const body = {
+			reservationId: id,
+			nightCount: prices.length,
+			prices: prices,
+		};
+		
+		try {
+			const res = await makeRequest(url, "POST", "json", body, userCredentials.token);
+			
+			if (!res.ok) {
+				showModal("Couldn't set the night prices", await res.json());
+			}
+			
+			showInfoPopup("Successfully updated night count.");
+			navigate(-1);
+		} catch (error: any) {
+			showModal("Request error occured", error.message);
+		}
 	};
 	
 	const onRemove = async (extraId: number) => {
@@ -174,7 +192,6 @@ const BillingScreen: FC<ScreenProps> = ({
 		}
 	}
 	
-	// TODO: Cap the height of the reservations.
 	return <>
 	<div className="billing-screen-wrapper">
 		<div className="billing-screen-controls">
