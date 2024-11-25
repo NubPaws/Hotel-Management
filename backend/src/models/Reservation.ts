@@ -464,7 +464,7 @@ async function addExtra(reservationId: number, item: string, price: number, desc
 	
 	reservation.extras.push(extra.extraId);
 	await reservation.save();
-	return reservation as Reservation;
+	return extra;
 }
 
 /**

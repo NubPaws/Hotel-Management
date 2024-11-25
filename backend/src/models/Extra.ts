@@ -34,7 +34,6 @@ const ExtraSchema = new Schema<Extra>({
 	},
 	description: {
 		type: String,
-		required: true,
 		default: "",
 	},
 	price: {

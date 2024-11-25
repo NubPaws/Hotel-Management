@@ -333,7 +333,7 @@ router.post("/remove-nights", verifyUser, async (req, res, next) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Reservation'
+ *               $ref: '#/components/schemas/Extra'
  *       400:
  *         description: Invalid input
  */
@@ -352,8 +352,8 @@ router.post("/add-extra", verifyUser, async (req, res, next) => {
 	}
 	
 	try {
-		const reservation = await ReservationModel.addExtra(reservationId, item, price, description);
-		res.status(StatusCode.Ok).json(reservation);
+		const extra = await ReservationModel.addExtra(reservationId, item, price, description);
+		res.status(StatusCode.Ok).json(extra);
 	} catch (error) {
 		next(error);
 	}

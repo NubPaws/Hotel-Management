@@ -1,5 +1,4 @@
-import { FC, useEffect, useState } from "react";
-import "./BillingScreen.css";
+import { FC, MouseEvent, useEffect, useState } from "react";
 import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,6 +9,14 @@ import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import DynamicList from "../UIElements/DynamicList";
 import ExtraEntry from "./Elements/ExtraEntry";
 import Button from "../UIElements/Buttons/Button";
+import IconButton from "../UIElements/Buttons/IconButton";
+
+import backIcon from "../assets/back.svg";
+import saveIcon from "../assets/save.svg";
+import "./BillingScreen.css";
+import InputModal, { InputModalField } from "../UIElements/InputModal";
+import { InputType } from "../UIElements/Forms/Input";
+import usePopup from "../Utils/Contexts/PopupContext";
 
 const BillingScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -23,15 +30,17 @@ const BillingScreen: FC<ScreenProps> = ({
 	const reservation = id ? useFetchReservationInfo(userCredentials.token, Number(id)) : undefined;
 	
 	const [prices, setPrices] = useState<number[]>([]);
-	const [extras, setExtras] = useState<Extra[]>([{
-		extraId: 1,
-		description: "This is a description",
-		price: 1000,
-		item: "Fancy item",
-		reservationId: Number(id),
-	}]);
+	const [extras, setExtras] = useState<Extra[]>([]);
+	
+	const [addExtraFields, setAddExtraFields] = useState<InputModalField[] | undefined>(undefined);
 	
 	const [showModal] = useModalError();
+	const [_, showInfoPopup] = usePopup();
+	
+	const nightsTotalPrice = prices.reduce((prev, curr) => prev + curr, 0);
+	const extrasTotalPrice = extras.reduce((prev, curr) => prev + curr.price, 0);
+	
+	const totalPrice = nightsTotalPrice + extrasTotalPrice;
 	
 	useEffect(() => {
 		if (!reservation) {
@@ -52,7 +61,7 @@ const BillingScreen: FC<ScreenProps> = ({
 			const reqUrl = "api/Extras/get-all";
 			
 			try {
-				const response = await makeRequest(reqUrl, "GET", "json", reqData, userCredentials.token);
+				const response = await makeRequest(reqUrl, "POST", "json", JSON.stringify(reqData), userCredentials.token);
 				
 				const jsonResponse = await response.json();
 				if (!response.ok) {
@@ -60,7 +69,7 @@ const BillingScreen: FC<ScreenProps> = ({
 					return;
 				}
 				
-				// setExtras(jsonResponse as Extra[]);
+				setExtras(jsonResponse as Extra[]);
 			} catch (error: any) {
 				if (error instanceof TypeError) {
 					showModal("Conection error", error.message);
@@ -74,21 +83,75 @@ const BillingScreen: FC<ScreenProps> = ({
 		getExtras();
 	}, [reservation]);
 	
+	const onSave = (event: MouseEvent<HTMLButtonElement>) => {
+		
+	};
+	
 	const onRemove = (extraId: number) => {
 		
 	};
 	
-	const nightsTotalPrice = prices.reduce((prev, curr) => prev + curr, 0);
-	const extrasTotalPrice = extras.reduce((prev, curr) => prev + curr.price, 0);
+	const showAddExtraInputModal = () => setAddExtraFields([
+		{ name: "item", label: "Item name", type: InputType.Text, placeholder: "Item name..." },
+		{ name: "description", label: "Description", type: InputType.Text, placeholder: "Describe the item..." },
+		{ name: "price", label: "Price", type: InputType.Number, placeholder: "0" },
+	]);
 	
-	const totalPrice = nightsTotalPrice + extrasTotalPrice;
+	const hideAddExtraInputModal = () => setAddExtraFields(undefined);
 	
-	return <div className="billing-screen-wrapper">
-		<p>Total: {totalPrice} | Nights: {nightsTotalPrice} | Extras: {extrasTotalPrice}</p>
-		<p>Night:</p>
+	const handleAddExtra = (formData: Record<string, any>) => {
+		hideAddExtraInputModal();
+		const item = formData["item"] as string;
+		const description = formData["description"] ? formData["description"] as string : "";
+		const price = formData["price"] as number;
+		
+		if (!item || !price) {
+			showModal("Invalid input", "Must provide item name and price.");
+		}
+		
+		const url = "api/Reservations/add-extra";
+		const body = {
+			reservationId: id,
+			item: item,
+			price: price,
+			description: description,
+		};
+		makeRequest(url, "POST", "json", body, userCredentials.token)
+			.then(handleAddExtraResponse)
+			.catch(error => showModal("Error occured", error.message));
+	}
+	
+	const handleAddExtraResponse = async (res: Response) => {
+		if (!res.ok) {
+			showModal("Failed to add extra", await res.json());
+		}
+		
+		const extra = await res.json() as Extra;
+		
+		setExtras(prev => [...prev, extra])
+		showInfoPopup("Successfully added extra");
+	}
+	
+	return <>
+	<div className="billing-screen-wrapper">
+		<div className="billing-screen-controls">
+			<IconButton
+				onClick={() => navigate(-1)}
+				iconUrl={backIcon}
+				fontSize="16pt"
+			/>
+			<span>Total: {totalPrice.toFixed(2)}$</span>
+			<IconButton
+				onClick={onSave}
+				iconUrl={saveIcon}
+				fontSize="16pt"
+			>Save</IconButton>
+		</div>
+		
 		<div className="billing-prices-container">
+			<p className="billing-prices-label">Nights: {nightsTotalPrice.toFixed(2)}$</p>
 			<DynamicList
-				id="billing-prices-list"
+				id="billing-prices-nights-list"
 				list={prices}
 				label="Night"
 				setList={setPrices}
@@ -96,8 +159,12 @@ const BillingScreen: FC<ScreenProps> = ({
 				addButtonText="Add night"
 			/>
 		</div>
-		<div className="billing-extras-containers">
-			<Button>Add extra</Button>
+		
+		<div className="billing-prices-container">
+			<p className="billing-prices-label">Extras: {extrasTotalPrice.toFixed(2)}$</p>
+			<div className="billing-add-extra">
+				<Button onClick={showAddExtraInputModal}>Add extra</Button>
+			</div>
 			{extras && extras.length > 0 && extras.map((extra, index) => (
 				<ExtraEntry
 					key={index}
@@ -106,7 +173,16 @@ const BillingScreen: FC<ScreenProps> = ({
 				/>
 			))}
 		</div>
-	</div>;
+	</div>
+	{addExtraFields && (
+		<InputModal
+			title="Add Extra"
+			fields={addExtraFields}
+			onConfirm={handleAddExtra}
+			onCancel={hideAddExtraInputModal}
+		/>
+	)}
+	</>;
 };
 
 export default BillingScreen;

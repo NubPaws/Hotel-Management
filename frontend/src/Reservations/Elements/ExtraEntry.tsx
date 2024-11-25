@@ -1,7 +1,9 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { Extra } from "../../APIRequests/ServerData";
+import IconButton from "../../UIElements/Buttons/IconButton";
+
+import trashcanIcon from "../../assets/trashcan.svg";
 import "./ExtraEntry.css";
-import Button from "../../UIElements/Buttons/Button";
 
 type ExtraEntryProps = {
 	extra: Extra;
@@ -12,11 +14,7 @@ const ExtraEntry: FC<ExtraEntryProps> = ({
 	extra,
 	onRemove = () => {},
 }) => {
-	const { extraId } = extra;
-	
-	const [item, setItem] = useState(extra.item);
-	const [description, setDescription] = useState(extra.description);
-	const [price, setPrice] = useState(extra.price);
+	const { extraId, item, description, price } = extra;
 	
 	return (
 	<div className="extra-entry-container">
@@ -25,9 +23,13 @@ const ExtraEntry: FC<ExtraEntryProps> = ({
 				<strong>{item}</strong>
 			</div>
 			<div className="extra-entry-description">{description}</div>
-			<div className="extra-entry-price">{price.toFixed(2)}</div>
+			<div className="extra-entry-price">{price.toFixed(2)}$</div>
 		</div>
-		<Button onClick={() => onRemove(extraId)}>X Remove</Button>
+		<IconButton
+			iconUrl={trashcanIcon}
+			onClick={() => onRemove(extraId)}
+			fontSize="18pt"
+		/>
 	</div>
 	);
 };

@@ -96,7 +96,7 @@ router.post("/update", verifyUser, async (req, res, next) => {
 /**
  * @swagger
  * /api/Extras/get-all:
- *   get:
+ *   post:
  *     summary: Retrieve multiple extras by their IDs
  *     tags: [Extras]
  *     security:
@@ -128,7 +128,7 @@ router.post("/update", verifyUser, async (req, res, next) => {
  *       403:
  *         description: Unauthorized, requires admin or food and beverage department
  */
-router.get("/get-all", verifyUser, async (req, res, next) => {
+router.post("/get-all", verifyUser, async (req, res, next) => {
 	const { extraIds } = req.body;
 	
 	// Validate input
