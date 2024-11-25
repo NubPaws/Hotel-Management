@@ -84,11 +84,9 @@ const BillingScreen: FC<ScreenProps> = ({
 	}, [reservation]);
 	
 	const onSave = (event: MouseEvent<HTMLButtonElement>) => {
-		
+		// TODO: this function
 	};
 	
-	// TODO: Add a confirmation to make sure that the user actually wants to delete the item.
-	// Like a modal.
 	const onRemove = async (extraId: number) => {
 		const url = "api/Reservations/remove-extra";
 		const body = {

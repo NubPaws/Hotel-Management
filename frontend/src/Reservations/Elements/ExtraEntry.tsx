@@ -3,6 +3,7 @@ import { Extra } from "../../APIRequests/ServerData";
 import IconButton from "../../UIElements/Buttons/IconButton";
 import InputModal, { InputModalField } from '../../UIElements/InputModal';
 import { InputType } from "../../UIElements/Forms/Input";
+import Modal from "../../UIElements/Modal";
 
 import trashcanIcon from "../../assets/trashcan.svg";
 import editIcon from "../../assets/edit.svg";
@@ -21,6 +22,8 @@ const ExtraEntry: FC<ExtraEntryProps> = ({
 }) => {
 	const { extraId, item, description, price } = extra;
 	const [editExtraFields, setEditExtraFields] = useState<InputModalField[] | undefined>(undefined);
+	
+	const [confirmDelete, setConfirmDelete] = useState(false);
 	
 	const hideEditExtraModal = () => setEditExtraFields(undefined);
 	
@@ -56,7 +59,7 @@ const ExtraEntry: FC<ExtraEntryProps> = ({
 			/>
 			<IconButton
 				iconUrl={trashcanIcon}
-				onClick={() => onRemove(extraId)}
+				onClick={() => setConfirmDelete(true)}
 				fontSize="18pt"
 			/>
 		</div>
@@ -68,6 +71,15 @@ const ExtraEntry: FC<ExtraEntryProps> = ({
 			onConfirm={onConfirm}
 			onCancel={hideEditExtraModal}
 		/>
+	)}
+	{confirmDelete && (
+		<Modal
+			title="Confirm Delete"
+			onClose={() => setConfirmDelete(false)}
+			onAccept={() => { onRemove(extraId); setConfirmDelete(false); }}
+		>
+			Are you sure you want to delete {item}
+		</Modal>
 	)}
 	</>;
 };
