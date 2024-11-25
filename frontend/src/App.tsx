@@ -7,7 +7,6 @@ import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
 import CreateGuestScreen from './Guests/CreateGuestScreen';
 import UpdateGuestScreen from './Guests/UpdateGuestScreen';
-import { CreateTaskScreen } from './Tasks/CreateTask';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
@@ -32,6 +31,7 @@ import RoomTypesScreen from './Rooms/RoomTypesScreen';
 import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
 import TasksScreen from './Tasks/TasksScreen';
+import CreateTaskScreen from './Tasks/CreateTaskScreen';
 
 
 function App() {
@@ -61,7 +61,7 @@ function App() {
         { path: "/guests/update-guest", element: UpdateGuestScreen },
 
         { path: "/tasks", element: TasksScreen },
-        { path: "/create-task", element: CreateTaskScreen },
+        { path: "/tasks/add", element: CreateTaskScreen },
         { path: "/update-task", element: UpdateTaskScreen },
         { path: "/remove-task", element: RemoveTaskScreen },
 

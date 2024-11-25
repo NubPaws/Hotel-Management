@@ -36,7 +36,7 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
             return;
         }
         
-        const userData = { username, password, role, department: department.replace(" ", "") };
+        const userData = { username, password, role, department: department.replace(new RegExp(" ", 'g'), "") };
         
         try {
             const res = await makeRequest("api/Users/create", "POST", "json", userData, userCredentials.token);
@@ -157,9 +157,9 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
             >
                 <RadioButton>General</RadioButton>
                 <RadioButton>Front Desk</RadioButton>
-                <RadioButton>Housekeeping</RadioButton>
+                <RadioButton>HouseKeeping</RadioButton>
                 <RadioButton>Maintenance</RadioButton>
-                <RadioButton>Food and Beverage</RadioButton>
+                <RadioButton>Food And Beverage</RadioButton>
                 <RadioButton>Security</RadioButton>
                 <RadioButton>Concierge</RadioButton>
             </RadioButtonContainer>
