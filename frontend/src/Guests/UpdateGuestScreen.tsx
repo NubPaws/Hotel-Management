@@ -8,7 +8,7 @@ import FormContainer from "../UIElements/Forms/FormContainer";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
-import { GuestUpdateState } from "./UpdateGuestState";
+import { Guest } from "../APIRequests/ServerData";
 
 const UpdateGuestScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -16,8 +16,13 @@ const UpdateGuestScreen: React.FC<ScreenProps> = ({
     useUserRedirect(userCredentials);
 
     const location = useLocation();
-    const state = location.state as GuestUpdateState;
-    const { email: initialEmail, guestId: initialGuestId, phone: initialPhone, fullName: initialFullName } = state || {};
+    const state = location.state as Partial<Guest>;
+    const {
+        email: initialEmail,
+        guestId: initialGuestId,
+        phone: initialPhone,
+        fullName: initialFullName
+    } = state || {};
 
     const [email, setEmail] = useState(initialEmail || "");
     const [guestId, setGuestId] = useState(initialGuestId || 0);
