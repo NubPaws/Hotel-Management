@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import Colors from "../../styles/Colors";
 import "./IconButton.css"
 
@@ -9,7 +10,7 @@ interface IconButtonProps {
 	borderRadius?: string;
 	fontSize?: string;
 	backgroundColor?: string;
-	onClick?: () => void;
+	onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
@@ -33,30 +34,15 @@ const IconButton: React.FC<IconButtonProps> = ({
 				backgroundColor,
 			}}
 		>
-			{children && (
-				<>
-					<img
-						className="icon-btn-image"
-						src={iconUrl}
-						alt="icon"
-						style={{
-							width: fontSize,
-							height: fontSize,
-						}}
-					></img>
-					<span>{children}</span>
-				</>
-			)}
-			{!children && (
-				<img
-					src={iconUrl}
-					alt="icon"
-					style={{
-						width: fontSize,
-						height: fontSize,
-					}}
-				></img>
-			)}
+			<img
+				src={iconUrl}
+				alt="icon"
+				style={{
+					width: fontSize,
+					height: fontSize,
+				}}
+			></img>
+			{children && <span style={{marginLeft: "8px"}}>{children}</span>}
 		</button>
 	);
 }

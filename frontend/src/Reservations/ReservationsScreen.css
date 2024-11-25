@@ -10,3 +10,14 @@
 	position: absolute;
 	right: 0;
 }
+
+.search-reservation-input-btn {
+	/* Instead of the input label that can't be empty for some reason */
+	margin-top: 12pt;
+}
+
+.reservation-entry-list-container {
+	margin-top: 16px;
+	overflow-y: auto;
+	max-height: 280px;
+}

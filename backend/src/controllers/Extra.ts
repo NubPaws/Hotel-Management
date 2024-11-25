@@ -93,6 +93,74 @@ router.post("/update", verifyUser, async (req, res, next) => {
 	}
 });
 
-
+/**
+ * @swagger
+ * /api/Extras/get-all:
+ *   post:
+ *     summary: Retrieve multiple extras by their IDs
+ *     tags: [Extras]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               extraIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: Array of extra IDs to retrieve
+ *                 example: [101, 102, 103]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the extras
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Extra'
+ *       400:
+ *         description: Invalid input or missing required fields
+ *       403:
+ *         description: Unauthorized, requires admin or food and beverage department
+ */
+router.post("/get-all", verifyUser, async (req, res, next) => {
+	const { extraIds } = req.body;
+	
+	// Validate input
+	const validation = dataValidate({ extraIds });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+	
+	if (!Array.isArray(extraIds) || extraIds.some(id => typeof id !== "number")) {
+		return res.status(StatusCode.BadRequest).json({
+			message: "extraIds must be an array of integers.",
+		});
+	}
+	
+	try {
+		const extras = await Promise.all(
+			extraIds.map(async (extraId) => {
+				try {
+					return await ExtraModel.getById(extraId);
+				} catch {
+					return null; // Ignore non-existent extras
+				}
+			})
+		);
+		
+		// Filter out nulls (non-existent extras)
+		const validExtras = extras.filter((extra) => extra !== null);
+		
+		return res.status(StatusCode.Ok).json(validExtras);
+	} catch (error) {
+		next(error);
+	}
+});
 
 export const ExtrasRouter = router;

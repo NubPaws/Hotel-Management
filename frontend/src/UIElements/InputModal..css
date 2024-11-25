@@ -1,0 +1,61 @@
+
+/* Background */
+.input-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 999;
+	animation: fadeBlackBackground 0.3s;
+}
+
+.input-modal {
+	position: fixed;
+	width: 400px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+	z-index: 1000;
+	animation: fadeBlackBackground 0.5s;
+}
+
+.input-modal-content {
+	display: flex;
+	flex-direction: column;
+}
+
+.input-modal-title {
+	font-size: 20pt;
+	font-weight: 500;
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.input-modal-form-group {
+	margin-bottom: 1rem;
+}
+
+.input-modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+
+.input-modal-actions button {
+	padding: 0.5rem 1.5rem;
+}
+
+@keyframes fadeBlackBackground {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}

@@ -1,227 +1,172 @@
-import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
-import { DynamicList } from "../UIElements/DynamicList";
-import Modal, { ModalController } from "../UIElements/Modal";
+import DynamicList from "../UIElements/DynamicList";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
-import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
 import DateInput from "../UIElements/Forms/DateInput";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
+import useFetchRoomTypes from "../Rooms/Hooks/useFetchRoomTypes";
+import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import { useNavigate } from "react-router-dom";
 
 const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
-    userCredentials, setShowConnectionErrorMessage
+    userCredentials
 }) => {
-    const [guest, setGuest] = useState(-1);
+    const [guestIdentification, setGuestIdentification] = useState("");
     const [guestName, setGuestName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [room, setRoom] = useState(-1);
     const [roomType, setRoomType] = useState("");
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [nightCount, setNightCount] = useState(-1);
     const [prices, setPrices] = useState<number[]>([]);
     const [comment, setComment] = useState("");
-
-    const [createReservationMessage, setCreateReservationMessage] = useState<ModalController | undefined>(undefined);
+    
+    const { roomTypes } = useFetchRoomTypes(userCredentials.token);
+    const [showModal] = useModalError();
+    
     const navigate = useNavigate();
-    useEffect(() => {
-        checkAdminOrFrontDesk(userCredentials.role, userCredentials.department, navigate);
-    }, [userCredentials, navigate]);
-
-    const handleSubmit = async (event: React.FormEvent) => {
+    useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
+    
+    const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-
-        if (!validateInputs()) {
-            return;
-        }
-
-        const createReservationData = {
-            guest,
+        
+        const requestBody = {
+            guest: guestIdentification,
+            comment,
+            startDate,
+            startTime,
+            nightCount: prices.length,
+            endTime,
+            prices,
+            roomType,
             guestName,
             email,
             phone,
-            room,
-            roomType,
-            startDate,
-            startTime,
-            endTime,
-            nightCount,
-            prices,
-            comment
         };
-
-        try {
-            const res = await makeRequest("api/Reservations/create", "POST", "json", createReservationData, userCredentials.token);
-            handleResponse(res);
-        } catch (error: any) {
-            if (error instanceof FetchError) {
-                setShowConnectionErrorMessage(true);
-            }
-            if (error instanceof RequestError) {
-                setCreateReservationMessage({
-                    title: "General Error Occurred",
-                    message: error.message,
-                });
-            }
-        }
+        
+        const url = "api/Reservations/create"
+        
+        makeRequest(url, "POST", "json", requestBody, userCredentials.token)
+            .then((res) => {
+                if (res.ok) {
+                    showModal("Success!", "Successfully created reservation!");
+                    navigate(-1);
+                } else {
+                    res.text().then((value) => showModal("Failed!", value));
+                }
+            })
+            .catch((error) => {
+                if (error instanceof FetchError) {
+                    showModal("Failed to connect to server", error.message);
+                }
+                if (error instanceof RequestError) {
+                    showModal("General Error Occurred", error.message);
+                }
+            });
     }
-
-    const validateInputs = () => {
-        const ERROR_TITLE = "Failed to process form";
-        if (nightCount !== prices.length) {
-            setCreateReservationMessage({
-                title: ERROR_TITLE,
-                message: "Nights and prices needs to match"
-            });
-            return false;
-        }
-        if (nightCount <= 0) {
-            setCreateReservationMessage({
-                title: ERROR_TITLE,
-                message: "Nights must be positive"
-            });
-            return false;
-        }
-        return true;
-    };
-
-    const handleResponse = async (res: Response) => {
-        switch (res.status) {
-            case 201:
-                setCreateReservationMessage({
-                    title: "Success!",
-                    message: "Successfully created reservation!",
-                });
-                break;
-            case 400:
-                setCreateReservationMessage({
-                    title: "Failed!",
-                    message: await res.text(),
-                });
-                break;
-            default:
-                setShowConnectionErrorMessage(true);
-                break;
-        }
-    };
-
+    
     return (
-        <>
-            <CenteredLabel>Create Reservation</CenteredLabel>
-            <FormContainer onSubmit={(e) => handleSubmit(e)}>
+    <>
+        <CenteredLabel>Create Reservation</CenteredLabel>
+        <FormContainer onSubmit={(e) => handleSubmit(e)} maxWidth="600px">
+            <MenuGridLayout>
                 <Input
-                    id="guestId"
-                    label="Guest Id"
-                    value={`${guest}`}
+                    id="create-reserve-guest-identification"
+                    label="Guest Identification"
+                    value={guestIdentification}
                     type={InputType.Number}
-                    placeholder="Enter guest Id"
-                    onChange={(e) => setGuest(Number(e.target.value))}
+                    placeholder="Enter guest identification"
+                    onChange={(e) => setGuestIdentification(e.target.value)}
+                    required
                 />
                 <Input
-                    id="guestName"
-                    label="Guest Name"
+                    id="create-reserve-full-name"
+                    label="Full Name"
                     value={guestName}
                     type={InputType.Text}
-                    placeholder="Enter guest name"
+                    placeholder="Enter name"
                     onChange={(e) => setGuestName(e.target.value)}
+                    required
                 />
                 <Input
-                    id="guestEmail"
-                    label="Guest email"
+                    id="create-reserve-email"
+                    label="Email address"
                     value={email}
                     type={InputType.Email}
-                    placeholder="Enter guest email"
+                    placeholder="Enter email"
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                 />
                 <Input
-                    id="guestPhone"
-                    label="Guest phone"
+                    id="create-reserve-phone-number"
+                    label="Phone number"
                     value={phone}
-                    type={InputType.Text}
-                    placeholder="Enter guest phone"
+                    type={InputType.Tel}
+                    placeholder="Enter phone"
                     onChange={(e) => setPhone(e.target.value)}
+                    required
                 />
-                <Input
-                    id="room"
-                    label="Room number"
-                    value={`${room}`}
-                    type={InputType.Number}
-                    placeholder="Enter room number"
-                    onChange={(e) => setRoom(Number(e.target.value))}
-                    required={false}
-                />
-                <Input
-                    id="roomType"
+                <SearchableDropdown
+                    id="create-reserve-room-type-drop-down"
+                    options={roomTypes}
                     label="Room type"
-                    value={roomType}
-                    type={InputType.Text}
-                    placeholder="Enter room type"
-                    onChange={(e) => setRoomType(e.target.value)}
+                    setValue={setRoomType}
+                    required
                 />
                 <DateInput
-                    id="startDate"
+                    id="create-reserve-start-date"
                     label="Start date"
                     value={startDate}
-                    placeholder="Enter start date"
-                    onChange={(year, month, day) => {setStartDate(new Date(year, month - 1, day))}}
+                    onChange={setStartDate}
+                    required
                 />
-                {/* TODO: Add values to those */}
                 <Input
-                    id="startTime"
-                    label="Start time"
+                    id="create-reserve-start-time"
+                    label="Start at"
                     type={InputType.Time}
-                    placeholder="Enter start time"
+                    value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
+                    required
                 />
                 <Input
-                    id="endTime"
-                    label="End time"
+                    id="create-reserve-end-time"
+                    label="End at"
                     type={InputType.Time}
-                    placeholder="Enter end time"
+                    value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
+                    required
                 />
-                <Input
-                    id="nightCount"
-                    label="Number of nights"
-                    type={InputType.Number}
-                    placeholder="Enter number of nights"
-                    onChange={(e) => setNightCount(Number(e.target.value))}
-                />
-                <DynamicList
-                    list={prices}
-                    setList={setPrices}
-                    listId="priceInputs"
-                    itemId="price"
-                    itemLabel="Night price"
-                    itemPlaceHolder="Enter night price"
-                    removeItemId="removePriceButton"
-                    addItemId="addPriceButton"
-                    addItemButtonValue="Add Price"
-                />
-                <Input
-                    id="comment"
-                    label="Comment"
-                    type={InputType.Text}
-                    placeholder="Enter comment"
-                    onChange={(e) => setComment(e.target.value)}
-                />
-                <Input
-                    id="createReservationButton"
-                    type={InputType.Submit}
-                    value="Create reservation"
-                />
-            </FormContainer>
-            {createReservationMessage && (
-                <Modal title={createReservationMessage.title} onClose={() => setCreateReservationMessage(undefined)}>
-                    {createReservationMessage.message}
-                </Modal>
-            )}
-        </>
-    )
-}
+            </MenuGridLayout>
+            <Input
+                id="create-reserve-comments"
+                label="Comments"
+                type={InputType.Text}
+                placeholder="Enter comments"
+                onChange={(e) => setComment(e.target.value)}
+            />
+            <DynamicList
+                id="room-night-list"
+                list={prices}
+                setList={setPrices}
+                label="Night price"
+                totalText="Number of nights"
+                addButtonText="Add Night"
+            />
+            
+            <Input
+                id="create-reserve-submit-btn"
+                type={InputType.Submit}
+                value="Create"
+            />
+        </FormContainer>
+    </>
+    );
+};
 
 export default CreateReservationScreen;
