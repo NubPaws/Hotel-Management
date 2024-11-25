@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import Button from "./Buttons/Button";
 import "./NavigationBar.css"
-
-import Colors from "../styles/Colors";
-import "./NavigationBar.css"
 import { ReactSetStateDispatch } from "../Utils/Types";
 import { UserCredentials } from "../APIRequests/ServerData";
+import Colors from "../styles/Colors";
+
+import backIcon from "../assets/back.svg";
+import "./NavigationBar.css"
+import IconButton from "./Buttons/IconButton";
 
 interface NavigationProps {
     setUserCredentials: ReactSetStateDispatch<UserCredentials>;
@@ -17,23 +19,32 @@ export const NavigationBar: React.FC<NavigationProps> = ({
     const navigate = useNavigate();
 
     return <>
-        <div className="navigation-container">
+    <div className="navigation-container">
+        <div className="navigation-bar-left-side">
+            <IconButton
+                iconUrl={backIcon}
+                borderWidth="0px"
+                fontSize="20pt"
+                onClick={() => navigate(-1)}
+            />
             <Button
-                className="navigation-button home-button"
+                className="navigation-button"
                 onClick={() => navigate("/home")}
                 borderWidth="3px"
             >
                 Home
             </Button>
+        </div>
+        <div className="nagivation-bar-right-side">
             <Button
-                className="navigation-button settings-button"
+                className="navigation-button"
                 onClick={() => navigate("/change-password")}
                 borderWidth="3px"
             >
                 Settings
             </Button>
             <Button
-                className="navigation-button logout-button"
+                className="navigation-button"
                 backgroundColor={Colors.red}
                 onClick={() => {
                     setUserCredentials({
@@ -49,6 +60,7 @@ export const NavigationBar: React.FC<NavigationProps> = ({
                 Logout
             </Button>
         </div>
-        <hr />
+    </div>
+    <hr />
     </>;
 }

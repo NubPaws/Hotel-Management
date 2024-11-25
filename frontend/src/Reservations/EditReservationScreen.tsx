@@ -7,12 +7,10 @@ import Button from "../UIElements/Buttons/Button";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import DateInput from "../UIElements/Forms/DateInput";
-import IconButton from "../UIElements/Buttons/IconButton";
 import { makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 
-import backIcon from "../assets/back.svg";
 import "./EditReservationScreen.css";
 
 const EditReservationScreen: FC<ScreenProps> = ({
@@ -128,13 +126,6 @@ const EditReservationScreen: FC<ScreenProps> = ({
 	};
 	
 	return <div className="edit-reservation-wrapper">
-		<IconButton
-			className="edit-reservation-back-btn"
-			iconUrl={backIcon}
-			onClick={() => navigate(-1)}
-			fontSize="16pt"
-		/>
-		
 		<div className="edit-reservation-fields-container">
 			<MenuGridLayout columns="1fr 1fr 2fr 1fr">
 				<Input

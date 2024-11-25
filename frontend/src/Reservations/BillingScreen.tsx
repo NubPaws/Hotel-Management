@@ -14,7 +14,6 @@ import InputModal, { InputModalField } from "../UIElements/InputModal";
 import { InputType } from "../UIElements/Forms/Input";
 import usePopup from "../Utils/Contexts/PopupContext";
 
-import backIcon from "../assets/back.svg";
 import saveIcon from "../assets/save.svg";
 import "./BillingScreen.css";
 
@@ -195,12 +194,7 @@ const BillingScreen: FC<ScreenProps> = ({
 	return <>
 	<div className="billing-screen-wrapper">
 		<div className="billing-screen-controls">
-			<IconButton
-				onClick={() => navigate(-1)}
-				iconUrl={backIcon}
-				fontSize="16pt"
-			/>
-			<span>Total: {totalPrice.toFixed(2)}$</span>
+			<span style={{fontSize: "20pt", fontWeight: "500"}}>Total: {totalPrice.toFixed(2)}$</span>
 			<IconButton
 				onClick={onSave}
 				iconUrl={saveIcon}
