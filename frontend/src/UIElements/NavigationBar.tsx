@@ -13,7 +13,7 @@ interface NavigationProps {
     setUserCredentials: ReactSetStateDispatch<UserCredentials>;
 }
 
-export const NavigationBar: React.FC<NavigationProps> = ({
+const NavigationBar: React.FC<NavigationProps> = ({
     setUserCredentials
 }) => {
     const navigate = useNavigate();
@@ -67,3 +67,5 @@ export const NavigationBar: React.FC<NavigationProps> = ({
     <hr />
     </>;
 }
+
+export default NavigationBar;

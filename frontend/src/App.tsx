@@ -12,13 +12,13 @@ import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
-import UserCreationScreen from './Authentication/UserCreationScreen';
+import CreateUserScreen from './Administration/CreateUserScreen.tsx';
 import { UserCredentials } from './APIRequests/ServerData';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
-import { NavigationBar } from './UIElements/NavigationBar';
+import NavigationBar from './UIElements/NavigationBar';
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
 import GuestsScreen from './Guests/GuestsScreen';
-import AdministrationScreen from './Administration/AdministrationScreen';
+import AdministrationScreen from './Administration/AdministrationScreen.tsx';
 import CreateRoomScreen from './Rooms/CreateRoomScreen';
 import { ModalErrorContextProvider } from './Utils/Contexts/ModalErrorContext';
 import RoomsScreen from './Rooms/RoomsScreen';
@@ -27,6 +27,7 @@ import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
 import EditReservationScreen from './Reservations/EditReservationScreen';
 import BillingScreen from './Reservations/BillingScreen';
+import EditUserScreen from './Administration/EditUserScreen.tsx';
 
 
 function App() {
@@ -41,9 +42,11 @@ function App() {
     const userRoutes = [
         { path: "/", element: LoginScreen },
         { path: "/login", element: LoginScreen },
-        { path: "/user-creation", element: UserCreationScreen },
         { path: "/change-password", element: ChangePasswordScreen },
+        
         { path: "/administration", element: AdministrationScreen },
+        { path: "/administration/create-user", element: CreateUserScreen },
+        { path: "/administration/edit-user", element: EditUserScreen },
 
         { path: "/home", element: HomeScreen },
 

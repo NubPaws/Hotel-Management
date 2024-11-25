@@ -3,30 +3,40 @@ import { ScreenProps } from "../Utils/Props";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import IconButton from "../UIElements/Buttons/IconButton";
-import plus from "../assets/plus-icon.svg"
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+
+import plusIcon from "../assets/plus-icon.svg"
+import editIcon from "../assets/edit.svg";
 
 const AdministrationScreen: React.FC<ScreenProps> = ({
     userCredentials,
 }) => {
+    useUserRedirect(userCredentials, ["Admin"]);
+    
     const navigate = useNavigate();
-    if (userCredentials.role !== "Admin") {
-        navigate("/home");
-    }
-
-
+    
+    
     return <>
         <CenteredLabel>Administration</CenteredLabel>
         <MenuGridLayout shadow>
             <IconButton
-                iconUrl={plus}
+                iconUrl={plusIcon}
                 borderWidth="2px"
                 borderRadius="5px"
                 fontSize="18pt"
-                onClick={() => navigate("/user-creation")}
+                onClick={() => navigate("/administration/create-user")}
             >
-                Create new user
+                New user
             </IconButton>
-
+            <IconButton
+                iconUrl={editIcon}
+                borderWidth="2px"
+                borderRadius="5px"
+                fontSize="18pt"
+                onClick={() => navigate("/administration/edit-user")}
+            >
+                Edit user
+            </IconButton>
         </MenuGridLayout>
     </>;
 }
