@@ -1,22 +1,19 @@
 import { useNavigate } from "react-router-dom";
-import { checkAdminOrFrontDesk } from "../Navigation/Navigation";
 import { AuthenticatedUserProps } from "../Utils/Props";
 
 import plus from "../assets/plus-icon.svg";
 import icon from "../assets/react.svg";
-import { useEffect } from "react";
 import IconButton from "../UIElements/Buttons/IconButton";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 const BackOfficeScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials
 }) => {
+    useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);
+    
     const navigate = useNavigate();
-    useEffect(() => {
-        checkAdminOrFrontDesk(userCredentials.role, userCredentials.department, navigate);
-    }, [userCredentials, navigate]);
-
     
     const elements = [
         {image: plus, navUrl: "/guests/add",              text: "Create guests"},
