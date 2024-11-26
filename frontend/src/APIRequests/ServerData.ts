@@ -1,6 +1,6 @@
 
 export type UserRole = "Admin" | "User" | "";
-export type Department = "General" | "FrontDesk" | "HouseKeeping"
+export type Department = "General" | "FrontDesk" | "Housekeeping"
     | "Maintenance" | "FoodAndBeverage" | "Security" | "Concierge" | "";
 
 export interface UserCredentials {

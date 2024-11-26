@@ -9,7 +9,6 @@ import IconButton from "../UIElements/Buttons/IconButton";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import { makeRequest } from "../APIRequests/APIRequests";
-import { UserCredentials } from "../APIRequests/ServerData";
 import RoleRadioButtons from "./Elements/RoleRadioButton";
 import DepartmentRadioButtons from "./Elements/DepartmentRadioButton";
 
@@ -39,13 +38,13 @@ const EditUserScreen: React.FC<ScreenProps> = ({
                 return;
             }
             
-            const user = await res.json() as UserCredentials;
+            const userResponse = await res.json();
             
-            setRole(user.role);
-            setDepartment(user.department);
+            setRole(userResponse.role);
+            setDepartment(userResponse.department);
             setShowButtons(true);
             
-            showInfoPopup(`Fetched user ${user.username}`);
+            showInfoPopup(`Fetched user ${userResponse.user}`);
         } catch (error: any) {
             showModal("Error occured making the query", error.message);
         }

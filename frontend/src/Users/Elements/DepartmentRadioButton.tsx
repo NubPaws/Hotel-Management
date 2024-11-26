@@ -18,12 +18,12 @@ const DepartmentRadioButtons: FC<DepartmentRadioButtonsProps> = ({
 		setValue={setValue}
 	>
 		<RadioButton>General</RadioButton>
-				<RadioButton>Front Desk</RadioButton>
-				<RadioButton>Housekeeping</RadioButton>
-				<RadioButton>Maintenance</RadioButton>
-				<RadioButton>Food And Beverage</RadioButton>
-				<RadioButton>Security</RadioButton>
-				<RadioButton>Concierge</RadioButton>
+		<RadioButton>FrontDesk</RadioButton>
+		<RadioButton>Housekeeping</RadioButton>
+		<RadioButton>Maintenance</RadioButton>
+		<RadioButton>FoodAndBeverage</RadioButton>
+		<RadioButton>Security</RadioButton>
+		<RadioButton>Concierge</RadioButton>
 	</RadioButtonContainer>
 );
 
