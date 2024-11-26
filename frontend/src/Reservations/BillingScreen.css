@@ -1,0 +1,36 @@
+
+.billing-screen-wrapper {
+	margin: 1rem;
+}
+
+.billing-screen-controls {
+	display: flex;
+	justify-content: space-between;
+	font-size: 16pt;
+	margin-bottom: 1rem;
+}
+
+/* Center the items vertically. */
+.billing-screen-controls > * {
+	margin: auto 0;
+}
+
+.billing-prices-label {
+	font-size: 20pt;
+	font-weight: 600;
+	margin: 0.25rem 0;
+}
+
+.billing-prices-container {
+	padding: 1rem 1rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+	margin: 1rem 0;
+	height: 330px;
+	max-height: 350px;
+	overflow-y: auto;
+}
+
+.billing-add-extra {
+	display: flex;
+	justify-content: right;
+}

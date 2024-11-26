@@ -10,15 +10,8 @@ import UpdateGuestScreen from './Guests/UpdateGuestScreen';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
-import CancelReservationScreen from './Reservations/CancelReservationScreen';
-import AddNightsScreen from './Reservations/AddNightsScreen';
-import RemoveNightScreen from './Reservations/RemoveNightsScreen';
-import AddExtraScreen from './Reservations/AddExtraScreen';
-import RemoveExtraScreen from './Reservations/RemoveExtraScreen';
 import UserCreationScreen from './Authentication/UserCreationScreen';
 import { UserCredentials } from './APIRequests/ServerData';
-import UpdateExtraScreen from './Extras/UpdateExtraScreen';
-import UpdateReservationScreen from './Reservations/UpdateReservationScreen';
 import EndOfDayScreen from './BackOffice/EndOfDayScreen';
 import { NavigationBar } from './UIElements/NavigationBar';
 import BackOfficeScreen from './BackOffice/BackOfficeScreen';
@@ -32,6 +25,8 @@ import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
 import TasksScreen from './Tasks/TasksScreen';
 import CreateTaskScreen from './Tasks/CreateTaskScreen';
+import EditReservationScreen from './Reservations/EditReservationScreen';
+import BillingScreen from './Reservations/BillingScreen';
 
 
 function App() {
@@ -65,15 +60,10 @@ function App() {
         { path: "/update-task", element: UpdateTaskScreen },
         { path: "/remove-task", element: RemoveTaskScreen },
 
-        { path: "/create-reservation", element: CreateReservationScreen },
-        { path: "/cancel-reservation", element: CancelReservationScreen },
-        { path: "/add-nights", element: AddNightsScreen },
-        { path: "/remove-nights", element: RemoveNightScreen },
-        { path: "/add-extra", element: AddExtraScreen },
-        { path: "/remove-extra", element: RemoveExtraScreen },
-        { path: "/update-extra", element: UpdateExtraScreen },
-        { path: "/update-reservation", element: UpdateReservationScreen },
         { path: "/reservations", element: ReservationsScreen },
+        { path: "/reservations/create", element: CreateReservationScreen },
+        { path: "/reservations/edit", element: EditReservationScreen },
+        { path: "/reservations/billing", element: BillingScreen },
 
         { path: "/back-office/end-of-day", element: EndOfDayScreen },
         { path: "/back-office", element: BackOfficeScreen}

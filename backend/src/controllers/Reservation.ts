@@ -191,9 +191,9 @@ router.post("/update", verifyUser, async (req, res, next) => {
 
 /**
  * @swagger
- * /api/Reservations/add-nights:
+ * /api/Reservations/set-nights:
  *   post:
- *     summary: Add nights to an existing reservation
+ *     summary: Set the number of nights for a reservation
  *     tags: [Reservations]
  *     security:
  *       - bearerAuth: []
@@ -206,95 +206,46 @@ router.post("/update", verifyUser, async (req, res, next) => {
  *             properties:
  *               reservationId:
  *                 type: integer
- *                 description: The reservation ID
- *               nights:
+ *                 description: The ID of the reservation to update
+ *               nightCount:
  *                 type: integer
- *                 description: How many nights to add
+ *                 description: The new number of nights for the reservation
  *               prices:
  *                 type: array
  *                 items:
  *                   type: number
- *                 description: Prices for each night of the stay
- *                 example: [100, 120, 150]
+ *                 description: Prices for each night
  *     responses:
  *       200:
- *         description: Night added successfully
+ *         description: Number of nights updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reservation'
  *       400:
  *         description: Invalid input
+ *       403:
+ *         description: Unauthorized
+ *       404:
+ *         description: Reservation not found
  */
-router.post("/add-nights", verifyUser, async (req, res, next) => {
+router.post("/set-nights", verifyUser, async (req, res, next) => {
 	const { isAdmin, isFrontDesk } = req as AuthedRequest;
 	if (!isAdmin && !isFrontDesk) {
 		return next(new UnauthorizedUserError());
 	}
 	
-	const { reservationId, nights, prices } = req.body;
+	const { reservationId, nightCount, prices } = req.body;
 	
-	if (!reservationId || !nights || !prices) {
+	if (!reservationId || !nightCount || !prices || prices.length !== nightCount) {
 		return res.status(StatusCode.BadRequest).json({
-			message: "Reservation id, nights, and prices are required"
+			message: "Reservation ID, nightCount, and matching prices array are required."
 		});
 	}
 	
 	try {
-		const reservation = await ReservationModel.addNights(reservationId, nights, prices);
-		res.status(StatusCode.Ok).json(reservation);
-	} catch (error) {
-		next(error);
-	}
-});
-
-/**
- * @swagger
- * /api/Reservations/remove-nights:
- *   post:
- *     summary: Remove the last night from a reservation
- *     tags: [Reservations]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               reservationId:
- *                 type: integer
- *                 description: The reservation ID
- *               nights:
- *                 type: integer
- *                 description: The amount of nights to remove from the end.
- *     responses:
- *       200:
- *         description: Night removed successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Reservation'
- *       400:
- *         description: Invalid input
- */
-router.post("/remove-nights", verifyUser, async (req, res, next) => {
-	const { isAdmin, isFrontDesk } = req as AuthedRequest;
-	if (!isAdmin && !isFrontDesk) {
-		return next(new UnauthorizedUserError());
-	}
-	
-	const { reservationId, nights } = req.body;
-	if (!reservationId || !nights) {
-		return res.status(StatusCode.BadRequest).json({
-			message: "Reservation id and nights are required"
-		});
-	}
-	
-	try {
-		const reservation = await ReservationModel.removeNights(reservationId, nights);
-		res.status(StatusCode.Ok).json(reservation);
+		const updatedReservation = await ReservationModel.setNightCount(reservationId, nightCount, prices);
+		res.status(StatusCode.Ok).json(updatedReservation);
 	} catch (error) {
 		next(error);
 	}
@@ -333,7 +284,7 @@ router.post("/remove-nights", verifyUser, async (req, res, next) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Reservation'
+ *               $ref: '#/components/schemas/Extra'
  *       400:
  *         description: Invalid input
  */
@@ -352,8 +303,8 @@ router.post("/add-extra", verifyUser, async (req, res, next) => {
 	}
 	
 	try {
-		const reservation = await ReservationModel.addExtra(reservationId, item, price, description);
-		res.status(StatusCode.Ok).json(reservation);
+		const extra = await ReservationModel.addExtra(reservationId, item, price, description);
+		res.status(StatusCode.Ok).json(extra);
 	} catch (error) {
 		next(error);
 	}
@@ -548,6 +499,130 @@ router.get("/query", verifyUser, async (req, res, next) => {
 		next(error);
 	}
 	
+});
+
+/**
+ * @swagger
+ * /api/Reservations/{id}:
+ *   get:
+ *     summary: Get a reservation by ID
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The reservation ID
+ *     responses:
+ *       200:
+ *         description: Reservation retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reservation'
+ *       403:
+ *         description: Unauthorized, requires front desk or admin
+ *       404:
+ *         description: Reservation not found
+ */
+router.get("/:id", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
+	}
+
+	const { id } = req.params;
+
+	if (!id || isNaN(Number(id))) {
+		return res.status(StatusCode.BadRequest).json({
+			message: "Invalid reservation ID"
+		});
+	}
+
+	try {
+		const reservation = await ReservationModel.getById(Number(id));
+		if (!reservation) {
+			return res.status(StatusCode.NotFound).json({
+				message: "Reservation not found"
+			});
+		}
+		res.status(StatusCode.Ok).json(reservation);
+	} catch (error) {
+		next(error);
+	}
+});
+
+/**
+ * @swagger
+ * /api/Reservations/checkin:
+ *   post:
+ *     summary: Check in a guest by updating the reservation state to "Active"
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reservationId:
+ *                 type: integer
+ *                 description: ID of the reservation to check in
+ *     responses:
+ *       200:
+ *         description: Reservation state updated to "Active"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid input or missing required fields
+ *       403:
+ *         description: Unauthorized, requires front desk or admin
+ *       404:
+ *         description: Reservation not found
+ */
+router.post("/checkin", verifyUser, async (req, res, next) => {
+	const { isAdmin, isFrontDesk } = req as AuthedRequest;
+	if (!isAdmin && !isFrontDesk) {
+		return next(new UnauthorizedUserError());
+	}
+
+	const { reservationId } = req.body;
+
+	const validation = dataValidate({ reservationId });
+	if (validation.status) {
+		return validation.respond(res);
+	}
+
+	try {
+		// Retrieve the reservation
+		const reservation = await ReservationModel.getById(Number(reservationId));
+		if (!reservation) {
+			return res.status(StatusCode.NotFound).json({
+				message: "Reservation not found"
+			});
+		}
+
+		// Ensure the reservation is in a state that allows check-in
+		if (reservation.state !== ReservationState.Arriving) {
+			return res.status(StatusCode.BadRequest).json({
+				message: `Cannot check in a reservation in state: ${reservation.state}`
+			});
+		}
+
+		// Update the state to "Active"
+		const updatedReservation = await ReservationModel.setState(reservationId, ReservationState.Active);
+
+		res.status(StatusCode.Ok).json(updatedReservation);
+	} catch (error) {
+		next(error);
+	}
 });
 
 export const ReservationsRouter = router;

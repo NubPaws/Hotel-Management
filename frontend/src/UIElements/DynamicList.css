@@ -1,0 +1,33 @@
+
+.dynamic-list-container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+}
+
+.dynamic-list-scrollable {
+	overflow-y: auto;
+}
+
+.dynamic-list-fields-container {
+	display: grid;
+	grid-template-columns: 5fr 14fr 1fr;
+	column-gap: 16px;
+	margin: 8px 0;
+}
+
+.dynamic-list-fields-container * {
+	margin: auto 0;
+}
+
+.dynamic-list-controls {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	margin-bottom: 16px;
+}
+
+.dynamic-list-controls * {
+	margin: auto 0;
+}

@@ -388,17 +388,28 @@ async function removeNights(reservationId: number, nightsToRemove: number) {
 	return reservation as Reservation;
 }
 
-async function setEndTime(reservationId: number, endTime: Time24) {
+/**
+ * Set the number of nights for a reservation and adjust prices accordingly.
+ * 
+ * @param reservationId The reservation to update.
+ * @param nightCount The new number of nights for the reservation.
+ * @param prices An array of prices matching the new number of nights.
+ * @returns The updated reservation.
+ * @throws ReservationUpdateError if the operation fails.
+ */
+async function setNightCount(reservationId: number, nightCount: number, prices: number[]): Promise<Reservation> {
 	const reservation = await getById(reservationId);
 	
-	if (numFromTime24(reservation.startTime) <= numFromTime24(endTime)) {
-		throw new ReservationUpdateError("End time must be after start time.");
+	if (prices.length !== nightCount) {
+		throw new ReservationUpdateError("Prices array length must match the new night count.");
 	}
 	
-	reservation.endTime = endTime;
+	reservation.nightCount = nightCount;
+	reservation.prices = prices;
+	
+	reservation.endDate = addDaysToDate(reservation.startDate, nightCount);
 	
 	await reservation.save();
-	
 	return reservation as Reservation;
 }
 
@@ -464,7 +475,7 @@ async function addExtra(reservationId: number, item: string, price: number, desc
 	
 	reservation.extras.push(extra.extraId);
 	await reservation.save();
-	return reservation as Reservation;
+	return extra;
 }
 
 /**
@@ -598,8 +609,7 @@ export default {
 	setState: (reservationId: number, state: ReservationState) => updateReservationField(reservationId, "state", state),
 	setRoomType: (reservationId: number, roomType: string) => updateReservationField(reservationId, "roomType", roomType),
 	
-	addNights,
-	removeNights,
+	setNightCount,
 	
 	addExtra,
 	removeExtra,
