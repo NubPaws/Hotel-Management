@@ -92,7 +92,11 @@ function App() {
         <div className="app-container">
             <BrowserRouter>
                 {userCredentials.username !== "" && (
-                    <NavigationBar setUserCredentials={setUserCredentials} />
+                    <NavigationBar
+                        userCredentials={userCredentials}
+                        setUserCredentials={setUserCredentials}
+                        setShowConnectionErrorMessage={setShowConnectionErrorMessage}
+                    />
                 )}
                 <Routes>
                     {routeComponents}

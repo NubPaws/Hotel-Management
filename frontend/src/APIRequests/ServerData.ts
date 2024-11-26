@@ -75,3 +75,12 @@ export type Extra = {
     price: number;
     reservationId: number;
 };
+
+export type SystemInformation = {
+    systemDate: number[];
+    occupancy: {
+        occupancy: number;
+        arrivals: number;
+        departures: number;
+    };
+};

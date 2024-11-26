@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { addDaysToDate, arrayToDate, compareDate, dateToArray } from "../utils/Clock.js";
 import Reservation, { ReservationState, ReservationState as ReserveState } from "./Reservation.js";
 import Logger from "../utils/Logger.js";
+import Room from "./Room.js";
 
 export class BackOfficeHasNotBeenInitializedError extends Error {}
 
@@ -131,13 +132,14 @@ export type Occupancy = {
  * - departures: Number of reservations in the "Departing" state.
  */
 async function getOccupancy(): Promise<Occupancy> {
-	const [occupancy, arrivals, departures] = await Promise.all([
+	const [roomCount, occupancy, arrivals, departures] = await Promise.all([
+		Room.count({}),
 		Reservation.count({ state: ReservationState.Active }),
 		Reservation.count({ state: ReservationState.Arriving }),
 		Reservation.count({ state: ReservationState.Departing }),
 	]);
 	return {
-		occupancy,
+		occupancy: occupancy / (roomCount === 0 ? roomCount : 1),
 		arrivals,
 		departures,
 	};
