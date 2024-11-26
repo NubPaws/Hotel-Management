@@ -35,7 +35,7 @@ const CreateTaskScreen: React.FC<ScreenProps> = ({
                 room,
                 description,
                 urgency,
-                department: department.replace(new RegExp(" ", 'g'), ""),
+                department: department.replace(/ /g, ""),
                 creator: userCredentials.username
             }, userCredentials.token);
 

@@ -10,6 +10,9 @@ import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 import Dropdown from "../UIElements/Dropdown";
 import { useState } from "react";
 import { Department } from "../APIRequests/ServerData";
+import { useModalError } from "../Utils/Contexts/ModalErrorContext";
+import usePopup from "../Utils/Contexts/PopupContext";
+import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 
 const TasksScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -19,6 +22,10 @@ const TasksScreen: React.FC<ScreenProps> = ({
     const DEPARTMENT_OPTIONS = ["General", "FrontDesk", "HouseKeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"]
     const [department, setDepartment] = useState<Department | undefined>(userCredentials.department);
     const { tasks, loading, update } = useFetchTasksByDepartment(userCredentials.token, department);
+
+    const [showModal] = useModalError();
+    const [showErrorPopup, showInfoPopup] = usePopup();
+    
     const navigate = useNavigate();
 
     if (loading) {
@@ -30,6 +37,52 @@ const TasksScreen: React.FC<ScreenProps> = ({
 
         if (allowedValues.includes(newDepartment as Department)) {
             setDepartment(newDepartment as Department);
+        }
+    }
+
+    const changeStatus = async (taskId: number, status: string) => {
+        const url = `api/Tasks/${taskId}`;
+
+        try {
+            const res = await makeRequest(url, "POST", "json", {
+                taskId: taskId,
+                status: status,
+            }, userCredentials.token);
+
+            if (res.ok) {
+                showInfoPopup(`Successfully updated task state to ${status}`);
+                update();
+            }
+        } catch (error) {
+            if (error instanceof FetchError) {
+                showErrorPopup("Error connecting to the server");
+            }
+            if (error instanceof RequestError) {
+				showModal("General Error Occurred", error.message);
+            }
+        }
+    }
+
+    const changeDepartment = async (taskId: number, newDepartment: string) => {
+        const url = `api/Tasks/${taskId}`;
+
+        try {
+            const res = await makeRequest(url, "POST", "json", {
+                taskId: taskId,
+                department: newDepartment,
+            }, userCredentials.token);
+
+            if (res.ok) {
+                showInfoPopup(`Successfully moved the task to ${newDepartment}`);
+                update();
+            }
+        } catch (error) {
+            if (error instanceof FetchError) {
+                showErrorPopup("Error connecting to the server");
+            }
+            if (error instanceof RequestError) {
+				showModal("General Error Occurred", error.message);
+            }
         }
     }
 
@@ -49,11 +102,13 @@ const TasksScreen: React.FC<ScreenProps> = ({
                 setValue={(value) => updateTasks(value)}
             />
         {tasks && (
-            <ul>
+            <ul className="task-entry-list-wrapper">
                 {tasks.map((task) => (
                     <TaskEntry
                         key={task.taskId}
                         task={task}
+                        changeStatus={changeStatus}
+                        changeDepartment={changeDepartment}
                     />
                 ))}
             </ul>

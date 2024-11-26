@@ -36,7 +36,7 @@ const UserCreationScreen: React.FC<ScreenProps> = ({
             return;
         }
         
-        const userData = { username, password, role, department: department.replace(new RegExp(" ", 'g'), "") };
+        const userData = { username, password, role, department: department.replace(/ /g, "") };
         
         try {
             const res = await makeRequest("api/Users/create", "POST", "json", userData, userCredentials.token);
