@@ -86,6 +86,23 @@ const TasksScreen: React.FC<ScreenProps> = ({
         }
     }
 
+    const onRemove = async (taskId: number) => {
+		const url = `api/Tasks/remove/${taskId}`;
+
+		try {
+			const res = await makeRequest(url, "POST", "text", "", userCredentials.token);
+
+			if (res.status === 401) {
+				showModal("Insufficient permissions", "Only administrators can remove tasks.");
+				return;
+			}
+
+			showInfoPopup(`Successfully deleted task`);
+		} catch (error: any) {
+			showModal("Request error has occurred", error.message);
+		}
+	};
+
     return <>
         <CenteredLabel>Tasks</CenteredLabel>
         <IconButton
@@ -109,6 +126,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
                         task={task}
                         changeStatus={changeStatus}
                         changeDepartment={changeDepartment}
+                        onRemove={onRemove}
                     />
                 ))}
             </ul>
