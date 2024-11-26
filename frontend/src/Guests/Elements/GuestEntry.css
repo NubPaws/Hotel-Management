@@ -1,22 +1,69 @@
+
 .guest-entry {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
-
-	gap: 20px;
-
-	padding: 4px 7px;
-	margin: 0 auto;
-
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 100vw;
+	max-width: 900px;
+	
+	padding: 0.5rem;
+	
 	background-color: #f9f9f9;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	max-width: 800px;
 }
 
-.guest-entry > * {
+.guest-entry-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.guest-entry-controls {
+	display: flex;
+	flex-direction: column;
+	
+	justify-content: space-between;
+}
+
+.guest-entry-controls > * {
 	margin: 0 auto;
+	margin-right: 0;
 }
 
-.guest-entry-cell {
-	white-space: nowrap;
-	overflow-x: hidden;
+.guest-id {
+	font-size: 12pt;
+}
+
+.guest-name {
+	font-size: 14pt;
+	font-weight: 500;
+}
+
+.guest-email a,
+.guest-email a:link,
+.guest-email a:active,
+.guest-email a:visited,
+.guest-email a:hover {
+	color: blue;
+	text-decoration: none;
+}
+
+.guest-phone {
+	font-size: 12pt;
+}
+
+.guest-entry-reservations {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease-in-out;
+}
+
+.guest-entry-reservations.visible {
+	max-height: 250px;
+	overflow-y: auto;
+}
+
+.guest-entry-no-reservation {
+	margin: 0.5rem;
+	font-size: 14pt;
 }

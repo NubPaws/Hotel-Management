@@ -7,13 +7,12 @@ import Button from "../UIElements/Buttons/Button";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
 import DateInput from "../UIElements/Forms/DateInput";
-import IconButton from "../UIElements/Buttons/IconButton";
 import { makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 
-import backIcon from "../assets/back.svg";
 import "./EditReservationScreen.css";
+import Colors from "../styles/Colors";
 
 const EditReservationScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -65,7 +64,7 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		reservationMade: dateMade, nightCount, roomType, endDate, state
 	} = reservation;
 	
-	const deleteReservation = () => {
+	const cancelReservation = () => {
 		const url = "api/Reservations/cancel";
 		const body = { reservationId: id };
 		makeRequest(url, "POST", "json", body, userCredentials.token)
@@ -128,13 +127,6 @@ const EditReservationScreen: FC<ScreenProps> = ({
 	};
 	
 	return <div className="edit-reservation-wrapper">
-		<IconButton
-			className="edit-reservation-back-btn"
-			iconUrl={backIcon}
-			onClick={() => navigate(-1)}
-			fontSize="16pt"
-		/>
-		
 		<div className="edit-reservation-fields-container">
 			<MenuGridLayout columns="1fr 1fr 2fr 1fr">
 				<Input
@@ -252,12 +244,11 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		
 		<div className="edit-reservation-controls">
 			<Button
-				backgroundColor="#FF0000"
-				textColor="#FFF"
-				onClick={deleteReservation}
+				backgroundColor={Colors.red}
+				onClick={cancelReservation}
 				disabled={state === "Cancelled"}
 			>
-				Delete
+				Cancel Reservation
 			</Button>
 			
 			<div className="edit-reservation-right-btns">

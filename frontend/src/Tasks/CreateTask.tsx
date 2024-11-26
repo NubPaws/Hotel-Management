@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input from "../UIElements/Forms/Input";
 import Button from "../UIElements/Buttons/Button";
-import { validateRadioButton } from "../Authentication/Validation";
+import { validateRadioButton } from "../Users/Validation";
 import { authorizedPostRequestWithBody } from "../APIRequests/APIRequests";
 import Modal from "../UIElements/Modal";
 

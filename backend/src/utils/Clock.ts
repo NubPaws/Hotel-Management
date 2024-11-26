@@ -26,7 +26,7 @@ export function addDaysToDate(date: Date, days: number): Date {
 
 export function getTodaysDate(): Date {
 	const date = new Date();
-	date.setHours(15, 0, 0, 0);
+	date.setHours(0, 0, 0, 0);
 	return date;
 }
 

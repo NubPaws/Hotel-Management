@@ -54,4 +54,66 @@ router.post("/end-of-day", verifyUser, async (req, res, next) => {
 	}
 });
 
+/**
+ * @swagger
+ * /api/BackOffice/get-system-information:
+ *   get:
+ *     summary: Retrieve system information
+ *     description:
+ *       Fetches the current system date and occupancy details, including the number of active reservations,
+ *       arrivals, and departures. This endpoint is accessible to all authenticated users.
+ *     tags:
+ *       - BackOffice
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: System information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 systemDate:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   description: The system date in [day, month, year] format.
+ *                   example: [25, 11, 2024]
+ *                 occupancy:
+ *                   type: object
+ *                   properties:
+ *                     occupancy:
+ *                       type: integer
+ *                       description: Number of active reservations.
+ *                       example: 25
+ *                     arrivals:
+ *                       type: integer
+ *                       description: Number of reservations with the "Arriving" state.
+ *                       example: 10
+ *                     departures:
+ *                       type: integer
+ *                       description: Number of reservations with the "Departing" state.
+ *                       example: 8
+ *       401:
+ *         description: Unauthorized. User is not authenticated.
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/get-system-information", verifyUser, async (req, res, next) => {
+	try {
+		const [systemDate, occupancy] = await Promise.all([
+			BackOffice.getSystemDate(),
+			BackOffice.getOccupancy()
+		]);
+		
+		res.status(StatusCode.Ok).json({
+			systemDate,
+			occupancy
+		});
+	} catch (error) {
+		next(error);
+	}
+});
+
 export const BackOfficeRouter = router;

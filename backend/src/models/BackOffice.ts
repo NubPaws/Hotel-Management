@@ -1,7 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { addDaysToDate, arrayToDate, compareDate, dateToArray } from "../utils/Clock.js";
-import Reservation, { ReservationState as ReserveState } from "./Reservation.js";
+import Reservation, { ReservationState, ReservationState as ReserveState } from "./Reservation.js";
 import Logger from "../utils/Logger.js";
+import Room from "./Room.js";
 
 export class BackOfficeHasNotBeenInitializedError extends Error {}
 
@@ -105,9 +106,50 @@ async function endOfDay(): Promise<BackOffice> {
 	return backOffice;
 }
 
+/**
+ * Fetch the current system date from the BackOffice schema.
+ * @returns Promise<number[]> - The system date in [day, month, year] format.
+ */
+async function getSystemDate(): Promise<number[]> {
+	const backOffice = await BackOfficeModel.findOne();
+	if (!backOffice) {
+		throw new BackOfficeHasNotBeenInitializedError();
+	}
+	return backOffice.systemDate;
+}
+
+export type Occupancy = {
+	occupancy: number,
+	arrivals: number,
+	departures: number,
+};
+
+/**
+ * Fetch the occupancy-related statistics.
+ * @returns Promise<{ occupancy: number, arrivals: number, departures: number }>
+ * - occupancy: Number of reservations in the "Active" state.
+ * - arrivals: Number of reservations in the "Arriving" state.
+ * - departures: Number of reservations in the "Departing" state.
+ */
+async function getOccupancy(): Promise<Occupancy> {
+	const [roomCount, occupancy, arrivals, departures] = await Promise.all([
+		Room.count({}),
+		Reservation.count({ state: ReservationState.Active }),
+		Reservation.count({ state: ReservationState.Arriving }),
+		Reservation.count({ state: ReservationState.Departing }),
+	]);
+	return {
+		occupancy: occupancy / (roomCount === 0 ? roomCount : 1),
+		arrivals,
+		departures,
+	};
+}
+
 export default {
 	initBackOffice,
 	endOfDay,
+	getSystemDate,
+	getOccupancy,
 }
 
 /**

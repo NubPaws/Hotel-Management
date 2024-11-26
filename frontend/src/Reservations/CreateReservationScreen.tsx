@@ -80,7 +80,7 @@ const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
                     id="create-reserve-guest-identification"
                     label="Guest Identification"
                     value={guestIdentification}
-                    type={InputType.Number}
+                    type={InputType.Text}
                     placeholder="Enter guest identification"
                     onChange={(e) => setGuestIdentification(e.target.value)}
                     required
