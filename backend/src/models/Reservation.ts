@@ -5,6 +5,7 @@ import Logger from "../utils/Logger.js";
 import Counter from "./Counter.js";
 import Extra from "./Extra.js";
 import Room from "./Room.js";
+import Guest from "./Guest.js";
 
 export class ReservationDoesNotExistError extends Error {}
 export class RoomIsAlreadyOccupiedAtThatTimeError extends Error {}
@@ -58,7 +59,7 @@ const ReservationSchema = new Schema<Reservation>({
 	},
 	comment: {
 		type: String,
-		required: true,
+		default: "",
 	},
 	startDate: {
 		type: Date,
@@ -206,7 +207,7 @@ const ReservationModel = mongoose.model<Reservation>("ReservationModel", Reserva
  * performs validation checks to ensure the provided information is valid.
  * Therefore, no validation checks are needed outside of this function.
  * 
- * @param guest - The ID of the guest making the reservation.
+ * @param guestIdentification - The ID of the guest making the reservation.
  * @param comment - Additional notes or comments about the reservation.
  * @param startDate - The start date of the reservation (dd/MM/YYYY).
  * @param startTime - The time of day the reservation starts (HH:mm, 24-hour format).
@@ -222,7 +223,7 @@ const ReservationModel = mongoose.model<Reservation>("ReservationModel", Reserva
  * @throws ReservationCreationError - Throws an error if the reservation creation fails due to validation or database issues.
  */
 async function create(
-	guest: number,
+	guestIdentification: string,
 	comment: string,
 	startDate: Date,
 	startTime: Time24,
@@ -237,7 +238,7 @@ async function create(
 	const today = getTodaysDate();
 	
 	/* Validate all the fields, let's gooo!!! */
-	
+	startDate.setHours(0, 0, 0, 0);
 	if (startDate < today) {
 		throw new ReservationCreationError("startDate field must be today or later.");
 	}
@@ -252,6 +253,8 @@ async function create(
 		throw new ReservationCreationError(" Prices array length must match nightCount");
 	}
 	
+	const guest = await Guest.getByIdentification(guestIdentification);
+	
 	/* Make sure that the start date is properly validated. */
 	startDate.setHours(0, 0, 0, 0);
 	
@@ -262,7 +265,7 @@ async function create(
 		
 		const reservation = await ReservationModel.create({
 			reservationId,
-			guest,
+			guest: guest.guestId,
 			reservationMade: getTodaysDate(),
 			comment,
 			startDate,
@@ -522,9 +525,10 @@ async function query(
 	
 	// Add filters based on query parameters provided
 	if (guestId) {
-		filters.guestIdentification = new RegExp(`${guestId}`, "i");
+		const guest = await Guest.getByIdentification(guestId);
+		filters.guest = { $eq: guest.guestId } //new RegExp(`${guest.guestId}`, "i");
 	}
-
+	
 	if (room) {
 		filters.$expr = {
 			$regexMatch: {

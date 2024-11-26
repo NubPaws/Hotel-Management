@@ -56,7 +56,7 @@ function App() {
 
         { path: "/guests/", element: GuestsScreen },
         { path: "/guests/add", element: CreateGuestScreen },
-        { path: "/guests/update-guest", element: UpdateGuestScreen },
+        { path: "/guests/update", element: UpdateGuestScreen },
 
         { path: "/create-task", element: CreateTaskScreen },
         { path: "/update-task", element: UpdateTaskScreen },

@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC } from "react";
 import { Reservation } from "../../APIRequests/ServerData";
 
 import "./ReservationEntry.css";
@@ -12,7 +12,6 @@ type ReservationEntryProps = {
 const ReservationEntry: FC<ReservationEntryProps> = ({
 	reservation
 }) => {
-	
 	const navigate = useNavigate();
 	
 	const {
@@ -20,13 +19,13 @@ const ReservationEntry: FC<ReservationEntryProps> = ({
 		endTime, endDate, state, guestName,
 	} = reservation;
 	
-	const formatDate = useCallback((date: Date) => {
+	const formatDate = (date: Date) => {
 		const year = `${date.getFullYear()}`.padStart(4, "0");
 		const month = `${date.getMonth() + 1}`.padStart(2, "0");
 		const day = `${date.getDay()}`.padStart(2, "0");
 		
 		return `${day}/${month}/${year}`;
-	}, []);
+	};
 	
 	return <div className="reservation-entry-fields-container">
 		<p className="reservation-entry-id">ID: {reservationId}</p>

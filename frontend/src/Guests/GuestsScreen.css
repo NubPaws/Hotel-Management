@@ -13,7 +13,7 @@
 }
 
 .guest-entry-list-wrapper {
-	max-height: 400px;
+	/* max-height: 400px; */
 	width: 100%;
 	overflow-y: auto;
 	width: fit-content;
