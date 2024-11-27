@@ -8,7 +8,6 @@ import Modal from './UIElements/Modal';
 import CreateGuestScreen from './Guests/CreateGuestScreen';
 import UpdateGuestScreen from './Guests/UpdateGuestScreen';
 import { UpdateTaskScreen } from './Tasks/UpdateTask';
-import { RemoveTaskScreen } from './Tasks/RemoveTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
 import UserCreationScreen from './Authentication/UserCreationScreen';
 import { UserCredentials } from './APIRequests/ServerData';
@@ -58,7 +57,6 @@ function App() {
         { path: "/tasks", element: TasksScreen },
         { path: "/tasks/add", element: CreateTaskScreen },
         { path: "/update-task", element: UpdateTaskScreen },
-        { path: "/remove-task", element: RemoveTaskScreen },
 
         { path: "/reservations", element: ReservationsScreen },
         { path: "/reservations/create", element: CreateReservationScreen },
