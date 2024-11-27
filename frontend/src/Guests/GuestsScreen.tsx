@@ -7,13 +7,14 @@ import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import FormContainer from "../UIElements/Forms/FormContainer";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import { useState } from "react";
-import { Guest } from "../APIRequests/ServerData";
+import { Guest, Reservation } from "../APIRequests/ServerData";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 import GuestEntry from "./Elements/GuestEntry";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
 
-import "./GuestsScreen.css"
+import "./GuestsScreen.css";
 
 const GuestsScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -22,32 +23,32 @@ const GuestsScreen: React.FC<ScreenProps> = ({
 
     const [email, setEmail] = useState("");
     const [id, setId] = useState("");
-    const [reservationId, setReservationId] = useState(0);
+    const [reservationId, setReservationId] = useState<number | undefined>(undefined);
     const [phone, setPhone] = useState("");
     const [fullName, setFullName] = useState("");
 
     const [guests, setGuests] = useState<Guest[]>([]);
+    const [guestsReservations, setGuestsReservations] = useState<Reservation[][]>([]);
 
     const [showModal] = useModalError();
     const [showErrorPopup, _] = usePopup();
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (event: React.FormEvent) => {
+    const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-
+        
         const url = buildQueryUrl(email, id, reservationId, phone, fullName);
-        try {
-            const res = await makeRequest(url, "GET", "text", "", userCredentials.token);
-            handleResponse(res);
-        } catch (error) {
-            if (error instanceof FetchError) {
-                showErrorPopup("Error connecting to the server");
-            }
-            if (error instanceof RequestError) {
-				showModal("General Error Occurred", error.message);
-            }
-        }
+        makeRequest(url, "GET", "text", "", userCredentials.token)
+            .then(handleResponse)
+            .catch(error => {
+                if (error instanceof FetchError) {
+                    showErrorPopup("Error connecting to the server");
+                }
+                if (error instanceof RequestError) {
+                    showModal("General Error Occurred", error.message);
+                }
+            });
     }
 
     const handleResponse = async (res: Response) => {
@@ -59,12 +60,38 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             showModal("Weird error occurred", "Unknown error occurred");
             return;
         }
-
+        
         const fetchedGuests = await res.json() as Guest[];
+        
         setGuests(fetchedGuests);
         if (fetchedGuests.length === 0) {
             showErrorPopup("No guests match your search criteria.");
         }
+        
+        const fetchedReservations: Reservation[][] = [];
+        
+        for (const guest of fetchedGuests) {
+            const url = `api/Reservations/query?guestIdentification=${guest.identification}`;
+            const res = await makeRequest(url, "GET", "text", "", userCredentials.token);
+            
+            if (!res.ok) {
+                fetchedReservations.push([]);
+                continue;
+            }
+            
+            const guestReservations = await res.json() as Reservation[];
+            
+            fetchedReservations.push(guestReservations.map(
+                value => ({
+                    ...value,
+                    startDate: new Date(value.startDate),
+                    endDate: new Date(value.endDate),
+                    reservationMade: new Date(value.reservationMade),
+                })
+            ));
+        }
+        
+        setGuestsReservations(fetchedReservations);
     }
 
     return <>
@@ -79,6 +106,7 @@ const GuestsScreen: React.FC<ScreenProps> = ({
             </IconButton>
         </div>
         <FormContainer maxWidth="600px" onSubmit={(e) => handleSubmit(e)}>
+            <MenuGridLayout>
             <Input
                 id="guest-id"
                 label="Identification"
@@ -116,31 +144,29 @@ const GuestsScreen: React.FC<ScreenProps> = ({
                 label="Reservation Id"
                 type={InputType.Number}
                 placeholder="Enter reservation Id"
-                value={`${reservationId}`}
-                onChange={(e) => setReservationId(Number(e.target.value))}
+                value={reservationId ? `${reservationId}` : ""}
+                onChange={(e) => setReservationId(e.target.value ? Number(e.target.value) : undefined)}
             />
             <Input
-                id="search-guest"
+                id="search-guest-btn"
+                className="guest-search-guest-btn"
                 type={InputType.Submit}
                 value="Search"
+                label=" "
             />
+            </MenuGridLayout>
         </FormContainer>
-        {guests.length > 0 && (
-                <ul className="guest-entry-list-wrapper">
-                    {guests.map((guest) => (
-                        <GuestEntry
-                            key={guest.guestId}
-                            guestId={guest.guestId}
-                            identification={guest.identification}
-                            fullName={guest.fullName}
-                            title={guest.title}
-                            email={guest.email}
-                            phone={guest.phone}
-                            reservations={guest.reservations}>
-                        </GuestEntry>
-                    ))}
-                </ul>
-            )}
+        {guests.length > 0 && guestsReservations.length === guests.length && (
+            <div className="guest-entry-list-wrapper">
+                {guests.map((guest, index) => (
+                    <GuestEntry
+                        key={index}
+                        guest={guest}
+                        reservations={guestsReservations[index] ? guestsReservations[index] : []}
+                    />
+                ))}
+            </div>
+        )}
     </>;
 }
 

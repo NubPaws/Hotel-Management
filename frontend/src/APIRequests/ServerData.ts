@@ -1,6 +1,6 @@
 
 export type UserRole = "Admin" | "User" | "";
-export type Department = "General" | "FrontDesk" | "HouseKeeping"
+export type Department = "General" | "FrontDesk" | "Housekeeping"
     | "Maintenance" | "FoodAndBeverage" | "Security" | "Concierge" | "";
 
 export interface UserCredentials {
@@ -74,4 +74,13 @@ export type Extra = {
     description: string;
     price: number;
     reservationId: number;
+};
+
+export type SystemInformation = {
+    systemDate: number[];
+    occupancy: {
+        occupancy: number;
+        arrivals: number;
+        departures: number;
+    };
 };

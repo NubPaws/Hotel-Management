@@ -28,7 +28,7 @@ export enum UserRole {
 export enum Department {
 	General = "General",
 	FrontDesk = "FrontDesk",
-	HouseKeeping = "HouseKeeping",
+	Housekeeping = "Housekeeping",
 	Maintenance = "Maintenance",
 	FoodAndBeverage = "FoodAndBeverage",
 	Security = "Security",
@@ -331,7 +331,7 @@ export default {
  *           enum:
  *             - General
  *             - FrontDesk
- *             - HouseKeeping
+ *             - Housekeeping
  *             - Maintenance
  *             - Security
  *             - Concierge

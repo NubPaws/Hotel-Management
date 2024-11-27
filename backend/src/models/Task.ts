@@ -295,7 +295,7 @@ export default {
  *           enum:
  *             - General
  *             - FrontDesk
- *             - HouseKeeping
+ *             - Housekeeping
  *             - Maintenance
  *             - Security
  *             - Concierge
