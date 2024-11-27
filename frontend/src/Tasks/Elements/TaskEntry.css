@@ -5,7 +5,7 @@
 	background-color: #f9f9f9;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
-	max-width: 350px;
+	max-width: 600px;
     position: relative;
 }
 
@@ -25,4 +25,15 @@
 .task-entry-description {
 	font-size: 16pt;
 	font-weight: 600;
+}
+
+.task-entry-history {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease-in-out;
+}
+
+.task-entry-history.visible {
+	max-height: 250px;
+	overflow-y: auto;
 }

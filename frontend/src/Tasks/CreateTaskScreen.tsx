@@ -125,7 +125,7 @@ const CreateTaskScreen: React.FC<ScreenProps> = ({
             >
                 <RadioButton>General</RadioButton>
                 <RadioButton>Front Desk</RadioButton>
-                <RadioButton>HouseKeeping</RadioButton>
+                <RadioButton>Housekeeping</RadioButton>
                 <RadioButton>Maintenance</RadioButton>
                 <RadioButton>Food And Beverage</RadioButton>
                 <RadioButton>Security</RadioButton>

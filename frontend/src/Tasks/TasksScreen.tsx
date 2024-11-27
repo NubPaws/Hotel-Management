@@ -19,7 +19,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
 }) => {
     useUserRedirect(userCredentials);
 
-    const DEPARTMENT_OPTIONS = ["General", "FrontDesk", "HouseKeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"]
+    const DEPARTMENT_OPTIONS = ["General", "FrontDesk", "Housekeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"]
     const [department, setDepartment] = useState<Department | undefined>(userCredentials.department);
     const { tasks, loading, update } = useFetchTasksByDepartment(userCredentials.token, department);
 
@@ -33,7 +33,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
     }
 
     const updateTasks = async (newDepartment: string) => {
-        const allowedValues: Department[] = ["General", "FrontDesk", "HouseKeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"];
+        const allowedValues: Department[] = ["General", "FrontDesk", "Housekeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"];
 
         if (allowedValues.includes(newDepartment as Department)) {
             setDepartment(newDepartment as Department);
