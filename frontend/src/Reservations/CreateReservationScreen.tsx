@@ -22,8 +22,8 @@ const CreateReservationScreen: React.FC<ScreenProps> = ({
     const [phone, setPhone] = useState("");
     const [roomType, setRoomType] = useState("");
     const [startDate, setStartDate] = useState(new Date());
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
+    const [startTime, setStartTime] = useState("15:00");
+    const [endTime, setEndTime] = useState("12:00");
     const [prices, setPrices] = useState<number[]>([]);
     const [comment, setComment] = useState("");
     
