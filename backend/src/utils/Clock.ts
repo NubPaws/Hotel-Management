@@ -71,5 +71,7 @@ export function arrayToDate(date: number[]): Date {
 	day.setMonth(date[1] - 1);
 	day.setDate(date[0]);
 	
+	day.setHours(0, 0, 0, 0);
+	
 	return day;
 }

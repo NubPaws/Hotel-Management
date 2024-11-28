@@ -94,9 +94,11 @@ async function endOfDay(): Promise<BackOffice> {
 	// Get the current system date and advance by 1 day.
 	const currSysDate = arrayToDate(backOffice.systemDate);
 	const date = addDaysToDate(currSysDate, 1);
+	Logger.info(currSysDate.toString());
+	Logger.info(date.toString());
 	
 	// Go over all reservations and update them.
-	updateReservations(date);
+	await updateReservations(date);
 	
 	// Update the system date.
 	backOffice.systemDate = dateToArray(date);
