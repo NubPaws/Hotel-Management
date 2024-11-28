@@ -16,18 +16,16 @@ import usePopup from "../Utils/Contexts/PopupContext";
 
 import plus from "../assets/plus-icon.svg";
 import "./ReservationsScreen.css";
+import { getTodaysDateRelativeTo } from "../Utils/DateConverter";
 
 const ReservationsScreen: React.FC<ScreenProps> = ({
     userCredentials
 }) => {
-    const today = new Date();
-    const aYearAgo = new Date();
-    aYearAgo.setFullYear(aYearAgo.getFullYear() - 1)
     
     const [guestIdentification, setGuestIdentification] = useState("");
     const [room, setRoom] = useState(0);
-    const [startDate, setStartDate] = useState<Date>(new Date(aYearAgo));
-    const [endDate, setEndDate] = useState<Date>(new Date(today));
+    const [startDate, setStartDate] = useState<Date>(getTodaysDateRelativeTo(-30));
+    const [endDate, setEndDate] = useState<Date>(new Date());
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [guestName, setGuestName] = useState("");

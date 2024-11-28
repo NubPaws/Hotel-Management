@@ -278,9 +278,9 @@ async function create(
 			guestName,
 			email,
 			phone,
+			state: startDate.getTime() === today.getTime() ? ReservationState.Arriving : ReservationState.Pending,
 			extras: [],
 		});
-		
 		return reservation as Reservation;
 	} catch (err: any) {
 		Logger.error(`${err.message}`);
@@ -334,31 +334,6 @@ async function updateReservationField(
 	} catch (err: any) {
 		throw new ReservationUpdateError(`Failed to update ${field}: ${err.message}`);
 	}
-}
-
-/**
- * Add nights to the reservation with the relevant prices.
- * 
- * @param reservationId The reservation to add the nights to.
- * @param nightsToAdd The number of nights to add.
- * @param prices The prices for each of the nights.
- * @returns The reservation with the nights updated.
- * @throws ReservationUpdateError
- * @throws ReservationNotFoundError
- */
-async function addNights(reservationId: number, nightsToAdd: number, prices: number[]) {
-	if (nightsToAdd != prices.length) {
-		throw new ReservationUpdateError("For each night there must be a price.");
-	}
-	
-	const reservation = await getById(reservationId);
-	
-	reservation.nightCount += nightsToAdd;
-	reservation.prices.push(...prices);
-	
-	await reservation.save();
-	
-	return reservation as Reservation;
 }
 
 /**
