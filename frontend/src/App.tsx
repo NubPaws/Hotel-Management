@@ -7,10 +7,6 @@ import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
 import CreateGuestScreen from './Guests/CreateGuestScreen';
 import UpdateGuestScreen from './Guests/UpdateGuestScreen';
-import { CreateTaskScreen } from './Tasks/CreateTask';
-import { UpdateTaskScreen } from './Tasks/UpdateTask';
-import { RemoveTaskScreen } from './Tasks/RemoveTask';
-import { SearchTaskByDepartmentScreen, SearchTaskByIdScreen } from './Tasks/SearchTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
 import CreateUserScreen from './Users/CreateUserScreen.tsx';
 import { UserCredentials } from './APIRequests/ServerData';
@@ -25,6 +21,8 @@ import RoomsScreen from './Rooms/RoomsScreen';
 import RoomTypesScreen from './Rooms/RoomTypesScreen';
 import ReservationsScreen from './Reservations/ReservationsScreen';
 import { PopupContextProvider } from './Utils/Contexts/PopupContext';
+import TasksScreen from './Tasks/TasksScreen';
+import CreateTaskScreen from './Tasks/CreateTaskScreen';
 import EditReservationScreen from './Reservations/EditReservationScreen';
 import BillingScreen from './Reservations/BillingScreen';
 import EditUserScreen from './Users/EditUserScreen.tsx';
@@ -58,11 +56,8 @@ function App() {
         { path: "/guests/add", element: CreateGuestScreen },
         { path: "/guests/update", element: UpdateGuestScreen },
 
-        { path: "/create-task", element: CreateTaskScreen },
-        { path: "/update-task", element: UpdateTaskScreen },
-        { path: "/remove-task", element: RemoveTaskScreen },
-        { path: "/search-task-by-id", element: SearchTaskByIdScreen },
-        { path: "/search-task-by-department", element: SearchTaskByDepartmentScreen },
+        { path: "/tasks", element: TasksScreen },
+        { path: "/tasks/add", element: CreateTaskScreen },
 
         { path: "/reservations", element: ReservationsScreen },
         { path: "/reservations/create", element: CreateReservationScreen },

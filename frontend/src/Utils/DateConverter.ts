@@ -6,3 +6,9 @@ export function dateToInputString(d: Date): string {
 	
 	return `${year}-${month}-${day}`;
 }
+
+export function getTodaysDateRelativeTo(days: number) {
+	const today = new Date();
+	today.setDate(today.getDate() + days);
+	return today;
+}
