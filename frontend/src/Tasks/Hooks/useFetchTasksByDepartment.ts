@@ -10,7 +10,7 @@ type UseFetchTasksByDepartmentResult = {
     update: () => void;
 };
 
-const useFetchTasksByDepartment = (token: string | null, department: Department | undefined): UseFetchTasksByDepartmentResult => {
+const useFetchTasksByDepartment = (token: string | null, department: Department | undefined, startDate: Date): UseFetchTasksByDepartmentResult => {
     const [tasks, setTasks] = useState<Task[]>([]);
 
     const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ const useFetchTasksByDepartment = (token: string | null, department: Department 
 
         const fetchTasks = async () => {
             try {
-                const url = "api/Tasks/department/" + department;
+                const url = `api/Tasks/department/${department}?from=${startDate.toISOString().split("T")[0]}`
                 const res = await makeRequest(url, "GET", "text", "", token);
 
                 const data: Task[] = await res.json();

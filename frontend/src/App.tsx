@@ -7,7 +7,6 @@ import { HomeScreen } from './HomeScreen/HomeScreen';
 import Modal from './UIElements/Modal';
 import CreateGuestScreen from './Guests/CreateGuestScreen';
 import UpdateGuestScreen from './Guests/UpdateGuestScreen';
-import { UpdateTaskScreen } from './Tasks/UpdateTask';
 import CreateReservationScreen from './Reservations/CreateReservationScreen';
 import CreateUserScreen from './Users/CreateUserScreen.tsx';
 import { UserCredentials } from './APIRequests/ServerData';
@@ -59,7 +58,6 @@ function App() {
 
         { path: "/tasks", element: TasksScreen },
         { path: "/tasks/add", element: CreateTaskScreen },
-        { path: "/update-task", element: UpdateTaskScreen },
 
         { path: "/reservations", element: ReservationsScreen },
         { path: "/reservations/create", element: CreateReservationScreen },

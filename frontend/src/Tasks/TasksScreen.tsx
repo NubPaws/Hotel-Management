@@ -7,12 +7,15 @@ import plusIcon from "../assets/plus-icon.svg";
 import useFetchTasksByDepartment from "./Hooks/useFetchTasksByDepartment";
 import TaskEntry from "./Elements/TaskEntry";
 import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
-import Dropdown from "../UIElements/Dropdown";
 import { useState } from "react";
 import { Department } from "../APIRequests/ServerData";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import usePopup from "../Utils/Contexts/PopupContext";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
+import DateInput from "../UIElements/Forms/DateInput";
+import { getTodaysDateRelativeTo } from "../Utils/DateConverter";
+
+const WEEK_AGO = -7;
 
 const TasksScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -21,11 +24,12 @@ const TasksScreen: React.FC<ScreenProps> = ({
 
     const DEPARTMENT_OPTIONS = ["General", "FrontDesk", "Housekeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"]
     const [department, setDepartment] = useState<Department | undefined>(userCredentials.department);
-    const { tasks, loading, update } = useFetchTasksByDepartment(userCredentials.token, department);
+    const [startDate, setStartDate] = useState(getTodaysDateRelativeTo(WEEK_AGO));
+    const { tasks, loading, update } = useFetchTasksByDepartment(userCredentials.token, department, startDate);
 
     const [showModal] = useModalError();
     const [showErrorPopup, showInfoPopup] = usePopup();
-    
+
     const navigate = useNavigate();
 
     if (loading) {
@@ -58,7 +62,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
                 showErrorPopup("Error connecting to the server");
             }
             if (error instanceof RequestError) {
-				showModal("General Error Occurred", error.message);
+                showModal("General Error Occurred", error.message);
             }
         }
     }
@@ -81,27 +85,27 @@ const TasksScreen: React.FC<ScreenProps> = ({
                 showErrorPopup("Error connecting to the server");
             }
             if (error instanceof RequestError) {
-				showModal("General Error Occurred", error.message);
+                showModal("General Error Occurred", error.message);
             }
         }
     }
 
     const onRemove = async (taskId: number) => {
-		const url = `api/Tasks/remove/${taskId}`;
+        const url = `api/Tasks/remove/${taskId}`;
 
-		try {
-			const res = await makeRequest(url, "POST", "text", "", userCredentials.token);
+        try {
+            const res = await makeRequest(url, "POST", "text", "", userCredentials.token);
 
-			if (res.status === 401) {
-				showModal("Insufficient permissions", "Only administrators can remove tasks.");
-				return;
-			}
+            if (res.status === 401) {
+                showModal("Insufficient permissions", "Only administrators can remove tasks.");
+                return;
+            }
 
-			showInfoPopup(`Successfully deleted task`);
-		} catch (error: any) {
-			showModal("Request error has occurred", error.message);
-		}
-	};
+            showInfoPopup(`Successfully deleted task`);
+        } catch (error: any) {
+            showModal("Request error has occurred", error.message);
+        }
+    };
 
     const onEdit = async (taskId: number, urgency: number, description: string) => {
         const url = `api/Tasks/${taskId}`;
@@ -126,7 +130,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
                 showErrorPopup("Error connecting to the server");
             }
             if (error instanceof RequestError) {
-				showModal("General Error Occurred", error.message);
+                showModal("General Error Occurred", error.message);
             }
         }
     }
@@ -141,11 +145,17 @@ const TasksScreen: React.FC<ScreenProps> = ({
             Add Task
         </IconButton>
         <SearchableDropdown
-                id="tasks-screen-departments"
-                label="Department"
-                options={DEPARTMENT_OPTIONS}
-                setValue={(value) => updateDepartment(value)}
-            />
+            id="tasks-screen-departments"
+            label="Department"
+            options={DEPARTMENT_OPTIONS}
+            setValue={(value) => updateDepartment(value)}
+        />
+        <DateInput
+            id="task-screen-start-date"
+            label="Task start date"
+            value={startDate}
+            onChange={(d) => setStartDate(d)}
+        />
         {tasks && tasks.length > 0 && (
             <ul className="task-entry-list-wrapper">
                 {tasks.map((task) => (
