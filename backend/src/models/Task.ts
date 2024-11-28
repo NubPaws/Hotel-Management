@@ -219,15 +219,30 @@ async function setStatus(taskId: number, setter: string, status: TaskStatus) {
  * @param department The department to filter tasks by.
  * @returns A promise that resolves to an array of Task objects.
  */
-async function getTasksByDepartment(department: Department): Promise<Task[]> {
+async function getTasksByDepartment(department: Department, date: Date = new Date(0)): Promise<Task[]> {
 	// Find tasks that match the department and sort them:
 	// 1. First by urgency (descending, higher urgency comes first)
 	// 2. Then by timeCreated (ascending, older tasks come first)
-	const tasks = await TaskModel.find({ department })
-	.sort({ urgency: -1, timeCreated: 1 })
-	.exec();
+	// 3. Filter all the ones that were made before date.
+	// 4. Put all the ones that have status "Finished" at the bottom of the list.
+	const tasks = await TaskModel.find({
+		department,
+		timeCreated: { $gte: date },
+	})
+	.sort({ urgency: -1, timeCreated: 1 });
 	
-	return tasks;
+	const isFinished = (a: Task) => a.status === TaskStatus.Finished;
+	
+	const sortedTasks = tasks.sort((a, b) => {
+		if (isFinished(a) && !isFinished(b)) {
+			return 1;
+		} else if (!isFinished(a) && isFinished(b)) {
+			return -1;
+		}
+		return 0;
+	});
+	
+	return sortedTasks;
 
 }
 

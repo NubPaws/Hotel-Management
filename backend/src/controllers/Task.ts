@@ -217,8 +217,18 @@ router.post("/:taskId", verifyUser, async (req, res, next) => {
 router.get("/department/:department", verifyUser, async (req, res, next) => {
 	const department = req.params.department as Department;
 	
+	const { from } = req.query;
+	const stringToDate = (str: string) => {
+		if (str) {
+			const splitted = str.split("-").map(s => parseInt(s));
+			return new Date(splitted[0], splitted[1], splitted[2]);
+		}
+		return new Date(0);
+	}
+	
+	
 	try {
-		const tasks = await TaskModel.getTasksByDepartment(department);
+		const tasks = await TaskModel.getTasksByDepartment(department, stringToDate(from as string));
 		res.status(StatusCode.Ok).json(tasks);
 	} catch (error) {
 		next(error);
