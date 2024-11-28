@@ -49,7 +49,7 @@ const TaskEntry: React.FC<TaskEntryProps> = ({
     <div className="task-entry">
     <div className="task-entry-main-body">
         <div className="task-entry-general-info">
-            <span className="task-entry-date">{timeCreated.toLocaleDateString()}</span>
+            <span className="task-entry-date">{timeCreated.toLocaleDateString("he")}</span>
             <span className="task-entry-room">Room {room}</span>
             <span className="task-entry-description">{description}</span>
             
