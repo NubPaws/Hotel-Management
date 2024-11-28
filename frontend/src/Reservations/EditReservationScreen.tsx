@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { ScreenProps } from "../Utils/Props";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -13,6 +13,7 @@ import usePopup from "../Utils/Contexts/PopupContext";
 
 import "./EditReservationScreen.css";
 import Colors from "../styles/Colors";
+import { ReservationState } from "../APIRequests/ServerData";
 
 const EditReservationScreen: FC<ScreenProps> = ({
 	userCredentials
@@ -53,6 +54,15 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		setPhoneNumber(reservation.phone);
 	}, [reservation]);
 	
+	const errorHandler = useCallback((error: any) => {
+		if (error instanceof TypeError) {
+			showModal("Connection error", error.message);
+		}
+		if (error instanceof RequestError) {
+			showModal("Request error", error.message);
+		}
+	}, [showModal]);
+	
 	if (!id) {
 		return <p>Id should be provided to access this screen.</p>
 	}
@@ -77,23 +87,30 @@ const EditReservationScreen: FC<ScreenProps> = ({
 				showInfoPopup(`Successfully cancelled reservation ${id}`);
 				navigate("/reservations");
 			})
-			.catch(error => {
-				if (error instanceof TypeError) {
-					showModal("Connection error", error.message);
-				}
-				if (error instanceof RequestError) {
-					showModal("Request error", error.message);
-				}
-			});
+			.catch(errorHandler);
 	};
 	
-	const checkIn = () => {
-		// TODO: Need to implement on the backend.
-	};
-	
-	const checkOut = () => {
-		// TODO: Need to implement on the backend.
-	};
+	const checkReservation = async (action: "checkin" | "checkout") => {
+		const url = `api/Reservations/${action}`;
+		const newState = action === "checkin" ? "Active" : "Passed";
+		
+		try {
+			const res = await makeRequest(url, "POST", "json", { reservationId: id }, userCredentials.token);
+			
+			if (!res.ok) {
+				showModal(
+					"Failed changing state",
+					`Failed changing reservation state from [${state}] to [${newState}].`
+				);
+				return;
+			}
+			
+			showInfoPopup(`Successfully changed reservation state to [${newState}]`);
+			navigate(-1);
+		} catch (error) {
+			errorHandler(error);
+		}
+	}
 	
 	const saveReservation = () => {
 		const url = "api/Reservations/update";
@@ -116,14 +133,7 @@ const EditReservationScreen: FC<ScreenProps> = ({
 				
 				showInfoPopup("Saved reservation.");
 			})
-			.catch(error => {
-				if (error instanceof TypeError) {
-					showModal("Connection error", error.message);
-				}
-				if (error instanceof RequestError) {
-					showModal("Request error", error.message);
-				}
-			});
+			.catch(errorHandler);
 	};
 	
 	return <div className="edit-reservation-wrapper">
@@ -256,17 +266,17 @@ const EditReservationScreen: FC<ScreenProps> = ({
 				
 				<Button
 					onClick={
-						state === "Arriving"
-							? checkIn
-							: state === "Departing"
-							? checkOut
+						canCheckin(state)
+							? () => checkReservation("checkin")
+							: canCheckout(state)
+							? () => checkReservation("checkout")
 							: undefined
 					}
-					disabled={state !== "Arriving" && state !== "Departing"}
+					disabled={!canCheckin(state) && !canCheckout(state)}
 				>
-					{state === "Arriving"
+					{canCheckin(state)
 						? "Check in"
-						: state === "Departing"
+						: canCheckout(state)
 						? "Check out"
 						: "Check in/out"
 					}
@@ -277,5 +287,8 @@ const EditReservationScreen: FC<ScreenProps> = ({
 		</div>
 	</div>;
 };
+
+const canCheckin = (state: ReservationState) => state === "Arriving";
+const canCheckout = (state: ReservationState) => state === "Active" || state === "Departing";
 
 export default EditReservationScreen;
