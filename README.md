@@ -4,6 +4,8 @@ A modern, web-based hotel management application that streamlines hotel operatio
 
 ---
 
+<img src="./preview.png" alt="Preview image of main screen" />
+
 ## Features
 
 ### Core Functionalities
