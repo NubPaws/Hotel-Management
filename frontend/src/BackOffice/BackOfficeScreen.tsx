@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { AuthenticatedUserProps } from "../Utils/Props";
+import { ScreenProps } from "../Utils/Props";
 import IconButton from "../UIElements/Buttons/IconButton";
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import CenteredLabel from "../UIElements/CenteredLabel";
@@ -8,7 +8,7 @@ import MenuGridLayout from "../UIElements/MenuGridLayout";
 import plus from "../assets/plus-icon.svg";
 import endOfDayIcon from "../assets/end-of-day.svg";
 
-const BackOfficeScreen: React.FC<AuthenticatedUserProps> = ({
+const BackOfficeScreen: React.FC<ScreenProps> = ({
     userCredentials
 }) => {
     useUserRedirect(userCredentials, ["Admin"], ["FrontDesk"]);

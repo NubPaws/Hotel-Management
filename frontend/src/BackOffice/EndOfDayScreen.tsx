@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AuthenticatedUserProps } from "../Utils/Props";
+import { ScreenProps } from "../Utils/Props";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import Input, { InputType } from "../UIElements/Forms/Input";
 import FormContainer from "../UIElements/Forms/FormContainer";
@@ -8,7 +8,7 @@ import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequest
 import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 
 
-const EndOfDayScreen: React.FC<AuthenticatedUserProps> = ({
+const EndOfDayScreen: React.FC<ScreenProps> = ({
     userCredentials, setShowConnectionErrorMessage
 }) => {
     const [endOfDayMessage, setEndOfDayMessage] = useState<ModalController | undefined>(undefined);

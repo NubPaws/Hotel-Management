@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { AuthenticatedUserProps } from "../Utils/Props";
+import { ScreenProps } from "../Utils/Props";
 import { useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
@@ -17,7 +17,7 @@ import usePopup from "../Utils/Contexts/PopupContext";
 import plus from "../assets/plus-icon.svg";
 import "./ReservationsScreen.css";
 
-const ReservationsScreen: React.FC<AuthenticatedUserProps> = ({
+const ReservationsScreen: React.FC<ScreenProps> = ({
     userCredentials
 }) => {
     const today = new Date();

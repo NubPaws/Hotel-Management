@@ -1,4 +1,4 @@
-import { AuthenticatedUserProps } from "../Utils/Props";
+import { ScreenProps } from "../Utils/Props";
 import { useState } from "react";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import FormContainer from "../UIElements/Forms/FormContainer";
@@ -13,7 +13,7 @@ import SearchableDropdown from "../UIElements/Forms/SearchableDropdown";
 import { useModalError } from "../Utils/Contexts/ModalErrorContext";
 import { useNavigate } from "react-router-dom";
 
-const CreateReservationScreen: React.FC<AuthenticatedUserProps> = ({
+const CreateReservationScreen: React.FC<ScreenProps> = ({
     userCredentials
 }) => {
     const [guestIdentification, setGuestIdentification] = useState("");
