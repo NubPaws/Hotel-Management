@@ -48,7 +48,7 @@ const useFetchTasksByDepartment = (token: string | null, department: Department 
         };
 
         fetchTasks();
-    }, [token, department, showErrorPopup, showModal, updater]);
+    }, [token, department, startDate, updater]);
 
     const update = () => {
         setUpdater(!updater);

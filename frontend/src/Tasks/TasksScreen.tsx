@@ -14,6 +14,9 @@ import usePopup from "../Utils/Contexts/PopupContext";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import DateInput from "../UIElements/Forms/DateInput";
 import { getTodaysDateRelativeTo } from "../Utils/DateConverter";
+import MenuGridLayout from "../UIElements/MenuGridLayout";
+
+import "./TasksScreen.css";
 
 const WEEK_AGO = -7;
 
@@ -136,7 +139,6 @@ const TasksScreen: React.FC<ScreenProps> = ({
     }
 
     return <>
-        <CenteredLabel>Tasks</CenteredLabel>
         <IconButton
             className="tasks-add-btn"
             iconUrl={plusIcon}
@@ -144,20 +146,24 @@ const TasksScreen: React.FC<ScreenProps> = ({
         >
             Add Task
         </IconButton>
-        <SearchableDropdown
-            id="tasks-screen-departments"
-            label="Department"
-            options={DEPARTMENT_OPTIONS}
-            setValue={(value) => updateDepartment(value)}
-        />
-        <DateInput
-            id="task-screen-start-date"
-            label="Task start date"
-            value={startDate}
-            onChange={(d) => setStartDate(d)}
-        />
+        <CenteredLabel>Tasks</CenteredLabel>
+        <MenuGridLayout>
+            <SearchableDropdown
+                id="tasks-screen-departments"
+                label="Department"
+                options={DEPARTMENT_OPTIONS}
+                setValue={(value) => updateDepartment(value)}
+            />
+            <DateInput
+                className="task-start-date"
+                id="task-screen-start-date"
+                label="Task start date"
+                value={startDate}
+                onChange={(d) => setStartDate(d)}
+            />
+        </MenuGridLayout>
         {tasks && tasks.length > 0 && (
-            <ul className="task-entry-list-wrapper">
+            <div>
                 {tasks.map((task) => (
                     <TaskEntry
                         key={task.taskId}
@@ -168,7 +174,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
                         onEdit={onEdit}
                     />
                 ))}
-            </ul>
+            </div>
         )}
     </>;
 }

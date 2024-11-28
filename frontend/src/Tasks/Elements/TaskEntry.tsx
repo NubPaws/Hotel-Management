@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Task } from "../../APIRequests/ServerData";
 import Dropdown from "../../UIElements/Dropdown";
-import "./TaskEntry.css"
 import Modal from "../../UIElements/Modal";
 import Button from "../../UIElements/Buttons/Button";
-import HistoryEntry from "./HistoryEntry";
 import InputModal, { InputModalField } from "../../UIElements/InputModal";
 import { InputType } from "../../UIElements/Forms/Input";
 import IconButton from "../../UIElements/Buttons/IconButton";
 import editIcon from "../../assets/edit.svg";
+
+import "./TaskEntry.css";
 
 const STATUS_OPTIONS = ["Pending", "Progress", "Finished"];
 const DEPARTMENT_OPTIONS = ["General", "FrontDesk", "Housekeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"];
@@ -24,7 +24,7 @@ type TaskEntryProps = {
 const TaskEntry: React.FC<TaskEntryProps> = ({
     task, changeStatus, changeDepartment, onRemove, onEdit
 }) => {
-    const { taskId, timeCreated, room, description, urgency, department, creator, status, history } = task;
+    const { taskId, timeCreated, room, description, urgency, department, status, history } = task;
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
@@ -46,64 +46,85 @@ const TaskEntry: React.FC<TaskEntryProps> = ({
     }
 
     return <>
-        <div className="task-entry">
-            <div className="task-entry-urgency">Level: {urgency}
-                <Button
-                    onClick={() => setConfirmDelete(true)}
-                    backgroundColor="#f9f9f9;">
-                    X
-                </Button>
-            </div>
-            <div>{timeCreated.toLocaleDateString()}</div>
-            <div className="task-entry-room">Room: {room}
+    <div className="task-entry">
+    <div className="task-entry-main-body">
+        <div className="task-entry-general-info">
+            <span className="task-entry-date">{timeCreated.toLocaleDateString()}</span>
+            <span className="task-entry-room">Room {room}</span>
+            <span className="task-entry-description">{description}</span>
+            
+            <div className="task-entry-dropdowns">
+            <span>Status: </span>
                 <Dropdown
                     options={STATUS_OPTIONS}
                     defaultOption={status}
-                    onChange={(newStatus) => changeStatus(taskId, newStatus)} />
+                    onChange={(newStatus) => changeStatus(taskId, newStatus)}
+                />
             </div>
-            <div className="task-entry-description">{description}</div>
-            <div>
+            <div className="task-entry-dropdowns">
+                <span>Department: </span>
                 <Dropdown
                     options={DEPARTMENT_OPTIONS}
                     defaultOption={department}
-                    onChange={(newDepartment) => changeDepartment(taskId, newDepartment)} />
+                    onChange={(newDepartment) => changeDepartment(taskId, newDepartment)}
+                />
             </div>
-            <IconButton
-				iconUrl={editIcon}
-				onClick={showEditTaskModal}
-				fontSize="18pt"
-			/>
-            <Button
-                borderRadius="5px"
-                borderWidth="2px"
-                textSize="14pt"
-                onClick={() => setShowHistory(prev => !prev)}
-            >
-                {showHistory ? "Hide" : "Show"} History
-            </Button>
-            <div className={`task-entry-history ${showHistory ? "visible" : ""}`}>
-                {history && history.length > 0 && (
-                    history.map((value, index) => <HistoryEntry key={index} event={value} />)
-                )}
+            
+        </div>
+        
+        <div className="task-entry-controls">
+            <div className="up">
+                <span className="task-entry-urgency">Level: {urgency}</span>
+                <Button onClick={() => setConfirmDelete(true)}>X</Button>
+            </div>
+            
+            <div className="down">
+                <IconButton
+                    className="task-entry-edit-btn"
+                    iconUrl={editIcon}
+                    onClick={showEditTaskModal}
+                    fontSize="14pt"
+                >
+                    Edit
+                </IconButton>
+                <Button
+                    textSize="14pt"
+                    onClick={() => setShowHistory(prev => !prev)}
+                >
+                    {showHistory ? "Hide" : "Show"} History
+                </Button>
             </div>
         </div>
-        {editTaskFields && (
-            <InputModal
-                fields={editTaskFields}
-                title={"Edit task"}
-                onConfirm={onConfirm}
-                onCancel={hideEditTaskModal}
-            />
+    </div>
+    
+    <div className={`task-entry-history ${showHistory ? "visible" : ""}`}>
+        {history && history.length > 0 && (
+            history.map((value, index) => (
+                <div key={index} className="task-history-entry">
+                    {value.replace(/\=\>/g, "→")}
+                </div>
+            ))
         )}
-        {confirmDelete && (
-            <Modal
-                title="Confirm Delete"
-                onClose={() => setConfirmDelete(false)}
-                onAccept={() => { onRemove(taskId); setConfirmDelete(false); }}
-            >
-                Are you sure you want to delete?
-            </Modal>
-        )}
+    </div>
+    
+    </div>
+    {editTaskFields && (
+        <InputModal
+            fields={editTaskFields}
+            title={"Edit task"}
+            onConfirm={onConfirm}
+            onCancel={hideEditTaskModal}
+        />
+    )}
+    {confirmDelete && (
+        <Modal
+            title="Confirm Delete"
+            onClose={() => setConfirmDelete(false)}
+            onAccept={() => { onRemove(taskId); setConfirmDelete(false); }}
+        >
+            Are you sure you want to delete?
+        </Modal>
+    )}
     </>;
 }
 

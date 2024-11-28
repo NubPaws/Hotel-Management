@@ -9,6 +9,7 @@ import usePopup from "../Utils/Contexts/PopupContext";
 import { FetchError, makeRequest, RequestError } from "../APIRequests/APIRequests";
 import RadioButtonContainer from "../UIElements/Forms/Radio/RadioButtonContainer";
 import RadioButton from "../UIElements/Forms/Radio/RadioButton";
+import { useNavigate } from "react-router-dom";
 
 const CreateTaskScreen: React.FC<ScreenProps> = ({
     userCredentials,
@@ -23,6 +24,8 @@ const CreateTaskScreen: React.FC<ScreenProps> = ({
     const [showModal] = useModalError();
     const [showErrorPopup, showInfoPopup] = usePopup();
 
+    const navigate = useNavigate();
+    
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
@@ -75,20 +78,13 @@ const CreateTaskScreen: React.FC<ScreenProps> = ({
         switch (res.status) {
             case 201:
                 showInfoPopup("Task created successfully");
-                clearForm();
+                navigate(-1);
                 return;
             case 400:
                 showErrorPopup("Failed to create task");
                 break;
         }
     };
-
-    const clearForm = () => {
-        setRoom(0);
-        setDescription("");
-        setUrgency(0);
-        setDepartment("");
-    }
 
     return <>
         <CenteredLabel>Create New Task</CenteredLabel>

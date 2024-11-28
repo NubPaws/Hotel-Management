@@ -1,9 +1,19 @@
-.task-entry-list-wrapper {
-	max-height: 400px;
-	width: 100%;
-	overflow-y: auto;
-	width: fit-content;
-	padding: 8px;
-	margin: 8px auto;
-	border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+.task-input-cotainer {
+	display: flex;
+	justify-content: space-between;
+	margin: 0 2rem;
+}
+
+.task-input-cotainer > * {
+	width: 40%;
+}
+
+.task-start-date input {
+	padding: 10px;
+}
+
+.tasks-add-btn {
+	position: absolute;
+	margin-top: 1rem;
 }

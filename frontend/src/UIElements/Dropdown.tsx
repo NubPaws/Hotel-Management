@@ -3,6 +3,7 @@ import { FC } from "react";
 import "./Dropdown.css";
 
 type DropdownProps = {
+	className?: string;
 	options: string[];
 	onChange: (selectedOption: string) => void;
 	emptyText?: string;
@@ -11,6 +12,7 @@ type DropdownProps = {
 }
 
 const Dropdown: FC<DropdownProps> = ({
+	className = "",
 	options,
 	onChange,
 	emptyText = "",
@@ -18,7 +20,7 @@ const Dropdown: FC<DropdownProps> = ({
 	label,
 }) => {
 	return (
-		<div className="dropdown-wrapper">
+		<div className={`dropdown-wrapper ${className}`}>
 			{label && (
 				<label className="dropdown-label">{label}</label>
 			)}
