@@ -32,7 +32,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
         return <p>Loading room types.</p>;
     }
 
-    const updateTasks = async (newDepartment: string) => {
+    const updateDepartment = async (newDepartment: string) => {
         const allowedValues: Department[] = ["General", "FrontDesk", "Housekeeping", "Maintenance", "FoodAndBeverage", "Security", "Concierge"];
 
         if (allowedValues.includes(newDepartment as Department)) {
@@ -103,6 +103,34 @@ const TasksScreen: React.FC<ScreenProps> = ({
 		}
 	};
 
+    const onEdit = async (taskId: number, urgency: number, description: string) => {
+        const url = `api/Tasks/${taskId}`;
+
+        if (urgency > 9 || urgency < 0) {
+            showModal("Invalid urgency", "Urgency must be between 0 and 9");
+            return;
+        }
+
+        try {
+            const res = await makeRequest(url, "POST", "json", {
+                urgency: urgency,
+                description: description,
+            }, userCredentials.token);
+
+            if (res.ok) {
+                showInfoPopup(`Successfully updated task`);
+                update();
+            }
+        } catch (error) {
+            if (error instanceof FetchError) {
+                showErrorPopup("Error connecting to the server");
+            }
+            if (error instanceof RequestError) {
+				showModal("General Error Occurred", error.message);
+            }
+        }
+    }
+
     return <>
         <CenteredLabel>Tasks</CenteredLabel>
         <IconButton
@@ -116,9 +144,9 @@ const TasksScreen: React.FC<ScreenProps> = ({
                 id="tasks-screen-departments"
                 label="Department"
                 options={DEPARTMENT_OPTIONS}
-                setValue={(value) => updateTasks(value)}
+                setValue={(value) => updateDepartment(value)}
             />
-        {tasks && (
+        {tasks && tasks.length > 0 && (
             <ul className="task-entry-list-wrapper">
                 {tasks.map((task) => (
                     <TaskEntry
@@ -127,6 +155,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
                         changeStatus={changeStatus}
                         changeDepartment={changeDepartment}
                         onRemove={onRemove}
+                        onEdit={onEdit}
                     />
                 ))}
             </ul>
