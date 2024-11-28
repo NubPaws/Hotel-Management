@@ -1,0 +1,37 @@
+
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+      JWT_SECRET: "example_jwt_secret"
+      MONGO_DB_IP: mongo
+      MONGO_DB_PORT: 27017
+      SWAGGER_DIR: "/api-docs"
+      DEFAULT_ADMIN_USER: "admin"
+      DEFAULT_ADMIN_PASS: "admin"
+    depends_on:
+      - mongo
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+  
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
