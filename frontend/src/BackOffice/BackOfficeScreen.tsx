@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { AuthenticatedUserProps } from "../Utils/Props";
-
-import plus from "../assets/plus-icon.svg";
-import icon from "../assets/react.svg";
 import IconButton from "../UIElements/Buttons/IconButton";
+import useUserRedirect from "../Utils/Hooks/useUserRedirect";
 import CenteredLabel from "../UIElements/CenteredLabel";
 import MenuGridLayout from "../UIElements/MenuGridLayout";
-import useUserRedirect from "../Utils/Hooks/useUserRedirect";
+
+import plus from "../assets/plus-icon.svg";
+import endOfDayIcon from "../assets/end-of-day.svg";
 
 const BackOfficeScreen: React.FC<AuthenticatedUserProps> = ({
     userCredentials
@@ -17,7 +17,7 @@ const BackOfficeScreen: React.FC<AuthenticatedUserProps> = ({
     
     const elements = [
         {image: plus, navUrl: "/guests/add",              text: "Create guests"},
-        {image: icon, navUrl: "/back-office/end-of-day",    text: "End of day"},
+        {image: endOfDayIcon, navUrl: "/back-office/end-of-day",    text: "End of day"},
     ];
 
     const buttons = [];
