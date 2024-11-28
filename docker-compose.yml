@@ -6,11 +6,11 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - 8000:8000
+      - "8000:8000"
     environment:
       PORT: 8000
       JWT_SECRET: "example_jwt_secret"
-      MONGO_DB_IP: mongo
+      MONGO_DB_IP: "mongo"
       MONGO_DB_PORT: 27017
       SWAGGER_DIR: "/api-docs"
       DEFAULT_ADMIN_USER: "admin"
@@ -23,7 +23,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - 3000:3000
+      - "3000:3000"
   
   mongo:
     image: mongo:6.0

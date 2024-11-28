@@ -147,6 +147,7 @@ const CreateReservationScreen: React.FC<ScreenProps> = ({
                 id="create-reserve-comments"
                 label="Comments"
                 type={InputType.Text}
+                value={comment}
                 placeholder="Enter comments"
                 onChange={(e) => setComment(e.target.value)}
             />
