@@ -105,6 +105,7 @@ const TasksScreen: React.FC<ScreenProps> = ({
             }
 
             showInfoPopup(`Successfully deleted task`);
+            update();
         } catch (error: any) {
             showModal("Request error has occurred", error.message);
         }
