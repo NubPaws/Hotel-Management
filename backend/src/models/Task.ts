@@ -186,7 +186,7 @@ async function setTaskValue<T extends keyof Task>(
 	value: Task[T],
 	setter: string
 ) {
-	const task = await getTask(taskId);
+	const task = await getTask(taskId) as Task;
 	
 	task.history.push(
 		actionStringNow(setter, `${field} changed`, `${task[field]} => ${value}`)

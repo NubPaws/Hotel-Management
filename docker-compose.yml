@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      VITE_BACKEND_ADDRESS: "http://backend:8000/"
   
   mongo:
     image: mongo:6.0

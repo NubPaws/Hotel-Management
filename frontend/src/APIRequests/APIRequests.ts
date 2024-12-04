@@ -2,7 +2,7 @@
 export class FetchError extends Error {}
 export class RequestError extends Error {}
 
-const BASE_URL = "http://localhost:8000/"
+const BASE_URL = import.meta.env.VITE_BACKEND_ADDRESS || "http://localhost:8000/"
 
 /**
  * Makes an HTTP request to a specified endpoint with customizable options.

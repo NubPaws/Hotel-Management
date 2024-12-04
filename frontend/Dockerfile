@@ -15,7 +15,10 @@ RUN npm install
 
 # Copies the rest of the files.
 COPY . .
+
 # Builds the project.
+ARG VITE_BACKEND_ADDRESS
+ENV VITE_BACKEND_ADDRESS=${VITE_BACKEND_ADDRESS}
 RUN npm run build
 
 # Expose the port
